@@ -12,7 +12,7 @@ export const MOCK_STUDENT_ENROLLED_COURSES: EnrolledCourse[] = [
       {
         id: "mod-1", moduleNo: "Module 01", title: "BIM Fundamentals & Revit Interface Setup",
         lessons: [
-          { id: "les-101", lessonNo: 1, title: "Lesson 01: BIM Core Principles & Navigation", duration: "1h 45m", videoUrl: "https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-720p.mp4", description: "LOD 100-500 standards, project browser setup, and view template configurations.", resources: [{ name: "BIM_LOD_Standards.pdf", size: "3.4 MB", type: "PDF" }], isCompleted: true, isUnlocked: true },
+          { id: "les-101", lessonNo: 1, title: "Lesson 01: BIM Core Principles & Navigation", duration: "1h 45m", videoUrl: "https://youtu.be/I1JAEnnHOSE", description: "LOD 100-500 standards, project browser setup, and view template configurations.", resources: [{ name: "BIM_LOD_Standards.pdf", size: "3.4 MB", type: "PDF" }], isCompleted: true, isUnlocked: true },
           { id: "les-102", lessonNo: 2, title: "Lesson 02: Architectural Grids & Datum Levels", duration: "2h 10m", videoUrl: "https://vjs.zencdn.net/v/oceans.mp4", description: "Architectural grid coordinate systems, datum levels, and importing DWG drawings.", resources: [{ name: "Grid_Setup_Template.rvt", size: "18 MB", type: "RVT" }], isCompleted: true, isUnlocked: true },
         ],
       },
