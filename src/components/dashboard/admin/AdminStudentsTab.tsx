@@ -2,12 +2,14 @@
 
 import React, { useState } from "react";
 import { Users, Search, Mail, Phone } from "lucide-react";
-import { MOCK_ADMIN_STUDENTS, AdminStudent } from "@/data/adminMockData";
+import { ALL_COURSES_STUDENTS } from "@/data/studentsCatalog20";
+import { AdminStudent } from "@/data/adminMockData";
 
 export default function AdminStudentsTab() {
-  const [students, setStudents] = useState<AdminStudent[]>(MOCK_ADMIN_STUDENTS);
+  const [students, setStudents] = useState<AdminStudent[]>(ALL_COURSES_STUDENTS);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [batchFilter, setBatchFilter] = useState("all");
 
   const filtered = students.filter((s) => {
     const matchSearch =
@@ -17,7 +19,9 @@ export default function AdminStudentsTab() {
       s.course.toLowerCase().includes(search.toLowerCase());
     const matchStatus =
       statusFilter === "all" || s.paymentStatus.toLowerCase() === statusFilter.toLowerCase();
-    return matchSearch && matchStatus;
+    const matchBatch =
+      batchFilter === "all" || s.batch.toLowerCase().includes(batchFilter.toLowerCase());
+    return matchSearch && matchStatus && matchBatch;
   });
 
   return (
@@ -26,10 +30,10 @@ export default function AdminStudentsTab() {
         <div>
           <h3 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2.5">
             <Users className="w-6 h-6 text-[#0077b6]" />
-            <span>Enrolled Students Directory</span>
+            <span>Enrolled Students Directory (Across 20 Courses & 8 Batches)</span>
           </h3>
           <p className="text-sm text-slate-500 mt-1">
-            Search student profiles, monitor installment dues, and review enrolled programs
+            Search student records, track 8th batch enrollments, and check tuition installments
           </p>
         </div>
         <span className="px-4 py-1.5 rounded-full bg-sky-50 text-[#0077b6] text-xs sm:text-sm font-bold border border-sky-200 w-fit">
@@ -37,30 +41,40 @@ export default function AdminStudentsTab() {
         </span>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="relative max-w-md w-full">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search by name, roll, phone or course..."
+            placeholder="Search by name, roll, course or batch..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:bg-white focus:border-[#0077b6] focus:outline-none"
           />
         </div>
 
-        <div className="flex items-center gap-2">
-          {["all", "Paid", "Due"].map((status) => (
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={batchFilter}
+            onChange={(e) => setBatchFilter(e.target.value)}
+            className="px-3 py-2 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
+          >
+            <option value="all">All Batches (1-8)</option>
+            <option value="8th Batch">8th Batch (Current)</option>
+            <option value="7th Batch">7th Batch (Archived)</option>
+          </select>
+
+          {["all", "Paid", "Partial"].map((status) => (
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 statusFilter === status
                   ? "bg-[#002b5b] text-white shadow-xs"
                   : "bg-slate-100 text-slate-700 hover:bg-slate-200"
               }`}
             >
-              {status === "all" ? "All Status" : status}
+              {status === "all" ? "All Payment Status" : status}
             </button>
           ))}
         </div>
@@ -87,7 +101,7 @@ export default function AdminStudentsTab() {
                 </td>
                 <td className="p-4">
                   <span className="font-semibold text-slate-800 block">{s.course}</span>
-                  <span className="text-xs text-slate-500 font-medium">{s.batch}</span>
+                  <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block mt-0.5">{s.batch}</span>
                 </td>
                 <td className="p-4 space-y-1">
                   <span className="flex items-center gap-1.5 text-xs text-slate-600">
@@ -114,7 +128,7 @@ export default function AdminStudentsTab() {
                 </td>
                 <td className="p-4 text-right">
                   <button
-                    onClick={() => alert(`Academic Profile: ${s.name} (${s.roll})\nCourse: ${s.course}\nPaid: ${s.paidAmount}`)}
+                    onClick={() => alert(`Academic Profile: ${s.name} (${s.roll})\nCourse: ${s.course}\nBatch: ${s.batch}\nPaid: ${s.paidAmount}`)}
                     className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-[#0077b6] hover:text-white text-slate-700 font-bold text-xs transition-colors cursor-pointer"
                   >
                     View Details

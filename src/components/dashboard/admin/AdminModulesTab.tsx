@@ -1,33 +1,28 @@
 "use client";
 
 import React, { useState } from "react";
-import { FolderTree, Plus, Video, Clock, Sparkles, FileText, CheckCircle2 } from "lucide-react";
+import { FolderTree, Plus, Video, Clock, Sparkles, Radio, CheckCircle2 } from "lucide-react";
 import { MOCK_COURSE_MODULES } from "@/data/adminCourseContentMockData";
+import { PLATFORM_20_COURSES } from "@/data/coursesCatalog20";
 import { CourseModuleItem } from "@/types/dashboard";
 import { computeModuleTotalDuration } from "@/utils/durationCalculator";
 import AdminAddModuleModal from "./AdminAddModuleModal";
 
 export default function AdminModulesTab() {
   const [modules, setModules] = useState<CourseModuleItem[]>(MOCK_COURSE_MODULES);
-  const [selectedCourse, setSelectedCourse] = useState("revit-combo-pro");
+  const [selectedCourseId, setSelectedCourseId] = useState("revit-combo-pro");
+  const [selectedBatch, setSelectedBatch] = useState("8th Batch");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const courseNames: Record<string, string> = {
-    "revit-combo-pro": "Revit Combo Pro (Arch + Struct + MEP)",
-    "tekla-steel-pro": "Tekla Steel Detailing Masterclass",
-    "revit-dynamo": "Revit Dynamo BIM Automation",
-  };
-
-  const filteredModules = modules.filter(
-    (m) => m.courseId === selectedCourse || selectedCourse === "all"
-  );
+  const currentCourse = PLATFORM_20_COURSES.find((c) => c.id === selectedCourseId) || PLATFORM_20_COURSES[0];
+  const filteredModules = modules.filter((m) => m.courseId === selectedCourseId || selectedCourseId === "revit-combo-pro");
 
   const totalVideos = filteredModules.reduce((acc, m) => acc + m.lessons.length, 0);
   const allLessons = filteredModules.flatMap((m) => m.lessons);
   const totalCourseDuration = computeModuleTotalDuration(allLessons);
 
   const handleAddModule = (newMod: CourseModuleItem) => {
-    newMod.courseId = selectedCourse === "all" ? "revit-combo-pro" : selectedCourse;
+    newMod.courseId = selectedCourseId;
     setModules([...modules, newMod]);
   };
 
@@ -37,100 +32,107 @@ export default function AdminModulesTab() {
         <div>
           <h3 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2.5">
             <FolderTree className="w-6 h-6 text-[#0077b6]" />
-            <span>Course Content & Module Manager</span>
+            <span>Course Content & Lecture Video Manager</span>
           </h3>
           <p className="text-sm text-slate-500 mt-1">
-            Organize syllabus modules, embed unlisted YouTube lecture URLs, and attach BIM exercise models
+            20 Professional Courses • 8 Batches each • Uploading unlisted YouTube lectures for active 8th batches
           </p>
         </div>
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#002b5b] to-[#0077b6] hover:from-[#001830] hover:to-[#005a8c] text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all cursor-pointer hover:scale-102 shrink-0"
+          className="px-6 py-3 rounded-xl bg-[#002b5b] hover:bg-[#001830] text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all cursor-pointer hover:scale-102 shrink-0"
         >
           <Plus className="w-4 h-4 text-sky-300" />
-          <span>Add New Module</span>
+          <span>Add Lecture / Module</span>
         </button>
       </div>
 
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          {Object.entries(courseNames).map(([id, title]) => (
-            <button
-              key={id}
-              onClick={() => setSelectedCourse(id)}
-              className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                selectedCourse === id
-                  ? "bg-[#002b5b] text-white shadow-xs"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-              }`}
-            >
-              {title}
-            </button>
-          ))}
+      {/* Selectors: 20 Courses & 8 Batches */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 bg-slate-50 p-5 rounded-3xl border border-slate-200">
+        <div className="md:col-span-8 space-y-1.5">
+          <label className="text-xs font-bold text-slate-600 uppercase tracking-wide">Select Course (20 Courses Available):</label>
+          <select
+            value={selectedCourseId}
+            onChange={(e) => setSelectedCourseId(e.target.value)}
+            className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-900 focus:border-[#0077b6] focus:outline-none cursor-pointer"
+          >
+            {PLATFORM_20_COURSES.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name} ({c.category} • Lead: {c.instructor})
+              </option>
+            ))}
+          </select>
         </div>
 
-        <div className="flex items-center gap-3 bg-sky-50 border border-sky-200 px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold text-slate-700">
-          <span className="flex items-center gap-1.5 text-[#0077b6]">
-            <Video className="w-4 h-4" /> {totalVideos} Video Lectures
-          </span>
-          <span className="text-slate-300">|</span>
-          <span className="flex items-center gap-1.5 text-emerald-700">
-            <Sparkles className="w-4 h-4 text-emerald-600" /> Duration: {totalCourseDuration}
-          </span>
+        <div className="md:col-span-4 space-y-1.5">
+          <label className="text-xs font-bold text-slate-600 uppercase tracking-wide">Select Batch (8 Batches):</label>
+          <select
+            value={selectedBatch}
+            onChange={(e) => setSelectedBatch(e.target.value)}
+            className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-900 focus:border-[#0077b6] focus:outline-none cursor-pointer"
+          >
+            <option value="8th Batch">8th Batch (🔥 Active - Video Uploading)</option>
+            <option value="7th Batch">7th Batch (Archived - 50 Students)</option>
+            <option value="6th Batch">6th Batch (Archived - 48 Students)</option>
+            <option value="5th Batch">5th Batch (Archived - 45 Students)</option>
+            <option value="4th Batch">4th Batch (Archived - 42 Students)</option>
+            <option value="3rd Batch">3rd Batch (Archived - 40 Students)</option>
+            <option value="2nd Batch">2nd Batch (Archived - 38 Students)</option>
+            <option value="1st Batch">1st Batch (Archived - 35 Students)</option>
+          </select>
         </div>
       </div>
 
-      <div className="space-y-4">
-        {filteredModules.map((mod) => {
-          const dynamicModDuration = computeModuleTotalDuration(mod.lessons) || mod.duration;
-          return (
-            <div key={mod.id} className="p-6 rounded-3xl bg-slate-50/70 border border-slate-200 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
-                <div className="flex items-center gap-3">
-                  <span className="px-3 py-1 rounded-lg bg-[#002b5b] text-white text-xs font-bold">
-                    {mod.moduleNo}
-                  </span>
-                  <strong className="text-base sm:text-lg font-black text-slate-900">{mod.moduleTitle}</strong>
-                </div>
-                <div className="flex items-center gap-2 text-xs sm:text-sm">
-                  <span className="px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-700 font-bold flex items-center gap-1.5 shadow-2xs">
-                    <Clock className="w-4 h-4 text-[#0077b6]" /> {dynamicModDuration}
-                  </span>
-                  <span className="text-xs text-slate-500 font-semibold">({mod.lessons.length} Lessons)</span>
-                </div>
-              </div>
+      {/* Active Batch Status & Live Stats */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-sky-50/70 border border-sky-200 p-4 rounded-2xl text-xs sm:text-sm font-bold">
+        <div className="flex items-center gap-2 text-[#002b5b]">
+          <Radio className="w-4 h-4 text-emerald-600 animate-pulse" />
+          <span>Selected: <strong>{currentCourse.name}</strong> • <strong>{selectedBatch}</strong></span>
+        </div>
+        <div className="flex items-center gap-3 text-slate-700">
+          <span className="flex items-center gap-1.5 text-[#0077b6]"><Video className="w-4 h-4" /> {totalVideos} Published Lectures</span>
+          <span className="text-slate-300">|</span>
+          <span className="flex items-center gap-1.5 text-emerald-700"><Sparkles className="w-4 h-4 text-emerald-600" /> {totalCourseDuration}</span>
+        </div>
+      </div>
 
-              <div className="space-y-2">
-                {mod.lessons.map((les) => (
-                  <div
-                    key={les.id}
-                    className="p-3.5 rounded-2xl bg-white border border-slate-200 flex items-center justify-between text-xs sm:text-sm shadow-2xs"
-                  >
-                    <div className="flex items-center gap-3 min-w-0 pr-2">
-                      <div className="w-8 h-8 rounded-xl bg-sky-50 text-[#0077b6] flex items-center justify-center shrink-0">
-                        <Video className="w-4 h-4" />
-                      </div>
-                      <span className="font-bold text-slate-900 truncate">{les.title}</span>
-                    </div>
-                    <div className="flex items-center gap-3 shrink-0 text-slate-600 font-semibold">
-                      <span className="px-2.5 py-1 rounded-md bg-sky-50 text-[#0077b6] font-bold text-xs">{les.duration}</span>
-                      <span className="text-xs text-slate-500">{les.resourcesCount} Files Attached</span>
-                    </div>
-                  </div>
-                ))}
+      {/* Modules List */}
+      <div className="space-y-4">
+        {filteredModules.map((mod) => (
+          <div key={mod.id} className="p-6 rounded-3xl bg-slate-50/70 border border-slate-200 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-3">
+                <span className="px-3 py-1 rounded-lg bg-[#002b5b] text-white text-xs font-bold">{mod.moduleNo}</span>
+                <strong className="text-base sm:text-lg font-black text-slate-900">{mod.moduleTitle}</strong>
+              </div>
+              <div className="flex items-center gap-2 text-xs sm:text-sm">
+                <span className="px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-700 font-bold flex items-center gap-1.5 shadow-2xs">
+                  <Clock className="w-4 h-4 text-[#0077b6]" /> {computeModuleTotalDuration(mod.lessons) || mod.duration}
+                </span>
+                <span className="text-xs text-slate-500 font-semibold">({mod.lessons.length} Lectures)</span>
               </div>
             </div>
-          );
-        })}
+
+            <div className="space-y-2">
+              {mod.lessons.map((les) => (
+                <div key={les.id} className="p-3.5 rounded-2xl bg-white border border-slate-200 flex items-center justify-between text-xs sm:text-sm shadow-2xs">
+                  <div className="flex items-center gap-3 min-w-0 pr-2">
+                    <div className="w-8 h-8 rounded-xl bg-sky-50 text-[#0077b6] flex items-center justify-center shrink-0"><Video className="w-4 h-4" /></div>
+                    <span className="font-bold text-slate-900 truncate">{les.title}</span>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0 text-slate-600 font-semibold">
+                    <span className="px-2.5 py-1 rounded-md bg-sky-50 text-[#0077b6] font-bold text-xs">{les.duration}</span>
+                    <span className="text-xs text-slate-500">{les.resourcesCount} Files Attached</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
 
-      <AdminAddModuleModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        selectedCourseName={courseNames[selectedCourse] || "Course"}
-        onAddModule={handleAddModule}
-      />
+      <AdminAddModuleModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} selectedCourseName={`${currentCourse.name} (${selectedBatch})`} onAddModule={handleAddModule} />
     </div>
   );
 }
