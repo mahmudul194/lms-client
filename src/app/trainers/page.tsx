@@ -33,6 +33,8 @@ export default function TrainersPage() {
                 <img
                   src={trainer.image}
                   alt={trainer.name}
+                  loading="lazy"
+                  decoding="async"
                   className="w-28 h-28 rounded-full object-cover border-4 border-sky-50 shadow-md mb-4 group-hover:scale-105 transition-transform"
                 />
                 <h3 className="text-base font-bold text-slate-900">{trainer.name}</h3>

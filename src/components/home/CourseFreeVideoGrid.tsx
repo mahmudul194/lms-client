@@ -50,6 +50,8 @@ export default function CourseFreeVideoGrid({
                   <img
                     src={vid.image}
                     alt={vid.label}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-90"
                   />
                   <div className="absolute inset-0 flex items-center justify-center">

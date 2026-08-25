@@ -84,6 +84,8 @@ export default function BlogsPage() {
                     <img
                       src={blog.image}
                       alt={blog.title}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-90"
                     />
                   </div>

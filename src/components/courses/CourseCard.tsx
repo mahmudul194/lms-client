@@ -31,6 +31,8 @@ export default function CourseCard({ course }: CourseCardProps) {
         <img
           src={course.image}
           alt={course.title}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-90"
         />
 

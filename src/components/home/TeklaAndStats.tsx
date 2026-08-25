@@ -39,6 +39,8 @@ export default function TeklaAndStats() {
               <img
                 src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80"
                 alt="Tekla Instructor"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover"
               />
             </div>

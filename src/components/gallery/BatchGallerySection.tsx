@@ -50,6 +50,8 @@ export default function BatchGallerySection({ batches }: BatchGallerySectionProp
                 <img
                   src={batch.image}
                   alt={batch.title}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               ) : (
