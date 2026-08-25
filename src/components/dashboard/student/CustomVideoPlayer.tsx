@@ -26,6 +26,7 @@ export default function CustomVideoPlayer({ videoUrl, title, onEnded }: CustomVi
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [posterErr, setPosterErr] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const isPlaying = isYouTube ? yt.isPlaying : html5Playing;
@@ -101,14 +102,17 @@ export default function CustomVideoPlayer({ videoUrl, title, onEnded }: CustomVi
   return (
     <div ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(e) => e.preventDefault()} className="relative aspect-video bg-slate-950 overflow-hidden rounded-2xl group select-none font-sans">
       {isYouTube ? (
-        <div className="absolute -inset-4 w-[calc(100%+32px)] h-[calc(100%+32px)] pointer-events-none scale-105"><div id={ytElementId} className="w-full h-full" /></div>
+        <div className="absolute -inset-8 w-[calc(100%+64px)] h-[calc(100%+64px)] pointer-events-none scale-[1.18]"><div id={ytElementId} className="w-full h-full" /></div>
       ) : (
         <video ref={videoRef} key={videoUrl} src={videoUrl} onTimeUpdate={() => videoRef.current && setHtml5Time(videoRef.current.currentTime)} onLoadedMetadata={() => videoRef.current && setHtml5Duration(videoRef.current.duration)} onEnded={() => { setHtml5Playing(false); onEnded?.(); }} onError={() => setHtml5Playing(false)} className="w-full h-full object-cover pointer-events-none" playsInline preload="metadata" />
       )}
-      <div onClick={togglePlay} className="absolute inset-0 cursor-pointer z-10" />
+      {!isPlaying && currentTime === 0 && isYouTube && !posterErr && (
+        <img src={`https://img.youtube.com/vi/${ytVideoId}/hqdefault.jpg`} onError={() => setPosterErr(true)} alt={title} className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10 brightness-90" />
+      )}
+      <div onClick={togglePlay} className="absolute inset-0 cursor-pointer z-15" />
       <div className={`absolute top-0 inset-x-0 p-4 bg-gradient-to-b from-black/85 via-black/40 to-transparent flex items-center justify-between text-white transition-opacity pointer-events-none z-20 ${showControls ? "opacity-100" : "opacity-0"}`}><span className="text-xs sm:text-sm font-bold text-white/95 drop-shadow-md truncate max-w-lg">{title}</span></div>
       {!isPlaying && (
-        <button onClick={togglePlay} className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-[#0077b6]/90 hover:bg-[#002b5b] text-white flex items-center justify-center shadow-2xl backdrop-blur-md transition-all hover:scale-110 cursor-pointer border border-sky-300/40 z-20"><Play className="w-7 h-7 fill-white ml-1" /></button>
+        <button onClick={togglePlay} className="absolute inset-0 m-auto w-18 h-18 rounded-full bg-gradient-to-br from-[#0077b6] to-[#002b5b] hover:from-[#005a8c] hover:to-[#001830] text-white flex items-center justify-center shadow-2xl backdrop-blur-md transition-all hover:scale-110 cursor-pointer border-2 border-white/80 z-20"><Play className="w-8 h-8 fill-white ml-1 text-white" /></button>
       )}
       <div className={`absolute bottom-0 inset-x-0 p-3 sm:p-4 bg-gradient-to-t from-black/95 via-black/70 to-transparent transition-opacity space-y-2 z-20 ${showControls ? "opacity-100" : "opacity-0"}`}>
         <input type="range" min={0} max={duration || 100} step={0.1} value={currentTime} onChange={handleSeek} style={{ background: `linear-gradient(to right, #0077b6 0%, #0077b6 ${progressPct}%, rgba(255,255,255,0.2) ${progressPct}%, rgba(255,255,255,0.2) 100%)` }} className="w-full h-1.5 hover:h-2 rounded-lg appearance-none cursor-pointer accent-[#0077b6] transition-all" />
