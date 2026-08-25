@@ -50,9 +50,12 @@ export default function CustomVideoPlayer({ videoUrl, title, onEnded }: CustomVi
   };
 
   const skip = (sec: number) => {
-    const next = Math.max(0, Math.min(duration, currentTime + sec));
-    if (isYouTube) yt.seekTo(next);
-    else if (videoRef.current) { videoRef.current.currentTime = next; setHtml5Time(next); }
+    if (isYouTube) yt.skip(sec);
+    else if (videoRef.current) {
+      const next = Math.max(0, Math.min(html5Duration, (videoRef.current.currentTime || 0) + sec));
+      videoRef.current.currentTime = next;
+      setHtml5Time(next);
+    }
   };
 
   const handleVolume = (v: number) => {
@@ -101,13 +104,14 @@ export default function CustomVideoPlayer({ videoUrl, title, onEnded }: CustomVi
 
   return (
     <div ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(e) => e.preventDefault()} className="relative aspect-video bg-slate-950 overflow-hidden rounded-2xl group select-none font-sans">
+      {/* 100% Natural 16:9 Aspect Video Surface */}
       {isYouTube ? (
-        <div className="absolute -inset-8 w-[calc(100%+64px)] h-[calc(100%+64px)] pointer-events-none scale-[1.18]"><div id={ytElementId} className="w-full h-full" /></div>
+        <div className="absolute inset-0 w-full h-full pointer-events-none scale-100"><div id={ytElementId} className="w-full h-full" /></div>
       ) : (
         <video ref={videoRef} key={videoUrl} src={videoUrl} onTimeUpdate={() => videoRef.current && setHtml5Time(videoRef.current.currentTime)} onLoadedMetadata={() => videoRef.current && setHtml5Duration(videoRef.current.duration)} onEnded={() => { setHtml5Playing(false); onEnded?.(); }} onError={() => setHtml5Playing(false)} className="w-full h-full object-cover pointer-events-none" playsInline preload="metadata" />
       )}
       {!isPlaying && currentTime === 0 && isYouTube && !posterErr && (
-        <img src={`https://img.youtube.com/vi/${ytVideoId}/hqdefault.jpg`} onError={() => setPosterErr(true)} alt={title} className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10 brightness-90" />
+        <img src={`https://img.youtube.com/vi/${ytVideoId}/hqdefault.jpg`} onError={() => setPosterErr(true)} alt={title} className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10 brightness-95" />
       )}
       <div onClick={togglePlay} className="absolute inset-0 cursor-pointer z-15" />
       <div className={`absolute top-0 inset-x-0 p-4 bg-gradient-to-b from-black/85 via-black/40 to-transparent flex items-center justify-between text-white transition-opacity pointer-events-none z-20 ${showControls ? "opacity-100" : "opacity-0"}`}><span className="text-xs sm:text-sm font-bold text-white/95 drop-shadow-md truncate max-w-lg">{title}</span></div>
@@ -119,8 +123,8 @@ export default function CustomVideoPlayer({ videoUrl, title, onEnded }: CustomVi
         <div className="flex items-center justify-between text-white text-xs">
           <div className="flex items-center gap-2 sm:gap-3">
             <button onClick={togglePlay} className="p-1 hover:text-sky-400 cursor-pointer">{isPlaying ? <Pause className="w-4 h-4 fill-white" /> : <Play className="w-4 h-4 fill-white" />}</button>
-            <button onClick={() => skip(-10)} title="Rewind 10s" className="p-1 hover:text-sky-400 cursor-pointer"><RotateCcw className="w-3.5 h-3.5" /></button>
-            <button onClick={() => skip(10)} title="Forward 10s" className="p-1 hover:text-sky-400 cursor-pointer"><RotateCw className="w-3.5 h-3.5" /></button>
+            <button onClick={() => skip(-10)} title="Rewind 10s (Left Arrow)" className="p-1 hover:text-sky-400 cursor-pointer"><RotateCcw className="w-3.5 h-3.5" /></button>
+            <button onClick={() => skip(10)} title="Forward 10s (Right Arrow)" className="p-1 hover:text-sky-400 cursor-pointer"><RotateCw className="w-3.5 h-3.5" /></button>
             <span className="font-mono text-[11px] text-slate-300">{fmt(currentTime)} / {fmt(duration)}</span>
             <div className="hidden sm:flex items-center gap-1.5 pl-2">
               <button onClick={() => handleVolume(isMuted ? 1 : 0)} title="Mute (M)" className="hover:text-sky-400 cursor-pointer">{isMuted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}</button>

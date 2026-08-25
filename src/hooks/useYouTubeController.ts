@@ -19,64 +19,47 @@ declare global {
 
 export function useYouTubeController(elementId: string, videoId: string | null, onEnded?: () => void) {
   const playerRef = useRef<any>(null);
+  const isSeekingUntilRef = useRef<number>(0);
   const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  // Load YouTube IFrame API Script
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!window.YT) {
       const tag = document.createElement("script");
       tag.src = "https://www.youtube.com/iframe_api";
-      const firstScriptTag = document.getElementsByTagName("script")[0];
-      firstScriptTag?.parentNode?.insertBefore(tag, firstScriptTag);
+      const first = document.getElementsByTagName("script")[0];
+      first?.parentNode?.insertBefore(tag, first);
     }
   }, []);
 
-  // Initialize or update player
   useEffect(() => {
     if (!videoId || typeof window === "undefined") return;
-
     const init = () => {
       if (!window.YT || !window.YT.Player) return;
       if (playerRef.current) {
         playerRef.current.loadVideoById?.(videoId);
         return;
       }
-
       playerRef.current = new window.YT.Player(elementId, {
         videoId,
         playerVars: {
-          controls: 0,
-          modestbranding: 1,
-          rel: 0,
-          showinfo: 0,
-          disablekb: 1,
-          fs: 0,
-          iv_load_policy: 3,
-          playsinline: 1,
-          cc_load_policy: 0,
-          origin: typeof window !== "undefined" ? window.location.origin : undefined,
+          controls: 0, modestbranding: 1, rel: 0, showinfo: 0,
+          disablekb: 1, fs: 0, iv_load_policy: 3, playsinline: 1,
+          cc_load_policy: 0, origin: typeof window !== "undefined" ? window.location.origin : undefined,
         },
         events: {
-          onReady: (e: any) => {
-            setIsReady(true);
-            setDuration(e.target.getDuration() || 0);
-          },
+          onReady: (e: any) => { setIsReady(true); setDuration(e.target.getDuration() || 0); },
           onStateChange: (e: any) => {
-            if (e.data === 1) setIsPlaying(true); // Playing
-            else if (e.data === 2) setIsPlaying(false); // Paused
-            else if (e.data === 0) { // Ended
-              setIsPlaying(false);
-              onEnded?.();
-            }
+            if (e.data === 1) setIsPlaying(true);
+            else if (e.data === 2) setIsPlaying(false);
+            else if (e.data === 0) { setIsPlaying(false); onEnded?.(); }
           },
         },
       });
     };
-
     if (window.YT && window.YT.Player) init();
     else window.onYouTubeIframeAPIReady = init;
 
@@ -89,13 +72,15 @@ export function useYouTubeController(elementId: string, videoId: string | null, 
     };
   }, [videoId, elementId, onEnded]);
 
-  // Sync current time and duration
   useEffect(() => {
     if (!isPlaying) return;
     const interval = setInterval(() => {
+      if (Date.now() < isSeekingUntilRef.current) return;
       if (playerRef.current?.getCurrentTime) {
-        setCurrentTime(playerRef.current.getCurrentTime() || 0);
-        setDuration(playerRef.current.getDuration() || 0);
+        const cur = playerRef.current.getCurrentTime() || 0;
+        const dur = playerRef.current.getDuration() || 0;
+        setCurrentTime(cur);
+        if (dur > 0) setDuration(dur);
       }
     }, 250);
     return () => clearInterval(interval);
@@ -103,11 +88,28 @@ export function useYouTubeController(elementId: string, videoId: string | null, 
 
   const play = useCallback(() => { playerRef.current?.playVideo?.(); setIsPlaying(true); }, []);
   const pause = useCallback(() => { playerRef.current?.pauseVideo?.(); setIsPlaying(false); }, []);
-  const seekTo = useCallback((sec: number) => { playerRef.current?.seekTo?.(sec, true); setCurrentTime(sec); }, []);
+
+  const seekTo = useCallback((sec: number) => {
+    if (!playerRef.current) return;
+    isSeekingUntilRef.current = Date.now() + 450;
+    setCurrentTime(sec);
+    playerRef.current.seekTo?.(sec, true);
+  }, []);
+
+  const skip = useCallback((sec: number) => {
+    if (!playerRef.current) return;
+    const cur = typeof playerRef.current.getCurrentTime === "function" ? (playerRef.current.getCurrentTime() || 0) : 0;
+    const dur = typeof playerRef.current.getDuration === "function" ? (playerRef.current.getDuration() || 0) : 0;
+    const target = Math.max(0, Math.min(dur || 999999, cur + sec));
+    isSeekingUntilRef.current = Date.now() + 450;
+    setCurrentTime(target);
+    playerRef.current.seekTo?.(target, true);
+  }, []);
+
   const setVolume = useCallback((vol: number) => { playerRef.current?.setVolume?.(vol * 100); }, []);
   const mute = useCallback(() => { playerRef.current?.mute?.(); }, []);
   const unMute = useCallback(() => { playerRef.current?.unMute?.(); }, []);
   const setPlaybackRate = useCallback((rate: number) => { playerRef.current?.setPlaybackRate?.(rate); }, []);
 
-  return { isReady, isPlaying, currentTime, duration, play, pause, seekTo, setVolume, mute, unMute, setPlaybackRate };
+  return { isReady, isPlaying, currentTime, duration, play, pause, seekTo, skip, setVolume, mute, unMute, setPlaybackRate };
 }
