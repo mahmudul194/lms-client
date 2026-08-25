@@ -7,9 +7,11 @@ import { Search } from "lucide-react";
 interface NavMobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  searchQuery?: string;
+  setSearchQuery?: (q: string) => void;
 }
 
-export default function NavMobileMenu({ isOpen, onClose }: NavMobileMenuProps) {
+export default function NavMobileMenu({ isOpen, onClose, searchQuery, setSearchQuery }: NavMobileMenuProps) {
   if (!isOpen) return null;
 
   return (
@@ -18,6 +20,8 @@ export default function NavMobileMenu({ isOpen, onClose }: NavMobileMenuProps) {
         <input
           type="text"
           placeholder="Search courses..."
+          value={searchQuery || ""}
+          onChange={(e) => setSearchQuery?.(e.target.value)}
           className="w-full pl-4 pr-10 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-sm focus:outline-none focus:bg-white"
         />
         <Search className="w-4 h-4 text-[#0077b6] absolute right-3.5 top-1/2 -translate-y-1/2" />

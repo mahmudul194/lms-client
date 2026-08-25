@@ -110,7 +110,7 @@ export default function InstructorOverviewTab({
               >
                 <div className="min-w-0 pr-2">
                   <span className="font-extrabold text-slate-900 block truncate">{sub.studentName}</span>
-                  <span className="text-slate-500 block truncate">{sub.fileName}</span>
+                  <span className="text-slate-500 block truncate">{sub.files?.[0]?.name || sub.assignmentTitle}</span>
                 </div>
                 <button
                   onClick={onNavigateToGrading}
