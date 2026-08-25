@@ -56,14 +56,14 @@ export default function AdminMetricsGrid() {
             </div>
 
             <div>
-              <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-mono">
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-semibold">
                 {m.value}
               </div>
               <div className="text-[11px] text-slate-400 font-medium mt-0.5">{m.sub}</div>
             </div>
 
             <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 font-mono">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 font-semibold">
                 <TrendingUp className="w-3 h-3 text-emerald-600" />
                 {m.trend}
               </span>

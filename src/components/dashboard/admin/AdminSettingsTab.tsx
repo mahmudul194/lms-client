@@ -46,7 +46,7 @@ export default function AdminSettingsTab() {
               type="text"
               value={helpline}
               onChange={(e) => setHelpline(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 font-mono text-slate-800 focus:border-[#0077b6] focus:outline-none"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 font-semibold text-slate-800 focus:border-[#0077b6] focus:outline-none"
             />
           </div>
         </div>
@@ -61,7 +61,7 @@ export default function AdminSettingsTab() {
                 type="text"
                 value={bkashNumber}
                 onChange={(e) => setBkashNumber(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 font-mono text-xs focus:border-[#0077b6] focus:outline-none"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold text-xs focus:border-[#0077b6] focus:outline-none"
               />
             </div>
             <div>
@@ -70,7 +70,7 @@ export default function AdminSettingsTab() {
                 type="text"
                 value={nagadNumber}
                 onChange={(e) => setNagadNumber(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 font-mono text-xs focus:border-[#0077b6] focus:outline-none"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold text-xs focus:border-[#0077b6] focus:outline-none"
               />
             </div>
             <div>
@@ -79,7 +79,7 @@ export default function AdminSettingsTab() {
                 type="text"
                 value={rocketNumber}
                 onChange={(e) => setRocketNumber(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 font-mono text-xs focus:border-[#0077b6] focus:outline-none"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold text-xs focus:border-[#0077b6] focus:outline-none"
               />
             </div>
           </div>

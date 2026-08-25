@@ -27,7 +27,7 @@ export default function DashboardBrandHeader({
           <h1 className="text-base font-black text-white tracking-tight leading-none">
             BIM Build BD
           </h1>
-          <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20 text-[10px] font-mono font-bold uppercase tracking-wider">
+          <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20 text-[10px] font-semibold font-bold uppercase tracking-wider">
             <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
             {currentRole} Portal
           </span>

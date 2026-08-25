@@ -67,7 +67,7 @@ export default function DashboardHeaderNotifications() {
               >
                 <div className="flex items-center justify-between">
                   <strong className="text-slate-900 font-bold">{n.title}</strong>
-                  <span className="text-[10px] text-slate-400 font-mono">{n.time}</span>
+                  <span className="text-[10px] text-slate-400 font-semibold">{n.time}</span>
                 </div>
                 <p className="text-slate-600 leading-snug">{n.desc}</p>
               </div>

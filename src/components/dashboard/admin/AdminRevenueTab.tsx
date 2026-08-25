@@ -42,9 +42,9 @@ export default function AdminRevenueTab() {
         <div className="p-6 rounded-3xl bg-slate-50 border border-slate-200 space-y-2">
           <span className="text-xs text-slate-500 font-bold uppercase">Payment Gateway Split</span>
           <div className="text-sm font-bold text-slate-800 space-y-1 pt-1">
-            <div className="flex justify-between"><span>bKash (62%)</span><strong className="font-mono">৳3,00,700</strong></div>
-            <div className="flex justify-between"><span>Nagad (26%)</span><strong className="font-mono">৳1,26,100</strong></div>
-            <div className="flex justify-between"><span>Card/Bank (12%)</span><strong className="font-mono">৳58,200</strong></div>
+            <div className="flex justify-between"><span>bKash (62%)</span><strong className="font-semibold">৳3,00,700</strong></div>
+            <div className="flex justify-between"><span>Nagad (26%)</span><strong className="font-semibold">৳1,26,100</strong></div>
+            <div className="flex justify-between"><span>Card/Bank (12%)</span><strong className="font-semibold">৳58,200</strong></div>
           </div>
         </div>
       </div>
@@ -64,7 +64,7 @@ export default function AdminRevenueTab() {
                 <th className="p-3.5 text-right">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 font-mono text-xs">
+            <tbody className="divide-y divide-slate-100 font-semibold text-xs">
               {transactions.map((tx) => (
                 <tr key={tx.id} className="hover:bg-slate-50">
                   <td className="p-3.5 font-bold text-[#0077b6]">{tx.id}</td>

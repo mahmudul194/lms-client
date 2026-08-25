@@ -59,7 +59,7 @@ export default function AssignmentUploadModal({
               required
               className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#0077b6] file:text-white hover:file:bg-[#005a8c] file:cursor-pointer"
             />
-            <span className="text-[11px] text-slate-400 block font-mono">Maximum file upload size: 150 MB</span>
+            <span className="text-[11px] text-slate-400 block font-semibold">Maximum file upload size: 150 MB</span>
           </div>
 
           <div>

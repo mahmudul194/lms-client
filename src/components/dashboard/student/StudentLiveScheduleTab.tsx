@@ -40,7 +40,7 @@ export default function StudentLiveScheduleTab({ liveClasses }: StudentLiveSched
                 <span className="px-3 py-1 rounded-full bg-[#0077b6] text-white text-xs font-bold shadow-xs">
                   {live.status}
                 </span>
-                <span className="text-xs font-bold text-slate-500 font-mono">
+                <span className="text-xs font-bold text-slate-500 font-semibold">
                   Batch 5
                 </span>
               </div>
@@ -58,7 +58,7 @@ export default function StudentLiveScheduleTab({ liveClasses }: StudentLiveSched
                   <Clock className="w-4 h-4 text-[#0077b6]" />
                   <span>Time: <strong className="text-slate-900">{live.time}</strong></span>
                 </p>
-                <p className="font-mono text-slate-600 pt-1 border-t border-slate-100">
+                <p className="font-semibold text-slate-600 pt-1 border-t border-slate-100">
                   Meeting ID: <strong className="text-slate-900">{live.meetingId}</strong> • Passcode: <strong className="text-slate-900">{live.passcode}</strong>
                 </p>
               </div>

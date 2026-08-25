@@ -60,7 +60,7 @@ export default function StudentOverviewTab({
             <div className="text-sm text-slate-700 space-y-2">
               <p>Instructor: <strong className="text-slate-900">{liveClasses[0].instructor}</strong></p>
               <p>Time: <strong className="text-[#002b5b]">{liveClasses[0].date} — {liveClasses[0].time}</strong></p>
-              <p className="font-mono text-slate-600">Meeting ID: <strong className="text-slate-900">{liveClasses[0].meetingId}</strong> • Passcode: <strong className="text-slate-900">{liveClasses[0].passcode}</strong></p>
+              <p className="font-semibold text-slate-600">Meeting ID: <strong className="text-slate-900">{liveClasses[0].meetingId}</strong> • Passcode: <strong className="text-slate-900">{liveClasses[0].passcode}</strong></p>
             </div>
 
             <div className="pt-2 flex items-center gap-3">
@@ -100,7 +100,7 @@ export default function StudentOverviewTab({
               >
                 <div className="truncate max-w-[220px]">
                   <span className="font-bold text-slate-800 block truncate">{res.name}</span>
-                  <span className="text-xs text-slate-500 font-mono">{res.type} • {res.size}</span>
+                  <span className="text-xs text-slate-500 font-semibold">{res.type} • {res.size}</span>
                 </div>
                 <button className="px-3 py-1.5 rounded-xl bg-[#0077b6] hover:bg-[#005a8c] text-white font-bold text-xs shrink-0 shadow-xs cursor-pointer">
                   Download

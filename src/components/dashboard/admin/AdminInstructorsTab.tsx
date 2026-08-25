@@ -107,18 +107,18 @@ export default function AdminInstructorsTab() {
                     {ins.specialty}
                   </span>
                 </td>
-                <td className="p-3.5 font-mono font-bold text-slate-900">
+                <td className="p-3.5 font-semibold font-bold text-slate-900">
                   <span className="px-2 py-0.5 rounded bg-sky-50 text-[#0077b6] text-xs font-bold border border-sky-200">
                     {ins.batchesCount} Batches
                   </span>
                 </td>
-                <td className="p-3.5 font-mono font-bold text-slate-800">
+                <td className="p-3.5 font-semibold font-bold text-slate-800">
                   {ins.studentsCount.toLocaleString()}
                 </td>
-                <td className="p-3.5 font-mono font-extrabold text-amber-800">
+                <td className="p-3.5 font-semibold font-extrabold text-amber-800">
                   ★ {ins.rating}
                 </td>
-                <td className="p-3.5 text-slate-600 font-mono text-[11px] space-y-0.5">
+                <td className="p-3.5 text-slate-600 font-semibold text-[11px] space-y-0.5">
                   <div className="flex items-center gap-1.5"><Phone className="w-3 h-3 text-[#0077b6]" /> {ins.phone}</div>
                   <div className="flex items-center gap-1.5"><Mail className="w-3 h-3 text-[#0077b6]" /> {ins.email}</div>
                 </td>

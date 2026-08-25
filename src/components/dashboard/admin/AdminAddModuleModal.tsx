@@ -84,7 +84,7 @@ export default function AdminAddModuleModal({
             <span className="text-slate-600 font-bold shrink-0">Course:</span>
             <strong className="font-black text-[#002b5b] truncate">{selectedCourseName}</strong>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-sky-200 shadow-xs font-mono font-bold text-[#0077b6] shrink-0">
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-sky-200 shadow-xs font-semibold font-bold text-[#0077b6] shrink-0">
             <Sparkles className="w-3.5 h-3.5 text-sky-500" />
             <span>Auto Duration: {autoDuration} ({lessons.length} Videos)</span>
           </div>
@@ -92,7 +92,7 @@ export default function AdminAddModuleModal({
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <div className="grid grid-cols-3 gap-3">
-            <input type="text" required placeholder="e.g. Module 01" value={moduleNo} onChange={(e) => setModuleNo(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] font-mono font-bold focus:outline-none" />
+            <input type="text" required placeholder="e.g. Module 01" value={moduleNo} onChange={(e) => setModuleNo(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] font-semibold font-bold focus:outline-none" />
             <input type="text" required placeholder="e.g. Advanced Structural Rebar Detailing" value={moduleTitle} onChange={(e) => setModuleTitle(e.target.value)} className="col-span-2 w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none" />
           </div>
 
@@ -115,9 +115,9 @@ export default function AdminAddModuleModal({
                 {lessons.map((les, idx) => (
                   <div key={idx} className="p-2 rounded-xl bg-slate-50 border border-slate-200 grid grid-cols-1 sm:grid-cols-12 gap-2 items-center text-xs">
                     <input type="text" required placeholder={`Lesson ${idx + 1} Topic`} value={les.title} onChange={(e) => updateLesson(idx, "title", e.target.value)} className="sm:col-span-6 px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 focus:border-[#0077b6] focus:outline-none" />
-                    <input type="url" required placeholder="Video URL" value={les.videoUrl} onChange={(e) => updateLesson(idx, "videoUrl", e.target.value)} className="sm:col-span-4 px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 focus:border-[#0077b6] font-mono text-[11px] focus:outline-none" />
+                    <input type="url" required placeholder="Video URL" value={les.videoUrl} onChange={(e) => updateLesson(idx, "videoUrl", e.target.value)} className="sm:col-span-4 px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 focus:border-[#0077b6] font-semibold text-[11px] focus:outline-none" />
                     <div className="sm:col-span-2 flex items-center gap-1">
-                      <input type="text" placeholder="e.g. 45m" value={les.duration} onChange={(e) => updateLesson(idx, "duration", e.target.value)} className="w-full px-2 py-1.5 rounded-lg bg-white border border-slate-200 text-center font-mono font-bold text-[#0077b6] focus:outline-none" />
+                      <input type="text" placeholder="e.g. 45m" value={les.duration} onChange={(e) => updateLesson(idx, "duration", e.target.value)} className="w-full px-2 py-1.5 rounded-lg bg-white border border-slate-200 text-center font-semibold font-bold text-[#0077b6] focus:outline-none" />
                       <button type="button" onClick={() => removeLesson(idx)} className="text-slate-400 hover:text-rose-600 p-1 cursor-pointer"><Trash2 className="w-3.5 h-3.5" /></button>
                     </div>
                   </div>

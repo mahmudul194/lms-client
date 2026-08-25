@@ -130,7 +130,7 @@ export default function InstructorMaterialsTab() {
           >
             <div>
               <strong className="text-slate-900 block font-bold">{m.title}</strong>
-              <span className="text-slate-500 text-xs font-mono">
+              <span className="text-slate-500 text-xs font-semibold">
                 Batch: {m.batchCode} • Attached: {m.attachedFile} • {m.uploadDate}
               </span>
             </div>

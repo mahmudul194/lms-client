@@ -45,7 +45,7 @@ export default function AdmissionSuccessSlip({
       <div className="bg-[#f8fafc] rounded-2xl border border-slate-200 p-6 text-left space-y-4 text-xs sm:text-sm max-w-xl mx-auto font-sans">
         <div className="flex items-center justify-between border-b border-slate-200 pb-3">
           <span className="font-bold text-slate-500 uppercase tracking-wider text-xs">Application ID</span>
-          <span className="font-mono font-bold text-[#0077b6]">ADM-{Math.floor(100000 + Math.random() * 900000)}</span>
+          <span className="font-semibold font-bold text-[#0077b6]">ADM-{Math.floor(100000 + Math.random() * 900000)}</span>
         </div>
         <div className="flex items-center justify-between border-b border-slate-200 pb-3">
           <span className="text-slate-600">Selected Course:</span>
@@ -61,7 +61,7 @@ export default function AdmissionSuccessSlip({
         </div>
         <div className="flex items-center justify-between border-b border-slate-200 pb-3">
           <span className="text-slate-600">TrxID Submitted:</span>
-          <span className="font-mono font-bold text-slate-800">{trxId || "PENDING-MANUAL"}</span>
+          <span className="font-semibold font-bold text-slate-800">{trxId || "PENDING-MANUAL"}</span>
         </div>
         <div className="flex items-center justify-between pt-1 text-sm sm:text-base">
           <span className="font-extrabold text-slate-900">Paid Amount (Today):</span>

@@ -77,7 +77,7 @@ export default function AdminModulesTab() {
             <Video className="w-4 h-4" /> {totalVideos} Video Lectures
           </span>
           <span className="text-slate-300">|</span>
-          <span className="flex items-center gap-1.5 text-emerald-700 font-mono">
+          <span className="flex items-center gap-1.5 text-emerald-700 font-semibold">
             <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> Total Duration: {totalCourseDuration}
           </span>
         </div>
@@ -91,13 +91,13 @@ export default function AdminModulesTab() {
             <div key={mod.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="px-2.5 py-0.5 rounded-md bg-[#002b5b] text-white font-mono text-xs font-bold">
+                  <span className="px-2.5 py-0.5 rounded-md bg-[#002b5b] text-white font-semibold text-xs font-bold">
                     {mod.moduleNo}
                   </span>
                   <strong className="text-sm sm:text-base font-extrabold text-slate-900">{mod.moduleTitle}</strong>
                 </div>
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="px-2.5 py-1 rounded-full bg-white border border-slate-200 text-slate-700 font-mono font-bold flex items-center gap-1.5 shadow-xs">
+                  <span className="px-2.5 py-1 rounded-full bg-white border border-slate-200 text-slate-700 font-semibold font-bold flex items-center gap-1.5 shadow-xs">
                     <Clock className="w-3.5 h-3.5 text-[#0077b6]" /> {dynamicModDuration}
                   </span>
                   <span className="text-[11px] text-slate-400 font-bold">({mod.lessons.length} Lessons)</span>
@@ -115,7 +115,7 @@ export default function AdminModulesTab() {
                       <Video className="w-4 h-4 text-[#0077b6] shrink-0" />
                       <span className="font-bold text-slate-800 truncate">{les.title}</span>
                     </div>
-                    <div className="flex items-center gap-3 shrink-0 text-slate-500 font-mono text-[11px]">
+                    <div className="flex items-center gap-3 shrink-0 text-slate-500 font-semibold text-[11px]">
                       <span className="px-2 py-0.5 rounded bg-sky-50 text-[#0077b6] font-bold">{les.duration}</span>
                       <span className="text-slate-400">{les.resourcesCount} Files</span>
                     </div>

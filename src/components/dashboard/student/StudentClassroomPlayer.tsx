@@ -94,7 +94,7 @@ export default function StudentClassroomPlayer({ course, onBackToCourses }: Stud
           {isCookingState ? <ModuleCookingCard completedCount={courseData.completedLessons} totalCount={allLessons.length} onReviewPrevious={() => handleSelectLesson(allLessons[0])} onBackToCourses={onBackToCourses} /> : <CustomVideoPlayer key={activeLesson.id} videoUrl={activeLesson.videoUrl} title={activeLesson.title} onEnded={handleNextAndComplete} />}
           <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/80 shadow-2xs space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
-              <div><span className="text-xs font-black uppercase text-[#0077b6] tracking-wider">{isCookingState ? "Course Milestone" : "Active Lecture"}</span><h1 className="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">{isCookingState ? "The new module is cooking" : activeLesson.title}</h1><span className="text-sm font-semibold text-slate-500 font-mono mt-1 block">{isCookingState ? "Weekly batch lectures completed" : `Duration: ${activeLesson.duration}`}</span></div>
+              <div><span className="text-xs font-black uppercase text-[#0077b6] tracking-wider">{isCookingState ? "Course Milestone" : "Active Lecture"}</span><h1 className="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">{isCookingState ? "The new module is cooking" : activeLesson.title}</h1><span className="text-sm font-semibold text-slate-500 font-semibold mt-1 block">{isCookingState ? "Weekly batch lectures completed" : `Duration: ${activeLesson.duration}`}</span></div>
               <div className="flex items-center gap-2">
                 <button onClick={() => { setIsCookingState(false); if (prevLesson) handleSelectLesson(prevLesson); }} disabled={!prevLesson && !isCookingState} className="px-4 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 cursor-pointer disabled:opacity-50"><ChevronLeft className="w-4 h-4" /> Previous</button>
                 <button onClick={handleNextAndComplete} className="px-5 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-1.5 shadow-xs bg-[#0077b6] hover:bg-[#002b5b] text-white cursor-pointer">{nextLesson ? <><span>Next & Complete</span><ChevronRight className="w-4 h-4" /></> : <><span>Finish Milestone</span><Sparkles className="w-4 h-4" /></>}</button>
@@ -106,7 +106,7 @@ export default function StudentClassroomPlayer({ course, onBackToCourses }: Stud
                 <h4 className="text-sm font-bold text-slate-900">Lecture Exercise Files & Project Models</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {activeLesson.resources.map((r, i) => (
-                    <div key={i} className="p-3.5 rounded-2xl bg-sky-50/70 border border-sky-200 flex items-center justify-between gap-3 text-sm"><div className="truncate"><strong className="text-slate-900 block truncate font-bold">{r.name}</strong><span className="text-xs text-[#0077b6] font-mono font-medium">{r.size} • {r.type}</span></div><button className="p-2 rounded-xl bg-white hover:bg-sky-600 hover:text-white text-[#0077b6] shadow-2xs border border-sky-200 transition-all cursor-pointer"><Download className="w-4 h-4" /></button></div>
+                    <div key={i} className="p-3.5 rounded-2xl bg-sky-50/70 border border-sky-200 flex items-center justify-between gap-3 text-sm"><div className="truncate"><strong className="text-slate-900 block truncate font-bold">{r.name}</strong><span className="text-xs text-[#0077b6] font-semibold font-medium">{r.size} • {r.type}</span></div><button className="p-2 rounded-xl bg-white hover:bg-sky-600 hover:text-white text-[#0077b6] shadow-2xs border border-sky-200 transition-all cursor-pointer"><Download className="w-4 h-4" /></button></div>
                   ))}
                 </div>
               </div>
@@ -115,7 +115,7 @@ export default function StudentClassroomPlayer({ course, onBackToCourses }: Stud
         </div>
 
         <div className="lg:col-span-4 bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-2xs space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3"><h3 className="text-lg font-black text-slate-900">Course Syllabus</h3><span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-sky-50 text-[#0077b6] border border-sky-200">{courseData.completedLessons}/{allLessons.length} Done</span></div>
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3"><h3 className="text-lg font-black text-slate-900">Course Syllabus</h3><span className="text-xs font-semibold font-bold px-3 py-1 rounded-full bg-sky-50 text-[#0077b6] border border-sky-200">{courseData.completedLessons}/{allLessons.length} Done</span></div>
           <div className="space-y-3 max-h-[640px] overflow-y-auto pr-1">
             {courseData.modules.map((m) => (
               <div key={m.id} className="rounded-2xl border border-slate-200 overflow-hidden bg-slate-50/50">
@@ -125,7 +125,7 @@ export default function StudentClassroomPlayer({ course, onBackToCourses }: Stud
                     {m.lessons.map((l) => (
                       <div key={l.id} onClick={() => handleSelectLesson(l)} className={`p-3 rounded-xl flex items-center justify-between gap-3 text-sm transition-all cursor-pointer ${!isCookingState && l.id === activeLesson.id ? "bg-sky-50 border-2 border-[#0077b6] shadow-xs" : l.isUnlocked ? "hover:bg-slate-50 border border-transparent" : "opacity-50 hover:bg-slate-50/50 border border-transparent"}`}>
                         <div className="flex items-center gap-3 truncate">{l.isCompleted ? <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" /> : !isCookingState && l.id === activeLesson.id ? <PlayCircle className="w-5 h-5 text-[#0077b6] shrink-0 animate-pulse" /> : l.isUnlocked ? <PlayCircle className="w-5 h-5 text-slate-400 shrink-0" /> : <Lock className="w-5 h-5 text-slate-400 shrink-0" />}<span className={`truncate ${!isCookingState && l.id === activeLesson.id ? "font-bold text-slate-950" : "font-medium text-slate-700"}`}>{l.title}</span></div>
-                        <span className="text-xs font-mono font-medium text-slate-500 shrink-0">{l.duration}</span>
+                        <span className="text-xs font-semibold font-medium text-slate-500 shrink-0">{l.duration}</span>
                       </div>
                     ))}
                   </div>

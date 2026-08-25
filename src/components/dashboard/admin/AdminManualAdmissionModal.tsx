@@ -78,7 +78,7 @@ export default function AdminManualAdmissionModal({
             {due > 0 ? <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" /> : <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
             <span><strong>Total Fee: ৳{total.toLocaleString()}</strong> — Advance: <strong>৳{advance.toLocaleString()}</strong></span>
           </div>
-          <span className={`px-3 py-1 rounded-full font-mono font-bold text-xs shrink-0 ${
+          <span className={`px-3 py-1 rounded-full font-semibold font-bold text-xs shrink-0 ${
             due > 0 ? "bg-amber-200/80 text-amber-950" : "bg-emerald-200/80 text-emerald-950"
           }`}>
             {due > 0 ? `Remaining Due (পাবো): ৳${due.toLocaleString()}` : "Fully Paid (100%)"}
@@ -88,7 +88,7 @@ export default function AdminManualAdmissionModal({
         <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input type="text" required placeholder="Student Full Name" value={form.name} onChange={(e) => update("name", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none" />
-            <input type="tel" required placeholder="Phone Number (+880 17XX...)" value={form.phone} onChange={(e) => update("phone", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] font-mono focus:outline-none" />
+            <input type="tel" required placeholder="Phone Number (+880 17XX...)" value={form.phone} onChange={(e) => update("phone", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] font-semibold focus:outline-none" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -113,10 +113,10 @@ export default function AdminManualAdmissionModal({
               <option value="Bank Transfer">Bank Transfer</option>
               <option value="Direct Cash / Desk">Direct Office Cash</option>
             </select>
-            <input type="text" placeholder="TrxID / Money Receipt No" value={form.trxId} onChange={(e) => update("trxId", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] uppercase font-mono font-bold focus:outline-none" />
+            <input type="text" placeholder="TrxID / Money Receipt No" value={form.trxId} onChange={(e) => update("trxId", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] uppercase font-semibold font-bold focus:outline-none" />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-semibold">
             <input type="number" required placeholder="Total Fee" value={form.totalFee} onChange={(e) => update("totalFee", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none" />
             <input type="number" required placeholder="Advance / Paid" value={form.advancePaid} onChange={(e) => update("advancePaid", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none font-bold text-[#0077b6]" />
           </div>

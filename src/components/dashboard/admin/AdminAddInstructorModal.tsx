@@ -89,11 +89,11 @@ export default function AdminAddInstructorModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="font-bold text-slate-700 block mb-1">Phone Number</label>
-              <input type="tel" required placeholder="+880 17XX-XXXXXX" value={form.phone} onChange={(e) => update("phone", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] font-mono focus:outline-none" />
+              <input type="tel" required placeholder="+880 17XX-XXXXXX" value={form.phone} onChange={(e) => update("phone", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] font-semibold focus:outline-none" />
             </div>
             <div>
               <label className="font-bold text-slate-700 block mb-1">Official Email Address</label>
-              <input type="email" required placeholder="trainer@bimbuildbd.com" value={form.email} onChange={(e) => update("email", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] font-mono focus:outline-none" />
+              <input type="email" required placeholder="trainer@bimbuildbd.com" value={form.email} onChange={(e) => update("email", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] font-semibold focus:outline-none" />
             </div>
           </div>
 

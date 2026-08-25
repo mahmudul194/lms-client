@@ -39,7 +39,7 @@ export default function InstructorEvaluationModal({
           <div className="space-y-0.5">
             <div className="flex items-center gap-2">
               <h4 className="text-lg font-black text-slate-900">Evaluating: {selectedSubmission.studentName}</h4>
-              <span className="text-xs font-mono bg-sky-50 text-[#0077b6] px-2 py-0.5 rounded-md font-bold">{selectedSubmission.studentRoll}</span>
+              <span className="text-xs font-semibold bg-sky-50 text-[#0077b6] px-2 py-0.5 rounded-md font-bold">{selectedSubmission.studentRoll}</span>
             </div>
             <p className="text-xs text-slate-500">{selectedSubmission.assignmentTitle}</p>
           </div>
@@ -59,7 +59,7 @@ export default function InstructorEvaluationModal({
             {selectedSubmission.files.map((file, idx) => (
               <a key={idx} href={file.url} onClick={(e) => { e.preventDefault(); alert(`Downloading ${file.name}`); }} className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center justify-between group text-xs cursor-pointer">
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="px-1.5 py-0.5 rounded bg-[#002b5b] text-white font-mono text-[10px] font-bold">{file.type}</span>
+                  <span className="px-1.5 py-0.5 rounded bg-[#002b5b] text-white font-semibold text-[10px] font-bold">{file.type}</span>
                   <span className="font-bold text-slate-900 truncate group-hover:text-[#0077b6]">{file.name}</span>
                 </div>
                 <Download className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0077b6] shrink-0" />

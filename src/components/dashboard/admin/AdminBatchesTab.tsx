@@ -50,7 +50,7 @@ export default function AdminBatchesTab() {
             className="p-6 rounded-3xl border border-slate-200 bg-slate-50 hover:bg-white hover:shadow-lg transition-all space-y-4"
           >
             <div className="flex items-center justify-between">
-              <span className="px-2.5 py-0.5 rounded-md bg-[#0077b6]/10 text-[#0077b6] font-mono text-xs font-bold">
+              <span className="px-2.5 py-0.5 rounded-md bg-[#0077b6]/10 text-[#0077b6] font-semibold text-xs font-bold">
                 {b.code}
               </span>
               <span
@@ -75,10 +75,10 @@ export default function AdminBatchesTab() {
 
             {/* Price & Discounts */}
             <div className="p-3 rounded-2xl bg-white border border-slate-200 flex items-center justify-between text-xs">
-              <span className="text-slate-400 line-through font-mono">{b.regularFee}</span>
+              <span className="text-slate-400 line-through font-semibold">{b.regularFee}</span>
               <div className="text-right">
                 <span className="text-[10px] text-emerald-700 font-bold uppercase block">Offer Price</span>
-                <strong className="text-sm font-black text-[#0077b6] font-mono">{b.discountFee}</strong>
+                <strong className="text-sm font-black text-[#0077b6] font-semibold">{b.discountFee}</strong>
               </div>
             </div>
 
@@ -113,7 +113,7 @@ export default function AdminBatchesTab() {
                 <span className="flex items-center gap-1.5 text-slate-500">
                   <Users className="w-3.5 h-3.5" /> Capacity
                 </span>
-                <strong className="font-mono text-slate-900">{b.enrolledStudents}/{b.maxSeats} Filled</strong>
+                <strong className="font-semibold text-slate-900">{b.enrolledStudents}/{b.maxSeats} Filled</strong>
               </p>
               <p className="flex items-center justify-between">
                 <span className="flex items-center gap-1.5 text-slate-500">
@@ -125,7 +125,7 @@ export default function AdminBatchesTab() {
                 <span className="flex items-center gap-1.5 text-slate-500">
                   <Wrench className="w-3.5 h-3.5" /> Software
                 </span>
-                <span className="font-mono text-[11px] text-[#0077b6] truncate max-w-[170px]">{b.softwareVersion}</span>
+                <span className="font-semibold text-[11px] text-[#0077b6] truncate max-w-[170px]">{b.softwareVersion}</span>
               </p>
             </div>
           </div>

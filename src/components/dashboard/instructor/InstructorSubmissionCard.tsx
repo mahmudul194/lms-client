@@ -18,7 +18,7 @@ export default function InstructorSubmissionCard({
       <div className="space-y-2 min-w-0 flex-1">
         <div className="flex items-center gap-2 flex-wrap">
           <strong className="text-slate-900 text-sm">{sub.studentName}</strong>
-          <span className="text-[11px] font-mono text-slate-500 bg-slate-200 px-2 py-0.5 rounded-md font-bold">
+          <span className="text-[11px] font-semibold text-slate-500 bg-slate-200 px-2 py-0.5 rounded-md font-bold">
             {sub.studentRoll}
           </span>
           <span
@@ -47,7 +47,7 @@ export default function InstructorSubmissionCard({
           {sub.files.map((f, i) => (
             <span
               key={i}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-sky-50 border border-sky-200 text-[#0077b6] text-[11px] font-mono font-bold"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-sky-50 border border-sky-200 text-[#0077b6] text-[11px] font-semibold font-bold"
             >
               <Download className="w-3 h-3" />
               <span>

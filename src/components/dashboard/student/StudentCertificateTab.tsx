@@ -49,7 +49,7 @@ export default function StudentCertificateTab({ currentUser }: StudentCertificat
 
         <div className="flex items-center justify-between pt-1">
           <span className="text-slate-500 font-bold uppercase tracking-wider">QR Verification ID:</span>
-          <span className="font-mono font-bold text-[#0077b6]">BIM-CERT-PENDING-2026</span>
+          <span className="font-semibold font-bold text-[#0077b6]">BIM-CERT-PENDING-2026</span>
         </div>
       </div>
 

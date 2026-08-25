@@ -46,19 +46,19 @@ export default function AdminPaymentQueueTable({
                     <UserCheck className="w-4 h-4 text-[#0077b6]" />
                     <span>{item.name}</span>
                   </div>
-                  <div className="text-xs text-slate-500 font-mono pl-5">{item.phone}</div>
+                  <div className="text-xs text-slate-500 font-semibold pl-5">{item.phone}</div>
                 </td>
                 <td className="p-3.5 text-slate-700">
                   <div className="font-bold text-slate-900">{item.course}</div>
                   <div className="text-xs text-slate-500 font-medium">{item.batch || "Regular Intake"}</div>
                 </td>
-                <td className="p-3.5 font-mono text-[#0077b6] font-bold">
+                <td className="p-3.5 font-semibold text-[#0077b6] font-bold">
                   <div className="bg-sky-50/80 px-2.5 py-1 rounded-lg border border-sky-100 inline-block text-xs">
                     {item.method}
                   </div>
                 </td>
                 <td className="p-3.5">
-                  <div className="font-mono font-bold text-slate-900">Paid: {item.amount}</div>
+                  <div className="font-semibold font-bold text-slate-900">Paid: {item.amount}</div>
                   {item.dueAmount && item.dueAmount !== "৳0" ? (
                     <span className="text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 inline-block mt-0.5">
                       Due: {item.dueAmount}

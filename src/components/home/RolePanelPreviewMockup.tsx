@@ -11,7 +11,7 @@ export default function RolePanelPreviewMockup({ activeTab }: RolePanelPreviewMo
   return (
     <div className="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-inner">
       <div className="flex items-center justify-between border-b border-slate-800 pb-3 text-xs text-slate-400">
-        <span className="font-mono">Live Interface Preview</span>
+        <span className="font-semibold">Live Interface Preview</span>
         <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
       </div>
 

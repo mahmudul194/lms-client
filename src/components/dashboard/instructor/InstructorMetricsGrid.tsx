@@ -62,7 +62,7 @@ export default function InstructorMetricsGrid({
             </div>
 
             <div>
-              <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-mono">
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-semibold">
                 {c.value}
               </div>
               <div className="text-[11px] text-slate-400 font-medium mt-0.5">{c.sub}</div>
@@ -70,7 +70,7 @@ export default function InstructorMetricsGrid({
 
             <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
               <span
-                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border font-mono ${
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border font-semibold ${
                   c.badgeDanger
                     ? "bg-rose-50 text-rose-700 border-rose-200/60"
                     : "bg-sky-50 text-[#0077b6] border-sky-200/60"

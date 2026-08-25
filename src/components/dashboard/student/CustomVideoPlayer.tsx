@@ -121,14 +121,14 @@ export default function CustomVideoPlayer({ videoUrl, title, onEnded }: CustomVi
             <button onClick={togglePlay} className="p-1 hover:text-sky-400 cursor-pointer">{isPlaying ? <Pause className="w-4 h-4 fill-white" /> : <Play className="w-4 h-4 fill-white" />}</button>
             <button onClick={() => skip(-10)} title="Rewind 10s" className="p-1 hover:text-sky-400 cursor-pointer"><RotateCcw className="w-3.5 h-3.5" /></button>
             <button onClick={() => skip(10)} title="Forward 10s" className="p-1 hover:text-sky-400 cursor-pointer"><RotateCw className="w-3.5 h-3.5" /></button>
-            <span className="font-mono text-[11px] text-slate-300">{fmt(currentTime)} / {fmt(duration)}</span>
+            <span className="font-semibold text-[11px] text-slate-300">{fmt(currentTime)} / {fmt(duration)}</span>
             <div className="hidden sm:flex items-center gap-1.5 pl-2">
               <button onClick={() => handleVolume(isMuted ? 1 : 0)} title="Mute (M)" className="hover:text-sky-400 cursor-pointer">{isMuted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}</button>
               <input type="range" min={0} max={1} step={0.02} value={isMuted ? 0 : volume} onChange={(e) => handleVolume(Number(e.target.value))} style={{ background: `linear-gradient(to right, #0077b6 0%, #0077b6 ${volumePct}%, rgba(255,255,255,0.2) ${volumePct}%, rgba(255,255,255,0.2) 100%)` }} className="w-16 h-1 hover:h-1.5 rounded appearance-none cursor-pointer accent-[#0077b6] transition-all" />
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex items-center bg-black/40 rounded-lg p-0.5 border border-slate-700 text-[11px] font-mono">
+            <div className="flex items-center bg-black/40 rounded-lg p-0.5 border border-slate-700 text-[11px] font-semibold">
               {[1, 1.25, 1.5, 2].map((r) => (
                 <button key={r} onClick={() => { setPlaybackRate(r); if (isYouTube) yt.setPlaybackRate(r); else if (videoRef.current) videoRef.current.playbackRate = r; }} className={`px-1.5 py-0.5 rounded cursor-pointer ${playbackRate === r ? "bg-[#0077b6] text-white font-bold" : "text-slate-400 hover:text-white"}`}>{r}x</button>
               ))}

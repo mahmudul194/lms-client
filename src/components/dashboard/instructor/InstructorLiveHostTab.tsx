@@ -62,7 +62,7 @@ export default function InstructorLiveHostTab({ batches }: InstructorLiveHostTab
       <div className="p-6 rounded-3xl bg-[#001830] text-white space-y-6 shadow-xl border border-slate-800">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
           <div>
-            <span className="text-xs font-mono text-sky-400 font-bold uppercase tracking-wider block">
+            <span className="text-xs font-semibold text-sky-400 font-bold uppercase tracking-wider block">
               HOST CREDENTIALS
             </span>
             <h4 className="text-lg font-bold text-white mt-0.5">{selectedBatch.nextClassTopic}</h4>
@@ -75,15 +75,15 @@ export default function InstructorLiveHostTab({ batches }: InstructorLiveHostTab
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
           <div className="p-3.5 bg-white/5 rounded-2xl border border-white/10">
             <span className="text-slate-400 block">Meeting ID</span>
-            <strong className="text-sm font-mono text-white">872 9102 4819</strong>
+            <strong className="text-sm font-semibold text-white">872 9102 4819</strong>
           </div>
           <div className="p-3.5 bg-white/5 rounded-2xl border border-white/10">
             <span className="text-slate-400 block">Host Passcode</span>
-            <strong className="text-sm font-mono text-white">BIM2026HOST</strong>
+            <strong className="text-sm font-semibold text-white">BIM2026HOST</strong>
           </div>
           <div className="p-3.5 bg-white/5 rounded-2xl border border-white/10">
             <span className="text-slate-400 block">Scheduled Time</span>
-            <strong className="text-sm font-mono text-sky-300">9:00 PM Tonight</strong>
+            <strong className="text-sm font-semibold text-sky-300">9:00 PM Tonight</strong>
           </div>
         </div>
 

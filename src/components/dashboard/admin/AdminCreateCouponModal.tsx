@@ -73,7 +73,7 @@ export default function AdminCreateCouponModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="font-bold text-slate-700 block mb-1.5">Coupon Promo Code</label>
-            <input type="text" required placeholder="e.g. BIMPRO2026" value={form.code} onChange={(e) => update("code", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] uppercase font-mono font-bold text-sm tracking-wider focus:outline-none" />
+            <input type="text" required placeholder="e.g. BIMPRO2026" value={form.code} onChange={(e) => update("code", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] uppercase font-semibold font-bold text-sm tracking-wider focus:outline-none" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -86,7 +86,7 @@ export default function AdminCreateCouponModal({
             </div>
             <div>
               <label className="font-bold text-slate-700 block mb-1.5">{form.discountType === "percentage" ? "Discount Rate (%)" : "Discount Amount (BDT ৳)"}</label>
-              <input type="number" required placeholder="15" value={form.discountValue} onChange={(e) => update("discountValue", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none font-mono font-bold text-[#0077b6]" />
+              <input type="number" required placeholder="15" value={form.discountValue} onChange={(e) => update("discountValue", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none font-semibold font-bold text-[#0077b6]" />
             </div>
           </div>
 
@@ -97,7 +97,7 @@ export default function AdminCreateCouponModal({
             </div>
             <div>
               <label className="font-bold text-slate-700 block mb-1.5">Usage Redemption Limit</label>
-              <input type="number" required placeholder="50" value={form.usageLimit} onChange={(e) => update("usageLimit", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none font-mono" />
+              <input type="number" required placeholder="50" value={form.usageLimit} onChange={(e) => update("usageLimit", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none font-semibold" />
             </div>
           </div>
 

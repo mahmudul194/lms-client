@@ -46,7 +46,7 @@ export default function InstructorProfileTab({ currentUser }: InstructorProfileT
           <div>
             <h4 className="font-extrabold text-slate-900 text-base">{name}</h4>
             <span className="text-xs text-[#0077b6] font-bold block">{currentUser.roleTitle}</span>
-            <span className="text-xs text-slate-400 font-mono">{currentUser.details}</span>
+            <span className="text-xs text-slate-400 font-semibold">{currentUser.details}</span>
           </div>
         </div>
 

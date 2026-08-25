@@ -60,7 +60,7 @@ export default function StudentResourcesTab({ resources }: StudentResourcesTabPr
               <h4 className="font-bold text-slate-900 text-sm truncate block mt-1">
                 {res.name}
               </h4>
-              <span className="text-xs text-slate-500 font-mono block">
+              <span className="text-xs text-slate-500 font-semibold block">
                 {res.type} • {res.size}
               </span>
             </div>

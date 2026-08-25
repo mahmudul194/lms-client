@@ -19,7 +19,7 @@ export default function StudentPaymentsTab() {
             <CheckCircle2 className="w-5 h-5 text-emerald-600" />
           </div>
           <div className="text-2xl font-black text-emerald-950">৳4,000 BDT</div>
-          <p className="text-xs text-emerald-700 font-mono">bKash: 9J87K65LM4</p>
+          <p className="text-xs text-emerald-700 font-semibold">bKash: 9J87K65LM4</p>
           <button className="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs sm:text-sm hover:bg-emerald-700 cursor-pointer">
             Download Receipt
           </button>
@@ -31,7 +31,7 @@ export default function StudentPaymentsTab() {
             <CheckCircle2 className="w-5 h-5 text-emerald-600" />
           </div>
           <div className="text-2xl font-black text-emerald-950">৳4,000 BDT</div>
-          <p className="text-xs text-emerald-700 font-mono">Nagad: 8K72M90P11</p>
+          <p className="text-xs text-emerald-700 font-semibold">Nagad: 8K72M90P11</p>
           <button className="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs sm:text-sm hover:bg-emerald-700 cursor-pointer">
             Download Receipt
           </button>

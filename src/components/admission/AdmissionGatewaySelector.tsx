@@ -72,7 +72,7 @@ export default function AdmissionGatewaySelector({
             <span className="text-xs text-slate-500 font-bold block uppercase tracking-wider">
               {paymentMethod.toUpperCase()} RECEIVER ACCOUNT:
             </span>
-            <strong className="text-sm sm:text-base font-extrabold text-slate-900 font-mono">
+            <strong className="text-sm sm:text-base font-extrabold text-slate-900 font-semibold">
               {merchantNumbers[paymentMethod]}
             </strong>
           </div>
@@ -106,7 +106,7 @@ export default function AdmissionGatewaySelector({
             placeholder="e.g. 9J87K65LM4"
             value={trxId}
             onChange={(e) => setTrxId(e.target.value.toUpperCase())}
-            className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-mono tracking-wider focus:border-[#0077b6] focus:ring-2 focus:ring-sky-100 focus:outline-none bg-white uppercase font-bold text-slate-900 shadow-2xs"
+            className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-semibold tracking-wider focus:border-[#0077b6] focus:ring-2 focus:ring-sky-100 focus:outline-none bg-white uppercase font-bold text-slate-900 shadow-2xs"
           />
         </div>
       </div>

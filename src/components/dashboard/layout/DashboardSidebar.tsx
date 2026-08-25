@@ -75,7 +75,7 @@ export default function DashboardSidebar({
                         <span>{item.label}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        {item.badge && <span className="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-200 font-mono font-bold">{item.badge}</span>}
+                        {item.badge && <span className="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-200 font-semibold font-bold">{item.badge}</span>}
                         <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
                       </div>
                     </button>
@@ -85,7 +85,7 @@ export default function DashboardSidebar({
                         {item.children?.map((sub) => (
                           <button key={sub.id} type="button" onClick={() => handleNavClick(sub.id)} className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${activeTabId === sub.id ? "bg-[#0077b6] text-white font-bold shadow-xs" : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]"}`}>
                             <span>{sub.label}</span>
-                            {sub.badge && <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${activeTabId === sub.id ? "bg-white/20 text-white" : "bg-slate-800 text-slate-400"}`}>{sub.badge}</span>}
+                            {sub.badge && <span className={`text-[10px] font-semibold px-1.5 py-0.2 rounded ${activeTabId === sub.id ? "bg-white/20 text-white" : "bg-slate-800 text-slate-400"}`}>{sub.badge}</span>}
                           </button>
                         ))}
                       </div>
@@ -100,7 +100,7 @@ export default function DashboardSidebar({
                     <Icon className={`w-4.5 h-4.5 ${isActive ? "text-white" : "text-sky-300"}`} />
                     <span>{item.label}</span>
                   </div>
-                  {item.badge && <span className="text-[11px] px-2 py-0.5 rounded-md font-mono font-bold bg-sky-500/15 text-sky-200 border border-sky-500/25">{item.badge}</span>}
+                  {item.badge && <span className="text-[11px] px-2 py-0.5 rounded-md font-semibold font-bold bg-sky-500/15 text-sky-200 border border-sky-500/25">{item.badge}</span>}
                 </button>
               );
             })}

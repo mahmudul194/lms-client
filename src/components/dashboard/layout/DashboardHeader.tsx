@@ -54,7 +54,7 @@ export default function DashboardHeader({
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-12 py-2 rounded-xl bg-slate-100/90 border border-slate-200/80 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:border-[#0077b6] focus:ring-2 focus:ring-sky-500/10 focus:outline-none transition-all"
           />
-          <kbd className="hidden lg:inline-block absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold bg-white text-slate-400 px-1.5 py-0.5 rounded border border-slate-200 shadow-2xs">
+          <kbd className="hidden lg:inline-block absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-semibold font-bold bg-white text-slate-400 px-1.5 py-0.5 rounded border border-slate-200 shadow-2xs">
             ⌘K
           </kbd>
         </div>

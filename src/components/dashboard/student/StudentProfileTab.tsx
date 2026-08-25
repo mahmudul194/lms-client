@@ -46,7 +46,7 @@ export default function StudentProfileTab({ currentUser }: StudentProfileTabProp
           <div>
             <h4 className="font-extrabold text-slate-900 text-base">{name}</h4>
             <span className="text-xs text-[#0077b6] font-bold block">{currentUser.roleTitle}</span>
-            <span className="text-xs text-slate-400 font-mono">{currentUser.details}</span>
+            <span className="text-xs text-slate-400 font-semibold">{currentUser.details}</span>
           </div>
         </div>
 
@@ -106,7 +106,7 @@ export default function StudentProfileTab({ currentUser }: StudentProfileTabProp
               <input
                 type="password"
                 defaultValue="123"
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 focus:border-[#0077b6] focus:outline-none font-mono"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 focus:border-[#0077b6] focus:outline-none font-semibold"
               />
             </div>
           </div>

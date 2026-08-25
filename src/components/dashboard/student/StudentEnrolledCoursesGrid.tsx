@@ -47,7 +47,7 @@ export default function StudentEnrolledCoursesGrid({
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-950/80 text-sky-300 text-[11px] font-bold border border-sky-400/30 backdrop-blur-md font-mono">
+                <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-950/80 text-sky-300 text-[11px] font-bold border border-sky-400/30 backdrop-blur-md font-semibold">
                   {c.batch}
                 </span>
                 <span className="absolute bottom-3 left-3 px-2.5 py-0.5 rounded-lg bg-sky-600/90 text-white text-[10px] font-bold uppercase tracking-wider">
@@ -70,7 +70,7 @@ export default function StudentEnrolledCoursesGrid({
                 <div className="space-y-1.5 pt-1">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-slate-500 font-bold">Course Progress</span>
-                    <span className="font-mono font-black text-slate-900">{c.progressPercent}%</span>
+                    <span className="font-semibold font-black text-slate-900">{c.progressPercent}%</span>
                   </div>
                   <div className="h-2 rounded-full bg-slate-100 overflow-hidden border border-slate-200/60">
                     <div
@@ -78,7 +78,7 @@ export default function StudentEnrolledCoursesGrid({
                       style={{ width: `${c.progressPercent}%` }}
                     />
                   </div>
-                  <span className="text-[11px] text-slate-400 font-mono block">
+                  <span className="text-[11px] text-slate-400 font-semibold block">
                     {c.completedLessons} of {c.totalLessons} Lessons Completed
                   </span>
                 </div>

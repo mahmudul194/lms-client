@@ -98,7 +98,7 @@ export default function AdminCreateBatchModal({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-semibold">
             <div>
               <label className="font-sans font-bold text-slate-700 block mb-1.5">Regular Fee (BDT ৳)</label>
               <input type="number" required placeholder="20000" value={form.regFee} onChange={(e) => update("regFee", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none" />
@@ -111,7 +111,7 @@ export default function AdminCreateBatchModal({
 
           <div>
             <label className="font-bold text-slate-700 block mb-1.5">FB Secret Support Group Link</label>
-            <input type="url" required placeholder="https://facebook.com/groups/..." value={form.fbUrl} onChange={(e) => update("fbUrl", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none font-mono text-xs" />
+            <input type="url" required placeholder="https://facebook.com/groups/..." value={form.fbUrl} onChange={(e) => update("fbUrl", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none font-semibold text-xs" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -121,7 +121,7 @@ export default function AdminCreateBatchModal({
             </div>
             <div>
               <label className="font-bold text-slate-700 block mb-1.5">Software Versions</label>
-              <input type="text" placeholder="Revit 2024 + Dynamo 2.19" value={form.software} onChange={(e) => update("software", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none font-mono text-xs" />
+              <input type="text" placeholder="Revit 2024 + Dynamo 2.19" value={form.software} onChange={(e) => update("software", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none font-semibold text-xs" />
             </div>
           </div>
 

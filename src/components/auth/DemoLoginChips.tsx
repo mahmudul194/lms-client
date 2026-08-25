@@ -23,7 +23,7 @@ export default function DemoLoginChips({ onPerformLogin }: DemoLoginChipsProps) 
         >
           <GraduationCap className="w-4 h-4 text-[#0077b6] mx-auto mb-1" />
           <div className="text-[11px] font-bold text-slate-800">Student</div>
-          <div className="text-[9px] text-slate-400 font-mono">123</div>
+          <div className="text-[9px] text-slate-400 font-semibold">123</div>
         </button>
 
         <button
@@ -33,7 +33,7 @@ export default function DemoLoginChips({ onPerformLogin }: DemoLoginChipsProps) 
         >
           <UserCheck className="w-4 h-4 text-[#002b5b] mx-auto mb-1" />
           <div className="text-[11px] font-bold text-slate-800">Instructor</div>
-          <div className="text-[9px] text-slate-400 font-mono">123</div>
+          <div className="text-[9px] text-slate-400 font-semibold">123</div>
         </button>
 
         <button
@@ -43,7 +43,7 @@ export default function DemoLoginChips({ onPerformLogin }: DemoLoginChipsProps) 
         >
           <ShieldCheck className="w-4 h-4 text-[#0f4c81] mx-auto mb-1" />
           <div className="text-[11px] font-bold text-slate-800">Admin</div>
-          <div className="text-[9px] text-slate-400 font-mono">123</div>
+          <div className="text-[9px] text-slate-400 font-semibold">123</div>
         </button>
       </div>
     </div>

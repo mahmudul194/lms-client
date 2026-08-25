@@ -63,7 +63,7 @@ export default function AdminStudentsTab() {
               <tr key={s.id} className="hover:bg-slate-50/70 transition-colors">
                 <td className="p-4">
                   <strong className="text-slate-900 block font-extrabold">{s.name}</strong>
-                  <span className="text-xs text-[#0077b6] font-mono font-bold">{s.roll}</span>
+                  <span className="text-xs text-[#0077b6] font-semibold font-bold">{s.roll}</span>
                 </td>
                 <td className="p-4">
                   <span className="font-semibold text-slate-800 block">{s.course}</span>
@@ -73,11 +73,11 @@ export default function AdminStudentsTab() {
                   <span className="flex items-center gap-1.5 text-xs text-slate-600">
                     <Mail className="w-3 h-3 text-slate-400" /> {s.email}
                   </span>
-                  <span className="flex items-center gap-1.5 text-xs text-slate-600 font-mono">
+                  <span className="flex items-center gap-1.5 text-xs text-slate-600 font-semibold">
                     <Phone className="w-3 h-3 text-slate-400" /> {s.phone}
                   </span>
                 </td>
-                <td className="p-4 font-mono">
+                <td className="p-4 font-semibold">
                   <strong className="text-slate-900 block font-bold">{s.paidAmount}</strong>
                   <span className="text-[11px] text-slate-400">of {s.totalFee}</span>
                 </td>

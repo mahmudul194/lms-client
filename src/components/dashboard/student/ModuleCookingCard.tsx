@@ -33,7 +33,7 @@ export default function ModuleCookingCard({
       </div>
 
       {/* Status Pill */}
-      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-md text-xs sm:text-sm font-mono text-sky-200 mb-3 shadow-xs">
+      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-md text-xs sm:text-sm font-semibold text-sky-200 mb-3 shadow-xs">
         <Clock className="w-3.5 h-3.5 text-amber-300 animate-spin" style={{ animationDuration: "6s" }} />
         <span>Next Batch Milestone in Progress</span>
       </div>

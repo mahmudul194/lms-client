@@ -85,7 +85,7 @@ export default function AdminCouponsTab() {
             {coupons.map((c) => (
               <tr key={c.id} className="hover:bg-slate-50">
                 <td className="p-3.5">
-                  <div className="flex items-center gap-1.5 font-mono">
+                  <div className="flex items-center gap-1.5 font-semibold">
                     <span className="font-bold text-slate-900 bg-slate-100 px-2 py-1 rounded-md text-xs">{c.code}</span>
                     <button
                       onClick={() => handleCopyCode(c.code)}
@@ -100,8 +100,8 @@ export default function AdminCouponsTab() {
                   {c.discountType === "percentage" ? `${c.discountValue}% OFF` : `৳${c.discountValue} Flat`}
                 </td>
                 <td className="p-3.5 text-slate-700">{c.applicableCourse}</td>
-                <td className="p-3.5 font-mono text-slate-600">{c.usedCount}/{c.usageLimit}</td>
-                <td className="p-3.5 text-slate-500 font-mono text-xs">{c.expiryDate}</td>
+                <td className="p-3.5 font-semibold text-slate-600">{c.usedCount}/{c.usageLimit}</td>
+                <td className="p-3.5 text-slate-500 font-semibold text-xs">{c.expiryDate}</td>
                 <td className="p-3.5 text-right">
                   <button
                     onClick={() => toggleCouponStatus(c.id)}
