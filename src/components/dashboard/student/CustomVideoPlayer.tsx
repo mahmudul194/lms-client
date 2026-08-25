@@ -105,9 +105,9 @@ export default function CustomVideoPlayer({ videoUrl, title, onEnded }: CustomVi
   return (
     <div ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(e) => e.preventDefault()} className="relative aspect-video bg-slate-950 overflow-hidden rounded-2xl group select-none font-sans">
       {isYouTube ? (
-        <div className="absolute -top-6 -bottom-6 inset-x-0 w-full h-[calc(100%+48px)] pointer-events-none scale-[1.02] select-none"><div id={ytElementId} className="w-full h-full" /></div>
+        <div className="absolute inset-0 w-full h-full pointer-events-none scale-100 select-none"><div id={ytElementId} className="w-full h-full" /></div>
       ) : (
-        <video ref={videoRef} key={videoUrl} src={videoUrl} onTimeUpdate={() => videoRef.current && setHtml5Time(videoRef.current.currentTime)} onLoadedMetadata={() => videoRef.current && setHtml5Duration(videoRef.current.duration)} onEnded={() => { setHtml5Playing(false); onEnded?.(); }} onError={() => setHtml5Playing(false)} className="w-full h-full object-cover pointer-events-none" playsInline preload="metadata" />
+        <video ref={videoRef} key={videoUrl} src={videoUrl} onTimeUpdate={() => videoRef.current && setHtml5Time(videoRef.current.currentTime)} onLoadedMetadata={() => videoRef.current && setHtml5Duration(videoRef.current.duration)} onEnded={() => { setHtml5Playing(false); onEnded?.(); }} onError={() => setHtml5Playing(false)} className="w-full h-full object-contain pointer-events-none" playsInline preload="metadata" />
       )}
       {!isPlaying && currentTime === 0 && isYouTube && (
         <img src={posterErr ? `https://img.youtube.com/vi/${ytVideoId}/hqdefault.jpg` : `https://img.youtube.com/vi/${ytVideoId}/maxresdefault.jpg`} onError={() => setPosterErr(true)} alt={title} className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10 brightness-95" />
