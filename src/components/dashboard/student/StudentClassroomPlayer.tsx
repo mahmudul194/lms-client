@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronLeft, ChevronRight, ChevronDown, CheckCircle2, PlayCircle, Lock, Download, ArrowLeft, Flame, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, CheckCircle2, PlayCircle, Lock, Download, ArrowLeft, Sparkles } from "lucide-react";
 import { EnrolledCourse, EnrolledLesson } from "@/types/dashboard";
 import CustomVideoPlayer from "./CustomVideoPlayer";
 import ModuleCookingCard from "./ModuleCookingCard";
@@ -132,9 +132,6 @@ export default function StudentClassroomPlayer({ course, onBackToCourses }: Stud
                 )}
               </div>
             ))}
-            <div onClick={() => setIsCookingState(true)} className={`rounded-2xl border-2 border-dashed p-4 transition-all cursor-pointer ${isCookingState ? "bg-sky-50 border-[#0077b6] shadow-xs" : "border-sky-200 bg-sky-50/40 hover:bg-sky-50"}`}>
-              <div className="flex items-center justify-between"><div><span className="text-[11px] font-black uppercase text-[#0077b6] tracking-wider block">Upcoming Module</span><strong className="text-xs sm:text-sm font-bold text-slate-800 block mt-0.5">The new module is cooking...</strong></div><Flame className="w-4 h-4 text-amber-500 animate-pulse shrink-0" /></div>
-            </div>
           </div>
         </div>
       </div>
