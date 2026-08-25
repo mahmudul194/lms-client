@@ -38,6 +38,14 @@ export function useYouTubeController(elementId: string, videoId: string | null, 
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
+  // Reset state immediately on video switch
+  useEffect(() => {
+    setCurrentTime(0);
+    setDuration(0);
+    setIsPlaying(false);
+    isSeekingUntilRef.current = 0;
+  }, [videoId]);
+
   useEffect(() => {
     if (!videoId || typeof window === "undefined") return;
     loadYT(() => {
