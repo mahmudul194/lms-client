@@ -17,6 +17,19 @@ declare global {
   }
 }
 
+function loadYT(cb: () => void) {
+  if (typeof window === "undefined") return;
+  if (window.YT?.Player) { cb(); return; }
+  const prev = window.onYouTubeIframeAPIReady;
+  window.onYouTubeIframeAPIReady = () => { prev?.(); cb(); };
+  if (!document.getElementById("yt-script")) {
+    const t = document.createElement("script");
+    t.id = "yt-script";
+    t.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(t);
+  }
+}
+
 export function useYouTubeController(elementId: string, videoId: string | null, onEnded?: () => void) {
   const playerRef = useRef<any>(null);
   const isSeekingUntilRef = useRef<number>(0);
@@ -26,21 +39,10 @@ export function useYouTubeController(elementId: string, videoId: string | null, 
   const [duration, setDuration] = useState(0);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!window.YT) {
-      const tag = document.createElement("script");
-      tag.src = "https://www.youtube.com/iframe_api";
-      const first = document.getElementsByTagName("script")[0];
-      first?.parentNode?.insertBefore(tag, first);
-    }
-  }, []);
-
-  useEffect(() => {
     if (!videoId || typeof window === "undefined") return;
-    const init = () => {
-      if (!window.YT || !window.YT.Player) return;
+    loadYT(() => {
       if (playerRef.current) {
-        playerRef.current.loadVideoById?.(videoId);
+        playerRef.current.cueVideoById?.(videoId);
         return;
       }
       playerRef.current = new window.YT.Player(elementId, {
@@ -59,9 +61,7 @@ export function useYouTubeController(elementId: string, videoId: string | null, 
           },
         },
       });
-    };
-    if (window.YT && window.YT.Player) init();
-    else window.onYouTubeIframeAPIReady = init;
+    });
 
     return () => {
       if (playerRef.current) {
@@ -77,10 +77,9 @@ export function useYouTubeController(elementId: string, videoId: string | null, 
     const interval = setInterval(() => {
       if (Date.now() < isSeekingUntilRef.current) return;
       if (playerRef.current?.getCurrentTime) {
-        const cur = playerRef.current.getCurrentTime() || 0;
-        const dur = playerRef.current.getDuration() || 0;
-        setCurrentTime(cur);
-        if (dur > 0) setDuration(dur);
+        setCurrentTime(playerRef.current.getCurrentTime() || 0);
+        const d = playerRef.current.getDuration() || 0;
+        if (d > 0) setDuration(d);
       }
     }, 250);
     return () => clearInterval(interval);
