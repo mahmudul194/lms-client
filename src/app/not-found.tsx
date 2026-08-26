@@ -29,13 +29,13 @@ export default function NotFound() {
         {/* 404 Headline */}
         <div className="space-y-3">
           <span className="text-xs sm:text-sm font-extrabold uppercase tracking-widest text-[#0077b6] bg-sky-50 px-4 py-1.5 rounded-full border border-sky-200">
-            Error 404 • Page Not Found
+            404 Error
           </span>
           <h1 className="text-4xl sm:text-6xl font-black text-[#002b5b] tracking-tight">
-            Model Not Found!
+            Page Not Found
           </h1>
           <p className="text-sm sm:text-base text-slate-600 max-w-md mx-auto leading-relaxed">
-            The architectural blueprint or page you are looking for might have been moved, renamed, or is currently under construction.
+            Oops! The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
           </p>
         </div>
 
