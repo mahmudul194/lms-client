@@ -8,18 +8,21 @@ import HeroShowcaseCard from "./HeroShowcaseCard";
 
 export default function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-[#f0f2f5] py-14 sm:py-18 lg:py-20 xl:py-24 flex items-center">
-      {/* Background subtle curve accent */}
+    <section className="relative overflow-hidden bg-[#f4f8fb] py-14 sm:py-18 lg:py-20 xl:py-24 flex items-center">
+      {/* Background Architectural Photo with Luxury Blueprint Overlay */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <svg className="w-full h-full" viewBox="0 0 1440 650" fill="none">
-          <circle
-            cx="1180"
-            cy="360"
-            r="300"
-            stroke="#cbd5e1"
-            strokeWidth="1.5"
-            strokeDasharray="6 6"
-          />
+        <img
+          src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=2000&q=80"
+          alt="Modern Architectural Infrastructure Background"
+          loading="lazy"
+          decoding="async"
+          className="w-full h-full object-cover object-center opacity-30 filter contrast-105"
+        />
+        {/* Architectural Light Gradients to ensure text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#f4f8fb] via-[#f4f8fb]/80 to-[#f4f8fb]/40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#f4f8fb] via-transparent to-[#f4f8fb]/60" />
+        <svg className="absolute inset-0 w-full h-full opacity-40" viewBox="0 0 1440 650" fill="none">
+          <circle cx="1180" cy="360" r="300" stroke="#0077b6" strokeWidth="1.5" strokeDasharray="6 6" />
         </svg>
       </div>
 
@@ -39,7 +42,7 @@ export default function HeroSection() {
                   B
                   <span className="relative inline-flex items-center">
                     I
-                    <GraduationCap className="w-6 h-6 sm:w-8 sm:h-8 lg:w-9 lg:h-9 text-[#002b5b] absolute -top-5 sm:-top-7 left-1/2 -translate-x-1/2" />
+                    <GraduationCap className="w-6 h-6 sm:w-8 sm:h-8 lg:w-9 lg:h-9 text-[#002b5b] absolute -top-5 sm:-top-7 left-1/2 -translate-y-1/2" />
                   </span>
                   M
                 </span>
