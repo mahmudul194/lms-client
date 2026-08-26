@@ -1,118 +1,139 @@
 "use client";
 
 import React, { useState } from "react";
-import { BookOpen, Users, Calendar, Video, Clock, CheckCircle2 } from "lucide-react";
+import { Video, Copy, Check, Monitor, ExternalLink, Users, Calendar, Clock, BookOpen, Sparkles } from "lucide-react";
 import { InstructorBatch } from "@/data/instructorMockData";
 
 interface InstructorBatchesTabProps {
   batches: InstructorBatch[];
-  onHostZoom: (batch: InstructorBatch) => void;
 }
 
-export default function InstructorBatchesTab({ batches, onHostZoom }: InstructorBatchesTabProps) {
-  const [filter, setFilter] = useState<"All" | "Active" | "Completed">("All");
+export default function InstructorBatchesTab({ batches }: InstructorBatchesTabProps) {
+  const [selectedBatch, setSelectedBatch] = useState<InstructorBatch>(batches[0]);
+  const [copied, setCopied] = useState(false);
 
-  const filteredBatches =
-    filter === "All" ? batches : batches.filter((b) => b.status === filter);
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText("https://zoom.us/j/87291024819");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const progressPercent = Math.round((selectedBatch.completedClasses / selectedBatch.totalClasses) * 100);
 
   return (
-    <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6 font-sans">
-      {/* Header with Title and Filter Buttons */}
+    <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-7 font-sans">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
         <div>
           <h3 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2.5">
-            <BookOpen className="w-6 h-6 text-[#0077b6]" />
-            <span>My Assigned Batches & Teaching Schedules</span>
+            <Video className="w-6 h-6 text-[#0077b6]" />
+            <span>Batches & Live Class Studio</span>
           </h3>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Manage your active 8th batches, student rosters, and syllabus progress
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Monitor syllabus progress, student rosters, and launch live Zoom classes for your active cohorts
           </p>
         </div>
+        <span className="px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-800 text-xs sm:text-sm font-bold border border-emerald-200 w-fit">
+          3 Active Cohorts
+        </span>
+      </div>
 
-        <div className="flex items-center gap-2">
-          {["All", "Active", "Completed"].map((tab) => (
+      {/* Step 1: Select Active Batch Tabs */}
+      <div className="space-y-2.5">
+        <label className="text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wide block">
+          Select Your Active Teaching Batch:
+        </label>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+          {batches.map((b) => (
             <button
-              key={tab}
-              onClick={() => setFilter(tab as any)}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                filter === tab
-                  ? "bg-[#002b5b] text-white shadow-xs"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              key={b.id}
+              onClick={() => setSelectedBatch(b)}
+              className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
+                selectedBatch.id === b.id
+                  ? "border-[#0077b6] bg-sky-50/70 ring-2 ring-sky-300 shadow-sm"
+                  : "border-slate-200 bg-slate-50/70 hover:bg-white text-slate-700"
               }`}
             >
-              {tab}
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-[#0077b6] bg-sky-100 px-2 py-0.5 rounded-md">{b.code}</span>
+                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">{b.status}</span>
+              </div>
+              <strong className="block text-sm text-slate-900 font-extrabold mt-1.5 truncate">{b.name}</strong>
+              <span className="text-xs text-slate-500 block mt-0.5">{b.studentsCount} Students • {b.schedule}</span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* Batch Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredBatches.map((b) => {
-          const progressPercent = Math.round((b.completedClasses / b.totalClasses) * 100);
+      {/* Step 2: Live Zoom Host Control Box for Selected Batch */}
+      <div className="p-6 sm:p-7 rounded-3xl bg-[#001830] text-white space-y-5 shadow-xl border border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+          <div>
+            <span className="text-xs font-bold text-sky-400 uppercase tracking-wider block">
+              LIVE STUDIO • {selectedBatch.code}
+            </span>
+            <h4 className="text-lg sm:text-xl font-black text-white mt-0.5">{selectedBatch.nextClassTopic}</h4>
+          </div>
+          <span className="px-3.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-black flex items-center gap-1.5 w-fit">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <span>Host Key Active</span>
+          </span>
+        </div>
 
-          return (
-            <div
-              key={b.id}
-              className="p-6 rounded-3xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:shadow-lg transition-all space-y-5 flex flex-col justify-between"
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="px-3 py-1 rounded-md bg-[#0077b6]/10 text-[#0077b6] text-xs font-black">
-                    {b.code}
-                  </span>
-                  <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black">
-                    {b.status}
-                  </span>
-                </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm">
+          <div className="p-3.5 bg-white/5 rounded-2xl border border-white/10">
+            <span className="text-slate-400 block text-xs">Meeting ID</span>
+            <strong className="text-base font-black text-white mt-0.5 block">872 9102 4819</strong>
+          </div>
+          <div className="p-3.5 bg-white/5 rounded-2xl border border-white/10">
+            <span className="text-slate-400 block text-xs">Host Passcode</span>
+            <strong className="text-base font-black text-white mt-0.5 block">BIM2026HOST</strong>
+          </div>
+          <div className="p-3.5 bg-white/5 rounded-2xl border border-white/10">
+            <span className="text-slate-400 block text-xs">Live Time</span>
+            <strong className="text-base font-black text-sky-300 mt-0.5 block">Tonight 9:00 PM</strong>
+          </div>
+        </div>
 
-                <h4 className="font-black text-slate-900 text-base sm:text-lg leading-snug">
-                  {b.name}
-                </h4>
+        <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
+          <a
+            href="https://zoom.us/j/87291024819"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:flex-1 py-3.5 rounded-2xl bg-[#0077b6] hover:bg-[#005a8c] text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg transition-all hover:scale-102"
+          >
+            <Monitor className="w-4 h-4" />
+            <span>Launch Zoom as Host</span>
+            <ExternalLink className="w-4 h-4 ml-1" />
+          </a>
 
-                <div className="text-xs sm:text-sm text-slate-600 space-y-2 pt-1">
-                  <p className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-[#0077b6]" />
-                    <span><strong className="text-slate-900">{b.studentsCount}</strong> Active Enrolled Students</span>
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-slate-400" />
-                    <span>{b.schedule}</span>
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-emerald-600" />
-                    <span className="font-bold text-slate-800 truncate">{b.nextClassTopic}</span>
-                  </p>
-                </div>
+          <button
+            onClick={handleCopyLink}
+            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-bold transition-colors flex items-center justify-center gap-2 cursor-pointer"
+          >
+            {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+            <span>{copied ? "Link Copied!" : "Copy Student Invite Link"}</span>
+          </button>
+        </div>
+      </div>
 
-                {/* Progress Bar */}
-                <div className="space-y-1.5 pt-2">
-                  <div className="flex justify-between text-xs font-bold text-slate-600">
-                    <span>Syllabus Covered</span>
-                    <span className="text-[#0077b6]">{b.completedClasses}/{b.totalClasses} Classes ({progressPercent}%)</span>
-                  </div>
-                  <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-[#0077b6] to-sky-400 rounded-full transition-all"
-                      style={{ width: `${progressPercent}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
+      {/* Step 3: Batch Details & Progress */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 rounded-2xl bg-slate-50 border border-slate-200">
+        <div className="space-y-2">
+          <span className="text-xs font-bold text-slate-500 uppercase block">Syllabus Completion</span>
+          <div className="flex justify-between text-xs sm:text-sm font-bold text-slate-700">
+            <span>{selectedBatch.completedClasses} of {selectedBatch.totalClasses} Classes Done</span>
+            <span className="text-[#0077b6]">{progressPercent}%</span>
+          </div>
+          <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-[#0077b6] to-sky-400 rounded-full" style={{ width: `${progressPercent}%` }} />
+          </div>
+        </div>
 
-              {/* Action Buttons */}
-              <div className="pt-3 border-t border-slate-200/80 flex items-center gap-2">
-                <button
-                  onClick={() => onHostZoom(b)}
-                  className="flex-1 py-3 rounded-xl bg-[#0077b6] hover:bg-[#005a8c] text-white text-xs sm:text-sm font-black flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer hover:scale-102"
-                >
-                  <Video className="w-4 h-4" />
-                  <span>Start Live Zoom</span>
-                </button>
-              </div>
-            </div>
-          );
-        })}
+        <div className="space-y-1 text-xs sm:text-sm text-slate-700 sm:pl-4 sm:border-l border-slate-200 flex flex-col justify-center">
+          <p className="flex justify-between"><span className="text-slate-500 font-medium">Batch Roster:</span><strong className="text-slate-900">{selectedBatch.studentsCount} Active Students</strong></p>
+          <p className="flex justify-between"><span className="text-slate-500 font-medium">Class Days:</span><strong className="text-[#002b5b]">{selectedBatch.schedule}</strong></p>
+        </div>
       </div>
     </div>
   );

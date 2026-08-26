@@ -10,7 +10,6 @@ import {
 
 import InstructorOverviewTab from "./InstructorOverviewTab";
 import InstructorBatchesTab from "./InstructorBatchesTab";
-import InstructorLiveHostTab from "./InstructorLiveHostTab";
 import InstructorGradingTab from "./InstructorGradingTab";
 import InstructorMaterialsTab from "./InstructorMaterialsTab";
 import InstructorProfileTab from "./InstructorProfileTab";
@@ -33,20 +32,13 @@ export default function InstructorDashboardView({
           currentUser={currentUser}
           batches={MOCK_INSTRUCTOR_BATCHES}
           submissions={MOCK_STUDENT_SUBMISSIONS}
-          onNavigateToLive={() => setInstructorTab("live_host")}
+          onNavigateToLive={() => setInstructorTab("batches")}
           onNavigateToGrading={() => setInstructorTab("grading")}
         />
       )}
 
-      {instructorTab === "batches" && (
-        <InstructorBatchesTab
-          batches={MOCK_INSTRUCTOR_BATCHES}
-          onHostZoom={() => setInstructorTab("live_host")}
-        />
-      )}
-
-      {instructorTab === "live_host" && (
-        <InstructorLiveHostTab batches={MOCK_INSTRUCTOR_BATCHES} />
+      {(instructorTab === "batches" || instructorTab === "live_host") && (
+        <InstructorBatchesTab batches={MOCK_INSTRUCTOR_BATCHES} />
       )}
 
       {instructorTab === "grading" && (
