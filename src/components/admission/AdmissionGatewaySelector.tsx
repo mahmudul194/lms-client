@@ -42,17 +42,17 @@ export default function AdmissionGatewaySelector({
           Select Payment Gateway <span className="text-rose-500">*</span>
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-          {[
+          {([
             { id: "bkash", name: "bKash", color: "border-pink-300 text-pink-600 bg-pink-50" },
             { id: "nagad", name: "Nagad", color: "border-orange-300 text-orange-600 bg-orange-50" },
             { id: "rocket", name: "Rocket", color: "border-purple-300 text-purple-600 bg-purple-50" },
             { id: "sslcommerz", name: "SSLCommerz / Cards", color: "border-blue-300 text-blue-600 bg-blue-50" },
             { id: "bank", name: "Bank Transfer", color: "border-emerald-300 text-emerald-600 bg-emerald-50" },
-          ].map((gw) => (
+          ] as const).map((gw) => (
             <button
               type="button"
               key={gw.id}
-              onClick={() => onSelectPaymentMethod(gw.id as any)}
+              onClick={() => onSelectPaymentMethod(gw.id)}
               className={`p-3 rounded-2xl border text-center text-xs font-bold transition-all cursor-pointer ${
                 paymentMethod === gw.id
                   ? `${gw.color} ring-2 ring-[#0077b6] shadow-sm font-black scale-105`

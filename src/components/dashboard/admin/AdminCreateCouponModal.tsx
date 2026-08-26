@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { TicketPercent, X } from "lucide-react";
 import { CouponItem } from "@/types/dashboard";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 interface AdminCreateCouponModalProps {
   isOpen: boolean;
@@ -16,7 +17,7 @@ export default function AdminCreateCouponModal({
   onClose,
   onCreateCoupon,
 }: AdminCreateCouponModalProps) {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsMounted();
   const [form, setForm] = useState({
     code: "",
     discountType: "percentage" as "percentage" | "flat",
@@ -26,10 +27,6 @@ export default function AdminCreateCouponModal({
     usageLimit: "50",
     applicableCourse: "All Courses",
   });
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   if (!mounted || !isOpen) return null;
 

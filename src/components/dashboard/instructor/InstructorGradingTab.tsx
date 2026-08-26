@@ -62,10 +62,10 @@ export default function InstructorGradingTab({ submissions }: InstructorGradingT
         </div>
 
         <div className="flex items-center gap-2">
-          {["All", "Pending", "Graded"].map((st) => (
+          {(["All", "Pending", "Graded"] as const).map((st) => (
             <button
               key={st}
-              onClick={() => setFilterStatus(st as any)}
+              onClick={() => setFilterStatus(st)}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 filterStatus === st
                   ? "bg-[#002b5b] text-white shadow-xs"

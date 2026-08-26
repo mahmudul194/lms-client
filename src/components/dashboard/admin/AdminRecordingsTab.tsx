@@ -43,8 +43,8 @@ export default function AdminRecordingsTab() {
           <p className="text-sm text-slate-500 mt-1">Review raw Zoom/Drive recordings from instructors, get practice BIM files, and publish to YouTube</p>
         </div>
         <div className="flex items-center gap-2">
-          {["All", "Pending", "Uploaded"].map((tab) => (
-            <button key={tab} onClick={() => setFilter(tab as any)} className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${filter === tab ? "bg-[#002b5b] text-white shadow-xs" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
+          {(["All", "Pending", "Uploaded"] as const).map((tab) => (
+            <button key={tab} onClick={() => setFilter(tab)} className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${filter === tab ? "bg-[#002b5b] text-white shadow-xs" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
               {tab === "Pending" ? "Pending Upload (3)" : tab === "Uploaded" ? "Published (1)" : "All Submissions"}
             </button>
           ))}

@@ -29,10 +29,15 @@ export default function CustomVideoPlayer({ videoUrl, title, onEnded }: CustomVi
   const [posterErr, setPosterErr] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    setHtml5Playing(false); setHtml5Time(0); setHtml5Duration(0);
-    setPosterErr(false); setShowControls(true);
-  }, [videoUrl, ytVideoId]);
+  const [prevVideoUrl, setPrevVideoUrl] = useState(videoUrl);
+  if (prevVideoUrl !== videoUrl) {
+    setPrevVideoUrl(videoUrl);
+    setHtml5Playing(false);
+    setHtml5Time(0);
+    setHtml5Duration(0);
+    setPosterErr(false);
+    setShowControls(true);
+  }
 
   const isPlaying = isYouTube ? yt.isPlaying : html5Playing;
   const currentTime = isYouTube ? yt.currentTime : html5Time;

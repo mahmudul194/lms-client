@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { createPortal } from "react-dom";
 import { X, UploadCloud } from "lucide-react";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 interface AssignmentUploadModalProps {
   isOpen: boolean;
@@ -13,11 +14,7 @@ export default function AssignmentUploadModal({
   isOpen,
   onClose,
 }: AssignmentUploadModalProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useIsMounted();
 
   if (!mounted || !isOpen) return null;
 

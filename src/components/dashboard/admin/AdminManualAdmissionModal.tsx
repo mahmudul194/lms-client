@@ -1,9 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { UserPlus, X, CheckCircle2, AlertCircle } from "lucide-react";
 import { PendingApproval } from "@/types/dashboard";
+import { useIsMounted } from "@/hooks/useIsMounted";
+
+const INITIAL_FORM = {
+  name: "", phone: "", course: "Revit Combo Pro (Arch + Struct + MEP)", batch: "8th Live Batch",
+  method: "bKash Personal", trxId: "", totalFee: "16000", advancePaid: "5000", note: "",
+};
 
 interface AdminManualAdmissionModalProps {
   isOpen: boolean;
@@ -16,18 +22,8 @@ export default function AdminManualAdmissionModal({
   onClose,
   onEnroll,
 }: AdminManualAdmissionModalProps) {
-  const [mounted, setMounted] = useState(false);
-  const [form, setForm] = useState({
-    name: "", phone: "", course: "Revit Combo Pro (Arch + Struct + MEP)", batch: "8th Live Batch",
-    method: "bKash Personal", trxId: "", totalFee: "16000", advancePaid: "5000", note: "",
-  });
-
-  useEffect(() => { setMounted(true); }, []);
-  useEffect(() => {
-    if (isOpen) {
-      setForm({ name: "", phone: "", course: "Revit Combo Pro (Arch + Struct + MEP)", batch: "8th Live Batch", method: "bKash Personal", trxId: "", totalFee: "16000", advancePaid: "5000", note: "" });
-    }
-  }, [isOpen]);
+  const mounted = useIsMounted();
+  const [form, setForm] = useState(INITIAL_FORM);
 
   if (!mounted || !isOpen) return null;
 

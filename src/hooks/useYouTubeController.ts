@@ -10,9 +10,30 @@ export function extractYouTubeVideoId(url?: string): string | null {
   return match ? match[1] : null;
 }
 
+export interface YTPlayer {
+  playVideo: () => void;
+  pauseVideo: () => void;
+  seekTo: (seconds: number, allowSeekAhead?: boolean) => void;
+  setVolume: (volume: number) => void;
+  mute: () => void;
+  unMute: () => void;
+  setPlaybackRate: (rate: number) => void;
+  getDuration: () => number;
+  getCurrentTime: () => number;
+  cueVideoById: (videoId: string) => void;
+  destroy: () => void;
+}
+
+interface YTEvent {
+  target: YTPlayer;
+  data: number;
+}
+
 declare global {
   interface Window {
-    YT?: any;
+    YT?: {
+      Player: new (elementId: string, options: unknown) => YTPlayer;
+    };
     onYouTubeIframeAPIReady?: () => void;
   }
 }
@@ -31,29 +52,31 @@ function loadYT(cb: () => void) {
 }
 
 export function useYouTubeController(elementId: string, videoId: string | null, onEnded?: () => void) {
-  const playerRef = useRef<any>(null);
+  const playerRef = useRef<YTPlayer | null>(null);
   const isSeekingUntilRef = useRef<number>(0);
   const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  // Reset state immediately on video switch
-  useEffect(() => {
+  // Synchronize state on videoId switch without cascading renders
+  const [prevVideoId, setPrevVideoId] = useState(videoId);
+  if (prevVideoId !== videoId) {
+    setPrevVideoId(videoId);
     setCurrentTime(0);
     setDuration(0);
     setIsPlaying(false);
-    isSeekingUntilRef.current = 0;
-  }, [videoId]);
+  }
 
   useEffect(() => {
+    isSeekingUntilRef.current = 0;
     if (!videoId || typeof window === "undefined") return;
     loadYT(() => {
       if (playerRef.current) {
-        playerRef.current.cueVideoById?.(videoId);
+        playerRef.current.cueVideoById(videoId);
         return;
       }
-      playerRef.current = new window.YT.Player(elementId, {
+      playerRef.current = new window.YT!.Player(elementId, {
         videoId,
         playerVars: {
           controls: 0, modestbranding: 1, rel: 0, showinfo: 0,
@@ -61,8 +84,8 @@ export function useYouTubeController(elementId: string, videoId: string | null, 
           cc_load_policy: 0, origin: typeof window !== "undefined" ? window.location.origin : undefined,
         },
         events: {
-          onReady: (e: any) => { setIsReady(true); setDuration(e.target.getDuration() || 0); },
-          onStateChange: (e: any) => {
+          onReady: (e: YTEvent) => { setIsReady(true); setDuration(e.target.getDuration() || 0); },
+          onStateChange: (e: YTEvent) => {
             if (e.data === 1) setIsPlaying(true);
             else if (e.data === 2) setIsPlaying(false);
             else if (e.data === 0) { setIsPlaying(false); onEnded?.(); }
@@ -83,40 +106,37 @@ export function useYouTubeController(elementId: string, videoId: string | null, 
   useEffect(() => {
     if (!isPlaying) return;
     const interval = setInterval(() => {
-      if (Date.now() < isSeekingUntilRef.current) return;
-      if (playerRef.current?.getCurrentTime) {
-        setCurrentTime(playerRef.current.getCurrentTime() || 0);
-        const d = playerRef.current.getDuration() || 0;
-        if (d > 0) setDuration(d);
+      if (playerRef.current && Date.now() > isSeekingUntilRef.current) {
+        try {
+          const t = playerRef.current.getCurrentTime() || 0;
+          setCurrentTime(t);
+        } catch {}
       }
     }, 250);
     return () => clearInterval(interval);
   }, [isPlaying]);
 
-  const play = useCallback(() => { playerRef.current?.playVideo?.(); setIsPlaying(true); }, []);
-  const pause = useCallback(() => { playerRef.current?.pauseVideo?.(); setIsPlaying(false); }, []);
-
+  const play = useCallback(() => { try { playerRef.current?.playVideo(); } catch {} }, []);
+  const pause = useCallback(() => { try { playerRef.current?.pauseVideo(); } catch {} }, []);
   const seekTo = useCallback((sec: number) => {
-    if (!playerRef.current) return;
-    isSeekingUntilRef.current = Date.now() + 450;
-    setCurrentTime(sec);
-    playerRef.current.seekTo?.(sec, true);
+    try {
+      setCurrentTime(sec);
+      isSeekingUntilRef.current = Date.now() + 600;
+      playerRef.current?.seekTo(sec, true);
+    } catch {}
   }, []);
+  const setVolume = useCallback((v: number) => { try { playerRef.current?.setVolume(v * 100); } catch {} }, []);
+  const mute = useCallback(() => { try { playerRef.current?.mute(); } catch {} }, []);
+  const unMute = useCallback(() => { try { playerRef.current?.unMute(); } catch {} }, []);
+  const setPlaybackRate = useCallback((r: number) => { try { playerRef.current?.setPlaybackRate(r); } catch {} }, []);
+  const skip = useCallback((delta: number) => {
+    try {
+      const cur = playerRef.current?.getCurrentTime() || 0;
+      const dur = duration || 9999;
+      const next = Math.max(0, Math.min(dur, cur + delta));
+      seekTo(next);
+    } catch {}
+  }, [duration, seekTo]);
 
-  const skip = useCallback((sec: number) => {
-    if (!playerRef.current) return;
-    const cur = typeof playerRef.current.getCurrentTime === "function" ? (playerRef.current.getCurrentTime() || 0) : 0;
-    const dur = typeof playerRef.current.getDuration === "function" ? (playerRef.current.getDuration() || 0) : 0;
-    const target = Math.max(0, Math.min(dur || 999999, cur + sec));
-    isSeekingUntilRef.current = Date.now() + 450;
-    setCurrentTime(target);
-    playerRef.current.seekTo?.(target, true);
-  }, []);
-
-  const setVolume = useCallback((vol: number) => { playerRef.current?.setVolume?.(vol * 100); }, []);
-  const mute = useCallback(() => { playerRef.current?.mute?.(); }, []);
-  const unMute = useCallback(() => { playerRef.current?.unMute?.(); }, []);
-  const setPlaybackRate = useCallback((rate: number) => { playerRef.current?.setPlaybackRate?.(rate); }, []);
-
-  return { isReady, isPlaying, currentTime, duration, play, pause, seekTo, skip, setVolume, mute, unMute, setPlaybackRate };
+  return { isReady, isPlaying, currentTime, duration, play, pause, seekTo, setVolume, mute, unMute, setPlaybackRate, skip };
 }

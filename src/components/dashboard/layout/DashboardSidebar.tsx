@@ -32,13 +32,6 @@ export default function DashboardSidebar({
 }: DashboardSidebarProps) {
   const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>({ user_management: true });
   const activeTabId = currentRole === "student" ? studentTab : currentRole === "instructor" ? instructorTab : adminTab;
-
-  useEffect(() => {
-    if (adminTab === "students" || adminTab === "instructors") {
-      setOpenDropdowns((prev) => ({ ...prev, user_management: true }));
-    }
-  }, [adminTab]);
-
   const currentNavItems = currentRole === "student" ? STUDENT_NAV_ITEMS : currentRole === "instructor" ? INSTRUCTOR_NAV_ITEMS : ADMIN_NAV_ITEMS;
   const toggleDropdown = (id: string) => setOpenDropdowns((p) => ({ ...p, [id]: !p[id] }));
 
@@ -64,7 +57,7 @@ export default function DashboardSidebar({
               const hasChildren = !!item.children?.length;
               const isChildActive = hasChildren && item.children?.some((c) => c.id === activeTabId);
               const isActive = activeTabId === item.id || isChildActive;
-              const isExpanded = !!openDropdowns[item.id];
+              const isExpanded = isChildActive || !!openDropdowns[item.id];
 
               if (hasChildren) {
                 return (

@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { createPortal } from "react-dom";
 import { Download, MessageSquare, X } from "lucide-react";
 import { StudentSubmission } from "@/data/instructorMockData";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 interface InstructorEvaluationModalProps {
   selectedSubmission: StudentSubmission | null;
@@ -24,11 +25,7 @@ export default function InstructorEvaluationModal({
   onSave,
   onClose,
 }: InstructorEvaluationModalProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useIsMounted();
 
   if (!mounted || !selectedSubmission) return null;
 

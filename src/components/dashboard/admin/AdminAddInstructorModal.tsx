@@ -1,9 +1,18 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { UserCheck, X } from "lucide-react";
 import { InstructorRecord } from "./AdminInstructorsTab";
+import { useIsMounted } from "@/hooks/useIsMounted";
+
+const INITIAL_FORM = {
+  name: "",
+  role: "Senior BIM Instructor",
+  specialty: "Revit Structure + Tekla Detailing",
+  phone: "+880 17XX-XXXXXX",
+  email: "",
+};
 
 interface AdminAddInstructorModalProps {
   isOpen: boolean;
@@ -16,21 +25,8 @@ export default function AdminAddInstructorModal({
   onClose,
   onAdd,
 }: AdminAddInstructorModalProps) {
-  const [mounted, setMounted] = useState(false);
-  const [form, setForm] = useState({
-    name: "",
-    role: "Senior BIM Instructor",
-    specialty: "Revit Structure + Tekla Detailing",
-    phone: "+880 17XX-XXXXXX",
-    email: "",
-  });
-
-  useEffect(() => { setMounted(true); }, []);
-  useEffect(() => {
-    if (isOpen) {
-      setForm({ name: "", role: "Senior BIM Instructor", specialty: "Revit Structure + Tekla Detailing", phone: "", email: "" });
-    }
-  }, [isOpen]);
+  const mounted = useIsMounted();
+  const [form, setForm] = useState(INITIAL_FORM);
 
   if (!mounted || !isOpen) return null;
 

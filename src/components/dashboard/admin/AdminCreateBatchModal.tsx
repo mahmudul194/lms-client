@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { Layers, X } from "lucide-react";
 import { AdminBatch } from "@/data/adminMockData";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 interface AdminCreateBatchModalProps {
   isOpen: boolean;
@@ -16,7 +17,7 @@ export default function AdminCreateBatchModal({
   onClose,
   onCreate,
 }: AdminCreateBatchModalProps) {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsMounted();
   const [form, setForm] = useState({
     name: "",
     code: "",
@@ -27,10 +28,6 @@ export default function AdminCreateBatchModal({
     schedule: "Mon, Wed, Fri (9:00 PM - 11:00 PM)",
     software: "Revit 2024 + Dynamo 2.19",
   });
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   if (!mounted || !isOpen) return null;
 

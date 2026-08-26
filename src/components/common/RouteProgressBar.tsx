@@ -6,15 +6,21 @@ import { usePathname } from "next/navigation";
 export default function RouteProgressBar() {
   const pathname = usePathname();
   const [loading, setLoading] = useState(false);
+  const [prevPath, setPrevPath] = useState(pathname);
+
+  if (prevPath !== pathname) {
+    setPrevPath(pathname);
+    setLoading(true);
+  }
 
   useEffect(() => {
-    setLoading(true);
+    if (!loading) return;
     const timer = setTimeout(() => {
       setLoading(false);
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [pathname]);
+  }, [loading]);
 
   if (!loading) return null;
 

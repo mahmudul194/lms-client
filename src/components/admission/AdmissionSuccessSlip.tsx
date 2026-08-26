@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import Link from "next/link";
 import { CheckCircle2, ArrowRight, PhoneCall } from "lucide-react";
 import { Course } from "@/data/mockData";
@@ -22,6 +22,8 @@ export default function AdmissionSuccessSlip({
   trxId,
   dueToday,
 }: AdmissionSuccessSlipProps) {
+  const applicationId = useMemo(() => trxId ? `ADM-${trxId.slice(-6).toUpperCase()}` : "ADM-842915", [trxId]);
+
   return (
     <div className="max-w-3xl mx-auto bg-white rounded-3xl border border-slate-200 p-8 sm:p-12 shadow-2xl space-y-8 text-center animate-in fade-in duration-300">
       <div className="w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-inner">
@@ -29,14 +31,14 @@ export default function AdmissionSuccessSlip({
       </div>
 
       <div className="space-y-2">
-        <span className="text-xs font-black uppercase tracking-widest text-emerald-600">
-          APPLICATION ACCEPTED
+        <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+          Payment & Registration Submitted
         </span>
         <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
-          Congratulations, {fullName || "Student"}!
+          Congratulations, {fullName}!
         </h2>
-        <p className="text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
-          Your admission application for <strong>{selectedCourse.title}</strong> has been submitted successfully.
+        <p className="text-slate-600 max-w-md mx-auto text-sm">
+          Your admission form has been received and logged successfully in our central student registry.
           Our team is verifying your payment details.
         </p>
       </div>
@@ -45,7 +47,7 @@ export default function AdmissionSuccessSlip({
       <div className="bg-[#f8fafc] rounded-2xl border border-slate-200 p-6 text-left space-y-4 text-xs sm:text-sm max-w-xl mx-auto font-sans">
         <div className="flex items-center justify-between border-b border-slate-200 pb-3">
           <span className="font-bold text-slate-500 uppercase tracking-wider text-xs">Application ID</span>
-          <span className="font-semibold font-bold text-[#0077b6]">ADM-{Math.floor(100000 + Math.random() * 900000)}</span>
+          <span className="font-semibold font-bold text-[#0077b6]">{applicationId}</span>
         </div>
         <div className="flex items-center justify-between border-b border-slate-200 pb-3">
           <span className="text-slate-600">Selected Course:</span>

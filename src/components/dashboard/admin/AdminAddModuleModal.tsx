@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { FolderTree, X, Plus, Trash2, Sparkles, Video } from "lucide-react";
 import { CourseModuleItem } from "@/types/dashboard";
 import { computeModuleTotalDuration } from "@/utils/durationCalculator";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 interface AdminAddModuleModalProps {
   isOpen: boolean;
@@ -19,15 +20,10 @@ export default function AdminAddModuleModal({
   selectedCourseName,
   onAddModule,
 }: AdminAddModuleModalProps) {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsMounted();
   const [moduleNo, setModuleNo] = useState("");
   const [moduleTitle, setModuleTitle] = useState("");
   const [lessons, setLessons] = useState<Array<{ title: string; videoUrl: string; duration: string }>>([]);
-
-  useEffect(() => { setMounted(true); }, []);
-  useEffect(() => {
-    if (isOpen) { setModuleNo(""); setModuleTitle(""); setLessons([]); }
-  }, [isOpen]);
 
   if (!mounted || !isOpen) return null;
 

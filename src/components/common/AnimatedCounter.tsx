@@ -18,38 +18,33 @@ export default function AnimatedCounter({
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    if (!trigger) {
-      setCount(0);
-      return;
-    }
+    if (!trigger) return;
 
-    let start = 0;
     const startTime = performance.now();
+    let frameId: number;
 
     function step(currentTime: number) {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-
-      // Ease-out cubic easing
       const easeOut = 1 - Math.pow(1 - progress, 3);
-      const current = Math.floor(easeOut * target);
-
-      setCount(current);
+      setCount(Math.floor(easeOut * target));
 
       if (progress < 1) {
-        requestAnimationFrame(step);
+        frameId = requestAnimationFrame(step);
       } else {
         setCount(target);
       }
     }
 
-    const frameId = requestAnimationFrame(step);
+    frameId = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frameId);
   }, [trigger, target, duration]);
 
+  const display = trigger ? count : 0;
+
   return (
     <span>
-      {count}
+      {display}
       {suffix}
     </span>
   );
