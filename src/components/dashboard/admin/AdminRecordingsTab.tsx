@@ -88,19 +88,19 @@ export default function AdminRecordingsTab() {
               {rec.status === "Pending Admin Upload" ? (
                 <button onClick={() => setActiveModalId(rec.id)} className="px-5 py-2.5 rounded-xl bg-[#0077b6] hover:bg-[#005a8c] text-white font-black text-xs flex items-center gap-2 shadow-xs cursor-pointer hover:scale-102 transition-all">
                   <Sparkles className="w-4 h-4 text-sky-300" />
-                  <span>Publish YouTube Unlisted URL</span>
+                  <span>Approve & Publish to Classroom</span>
                 </button>
               ) : (
-                <span className="text-xs font-bold text-emerald-700 flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-600" /><span>Live on YouTube & Classroom</span></span>
+                <span className="text-xs font-bold text-emerald-700 flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-600" /><span>Live in Student Classroom</span></span>
               )}
             </div>
 
             {activeModalId === rec.id && (
               <div className="p-4 rounded-2xl bg-white border-2 border-[#0077b6] space-y-3">
-                <label className="text-xs font-bold text-slate-800 block">Enter Uploaded YouTube Unlisted Video URL:</label>
+                <label className="text-xs font-bold text-slate-800 block">Enter Video Embed Link (YouTube Unlisted / Vimeo) to publish for students:</label>
                 <div className="flex gap-2">
                   <input type="url" placeholder="https://www.youtube.com/watch?v=..." value={youtubeInput} onChange={(e) => setYoutubeInput(e.target.value)} className="flex-1 px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:outline-none focus:border-[#0077b6]" />
-                  <button onClick={() => handlePublishYouTube(rec.id)} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl">Confirm & Publish</button>
+                  <button onClick={() => handlePublishYouTube(rec.id)} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl">Publish to Classroom</button>
                   <button onClick={() => setActiveModalId(null)} className="px-3 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">Cancel</button>
                 </div>
               </div>
