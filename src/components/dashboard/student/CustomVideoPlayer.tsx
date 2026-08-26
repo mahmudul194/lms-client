@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useId } from "react";
-import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, RotateCcw, RotateCw, ShieldCheck } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, RotateCcw, RotateCw } from "lucide-react";
 import { extractYouTubeVideoId, useYouTubeController } from "@/hooks/useYouTubeController";
 
 interface CustomVideoPlayerProps {
@@ -11,43 +11,60 @@ interface CustomVideoPlayerProps {
 }
 
 export default function CustomVideoPlayer({ videoUrl, title, onEnded }: CustomVideoPlayerProps) {
-  const containerRef = useRef<HTMLDivElement>(null); const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const ytElementId = `yt-embed-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
-  const ytVideoId = extractYouTubeVideoId(videoUrl); const isYouTube = Boolean(ytVideoId);
+  const ytVideoId = extractYouTubeVideoId(videoUrl);
+  const isYouTube = Boolean(ytVideoId);
 
   const yt = useYouTubeController(ytElementId, ytVideoId, onEnded);
-  const [hPlaying, setHPlaying] = useState(false); const [hTime, setHTime] = useState(0);
-  const [hDuration, setHDuration] = useState(0); const [volume, setVolume] = useState(1);
-  const [isMuted, setIsMuted] = useState(false); const [rate, setRate] = useState(1);
-  const [isFullscreen, setIsFullscreen] = useState(false); const [showControls, setShowControls] = useState(true);
+  const [html5Playing, setHtml5Playing] = useState(false);
+  const [html5Time, setHtml5Time] = useState(0);
+  const [html5Duration, setHtml5Duration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
+  const [playbackRate, setPlaybackRate] = useState(1);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showControls, setShowControls] = useState(true);
+  const [posterErr, setPosterErr] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => { setHPlaying(false); setHTime(0); setHDuration(0); setShowControls(true); }, [videoUrl, ytVideoId]);
-  const isPlaying = isYouTube ? yt.isPlaying : hPlaying;
-  const currentTime = isYouTube ? yt.currentTime : hTime;
-  const duration = isYouTube ? yt.duration : hDuration;
+  useEffect(() => {
+    setHtml5Playing(false); setHtml5Time(0); setHtml5Duration(0);
+    setPosterErr(false); setShowControls(true);
+  }, [videoUrl, ytVideoId]);
+
+  const isPlaying = isYouTube ? yt.isPlaying : html5Playing;
+  const currentTime = isYouTube ? yt.currentTime : html5Time;
+  const duration = isYouTube ? yt.duration : html5Duration;
   const progressPct = duration > 0 ? (currentTime / duration) * 100 : 0;
   const volumePct = isMuted ? 0 : volume * 100;
+
   const togglePlay = () => {
     if (isYouTube) { if (yt.isPlaying) yt.pause(); else yt.play(); }
     else if (videoRef.current) {
-      if (hPlaying) { videoRef.current.pause(); setHPlaying(false); }
-      else videoRef.current.play()?.then(() => setHPlaying(true)).catch(() => {});
+      if (html5Playing) { videoRef.current.pause(); setHtml5Playing(false); }
+      else videoRef.current.play()?.then(() => setHtml5Playing(true)).catch(() => {});
     }
   };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const t = Number(e.target.value);
-    if (isYouTube) yt.seekTo(t); else if (videoRef.current) { videoRef.current.currentTime = t; setHTime(t); }
+    if (isYouTube) yt.seekTo(t);
+    else if (videoRef.current) { videoRef.current.currentTime = t; setHtml5Time(t); }
   };
 
-  const skip = (s: number) => {
-    if (isYouTube) yt.skip(s);
-    else if (videoRef.current) { videoRef.current.currentTime = Math.max(0, (videoRef.current.currentTime || 0) + s); setHTime(videoRef.current.currentTime); }
+  const skip = (sec: number) => {
+    if (isYouTube) yt.skip(sec);
+    else if (videoRef.current) {
+      const next = Math.max(0, Math.min(html5Duration || 9999, (videoRef.current.currentTime || 0) + sec));
+      videoRef.current.currentTime = next; setHtml5Time(next);
+    }
   };
 
   const handleVolume = (v: number) => {
-    const val = Math.max(0, Math.min(1, v)); setVolume(val); const muted = val === 0; setIsMuted(muted);
+    const val = Math.max(0, Math.min(1, v));
+    setVolume(val); const muted = val === 0; setIsMuted(muted);
     if (isYouTube) { yt.setVolume(val); if (muted) yt.mute(); else yt.unMute(); }
     else if (videoRef.current) { videoRef.current.volume = val; videoRef.current.muted = muted; }
   };
@@ -63,11 +80,11 @@ export default function CustomVideoPlayer({ videoUrl, title, onEnded }: CustomVi
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag && ["INPUT", "TEXTAREA", "SELECT"].includes(tag)) return;
       if (e.code === "Space" || e.key === "k" || e.key === "K") { e.preventDefault(); togglePlay(); }
-      else if (e.code === "ArrowRight" || e.key === "l") { e.preventDefault(); skip(10); }
-      else if (e.code === "ArrowLeft" || e.key === "j") { e.preventDefault(); skip(-10); }
+      else if (e.code === "ArrowRight" || e.key === "l" || e.key === "L") { e.preventDefault(); skip(10); }
+      else if (e.code === "ArrowLeft" || e.key === "j" || e.key === "J") { e.preventDefault(); skip(-10); }
       else if (e.code === "ArrowUp") { e.preventDefault(); handleVolume(volume + 0.1); }
       else if (e.code === "ArrowDown") { e.preventDefault(); handleVolume(volume - 0.1); }
-      else if (e.key === "m" || e.key === "M") { const n = !isMuted; setIsMuted(n); if (isYouTube) { if (n) yt.mute(); else yt.unMute(); } else if (videoRef.current) videoRef.current.muted = n; }
+      else if (e.key === "m" || e.key === "M") { const next = !isMuted; setIsMuted(next); if (isYouTube) { if (next) yt.mute(); else yt.unMute(); } else if (videoRef.current) videoRef.current.muted = next; }
       else if (e.key === "f" || e.key === "F") { e.preventDefault(); toggleFullscreen(); }
     };
     window.addEventListener("keydown", onKey);
@@ -84,43 +101,20 @@ export default function CustomVideoPlayer({ videoUrl, title, onEnded }: CustomVi
 
   return (
     <div ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(e) => e.preventDefault()} className="relative aspect-video bg-slate-950 overflow-hidden rounded-2xl group select-none font-sans transition-all duration-300">
-      {/* 100% natural resolution - zero zoom, no cropping of lecture slides */}
       {isYouTube ? (
-        <div className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-hidden scale-100 origin-center">
-          <div id={ytElementId} className="w-full h-full pointer-events-none" />
-        </div>
+        <div className="absolute inset-0 w-full h-full pointer-events-none scale-100 select-none"><div id={ytElementId} className="w-full h-full" /></div>
       ) : (
-        <video ref={videoRef} key={videoUrl} src={videoUrl} onTimeUpdate={() => videoRef.current && setHTime(videoRef.current.currentTime)} onLoadedMetadata={() => videoRef.current && setHDuration(videoRef.current.duration)} onEnded={() => { setHPlaying(false); onEnded?.(); }} onError={() => setHPlaying(false)} className="w-full h-full object-contain pointer-events-none" playsInline preload="metadata" />
+        <video ref={videoRef} key={videoUrl} src={videoUrl} onTimeUpdate={() => videoRef.current && setHtml5Time(videoRef.current.currentTime)} onLoadedMetadata={() => videoRef.current && setHtml5Duration(videoRef.current.duration)} onEnded={() => { setHtml5Playing(false); onEnded?.(); }} onError={() => setHtml5Playing(false)} className="w-full h-full object-contain pointer-events-none" playsInline preload="metadata" />
       )}
-
-      {/* Top Banner Shield: shows during control hover */}
-      <div className={`absolute top-0 inset-x-0 h-11 bg-slate-950/90 border-b border-white/10 flex items-center justify-between px-4 text-white z-25 transition-opacity duration-300 pointer-events-none ${showControls ? "opacity-100" : "opacity-0"}`}>
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="px-2 py-0.5 rounded bg-[#0077b6] text-white text-[10px] font-black uppercase tracking-wider shrink-0">BIM CLASSROOM</span>
-          <span className="text-xs sm:text-sm font-bold text-white truncate">{title}</span>
-        </div>
-        <span className="text-[10px] text-slate-400 font-semibold hidden sm:inline-block shrink-0 flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-emerald-400" /> Protected Player</span>
-      </div>
-
+      {!isPlaying && currentTime === 0 && isYouTube && (
+        <img src={posterErr ? `https://img.youtube.com/vi/${ytVideoId}/hqdefault.jpg` : `https://img.youtube.com/vi/${ytVideoId}/maxresdefault.jpg`} onError={() => setPosterErr(true)} alt={title} className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10 brightness-95 transition-opacity duration-300" />
+      )}
       <div onClick={togglePlay} className="absolute inset-0 cursor-pointer z-15" />
-
+      <div className={`absolute top-0 inset-x-0 p-4 bg-gradient-to-b from-black/85 via-black/40 to-transparent flex items-center justify-between text-white transition-opacity duration-300 pointer-events-none z-20 ${showControls ? "opacity-100" : "opacity-0"}`}><span className="text-xs sm:text-sm font-bold text-white/95 drop-shadow-md truncate max-w-lg">{title}</span></div>
       {!isPlaying && (
-        <div className="absolute inset-0 bg-slate-950/75 backdrop-blur-2xs flex flex-col items-center justify-center z-18 pointer-events-none">
-          <button onClick={togglePlay} className="w-18 h-18 rounded-full bg-gradient-to-br from-[#0077b6] to-[#002b5b] hover:from-[#005a8c] hover:to-[#001830] text-white flex items-center justify-center shadow-2xl transition-all hover:scale-110 cursor-pointer border-2 border-white/80 pointer-events-auto">
-            <Play className="w-8 h-8 fill-white ml-1 text-white" />
-          </button>
-          <span className="text-white/90 text-xs font-bold mt-3 drop-shadow">Click to Play Lesson</span>
-        </div>
+        <button onClick={togglePlay} className="absolute inset-0 m-auto w-18 h-18 rounded-full bg-gradient-to-br from-[#0077b6] to-[#002b5b] hover:from-[#005a8c] hover:to-[#001830] text-white flex items-center justify-center shadow-2xl backdrop-blur-md transition-all hover:scale-110 cursor-pointer border-2 border-white/80 z-20"><Play className="w-8 h-8 fill-white ml-1 text-white" /></button>
       )}
-
-      {/* Bottom-right Corner Watermark Shield */}
-      <div className="absolute bottom-3 right-3 px-2 py-1 rounded-md bg-slate-950/90 border border-white/10 z-20 pointer-events-auto flex items-center gap-1.5 shadow-sm">
-        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-        <span className="text-[10px] font-black text-white tracking-wider">BIM PLAYER</span>
-      </div>
-
-      {/* Bottom Controls Bar */}
-      <div className={`absolute bottom-0 inset-x-0 p-3 sm:p-4 bg-slate-950/95 border-t border-white/10 transition-opacity duration-300 space-y-2 z-25 ${showControls ? "opacity-100" : "opacity-0"}`}>
+      <div className={`absolute bottom-0 inset-x-0 p-3 sm:p-4 bg-gradient-to-t from-black/95 via-black/70 to-transparent transition-opacity duration-300 space-y-2 z-20 ${showControls ? "opacity-100" : "opacity-0"}`}>
         <input type="range" min={0} max={duration || 100} step={0.1} value={currentTime} onChange={handleSeek} style={{ background: `linear-gradient(to right, #0077b6 0%, #0077b6 ${progressPct}%, rgba(255,255,255,0.2) ${progressPct}%, rgba(255,255,255,0.2) 100%)` }} className="w-full h-1.5 hover:h-2 rounded-lg appearance-none cursor-pointer accent-[#0077b6] transition-all" />
         <div className="flex items-center justify-between text-white text-xs">
           <div className="flex items-center gap-2 sm:gap-3">
@@ -133,10 +127,10 @@ export default function CustomVideoPlayer({ videoUrl, title, onEnded }: CustomVi
               <input type="range" min={0} max={1} step={0.02} value={isMuted ? 0 : volume} onChange={(e) => handleVolume(Number(e.target.value))} style={{ background: `linear-gradient(to right, #0077b6 0%, #0077b6 ${volumePct}%, rgba(255,255,255,0.2) ${volumePct}%, rgba(255,255,255,0.2) 100%)` }} className="w-16 h-1 hover:h-1.5 rounded appearance-none cursor-pointer accent-[#0077b6] transition-all" />
             </div>
           </div>
-          <div className="flex items-center gap-2 pr-20">
+          <div className="flex items-center gap-2">
             <div className="flex items-center bg-black/40 rounded-lg p-0.5 border border-slate-700 text-[11px] font-semibold">
               {[1, 1.25, 1.5, 2].map((r) => (
-                <button key={r} onClick={() => { setRate(r); if (isYouTube) yt.setPlaybackRate(r); else if (videoRef.current) videoRef.current.playbackRate = r; }} className={`px-1.5 py-0.5 rounded cursor-pointer ${rate === r ? "bg-[#0077b6] text-white font-bold" : "text-slate-400 hover:text-white"}`}>{r}x</button>
+                <button key={r} onClick={() => { setPlaybackRate(r); if (isYouTube) yt.setPlaybackRate(r); else if (videoRef.current) videoRef.current.playbackRate = r; }} className={`px-1.5 py-0.5 rounded cursor-pointer ${playbackRate === r ? "bg-[#0077b6] text-white font-bold" : "text-slate-400 hover:text-white"}`}>{r}x</button>
               ))}
             </div>
             <button onClick={toggleFullscreen} title="Fullscreen (F)" className="p-1 hover:text-sky-400 cursor-pointer">{isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}</button>
