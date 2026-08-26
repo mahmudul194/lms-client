@@ -9,7 +9,7 @@ export const MOCK_COURSE_MODULES: CourseModuleItem[] = [
     moduleTitle: "BIM Fundamentals & UI Navigation",
     duration: "6 Hours",
     lessons: [
-      { id: "les-101", title: "Introduction to BIM Levels & LOD Standards", videoUrl: "https://youtu.be/JMF1I6_OsgQ", duration: "45m", resourcesCount: 3 },
+      { id: "les-101", title: "Introduction to BIM Levels & LOD Standards", videoUrl: "https://youtu.be/I1JAEnnHOSE", duration: "45m", resourcesCount: 3 },
       { id: "les-102", title: "Project Levels, Grids & CAD Linking", videoUrl: "https://youtu.be/IXf3LHpDgaM", duration: "52m", resourcesCount: 2 },
     ],
   },

@@ -20,7 +20,7 @@ export const MOCK_LIVE_RECORDINGS: LiveClassRecording[] = [
     title: "Class 28: Structural Column & Rebar Detailing in Revit",
     duration: "1h 52m",
     recordedDate: "Aug 22, 2026",
-    videoUrl: "https://youtu.be/JMF1I6_OsgQ",
+    videoUrl: "https://youtu.be/I1JAEnnHOSE",
     attachedFile: "Class_28_Rebar_Model.rvt",
     fileSize: "38 MB",
     instructor: "Engr. Ashikur Rahman",
