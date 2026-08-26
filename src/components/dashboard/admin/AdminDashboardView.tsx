@@ -7,6 +7,7 @@ import AdminAdmissionsTab from "./AdminAdmissionsTab";
 import AdminStudentsTab from "./AdminStudentsTab";
 import AdminInstructorsTab from "./AdminInstructorsTab";
 import AdminBatchesTab from "./AdminBatchesTab";
+import AdminRecordingsTab from "./AdminRecordingsTab";
 import AdminModulesTab from "./AdminModulesTab";
 import AdminCouponsTab from "./AdminCouponsTab";
 import AdminRevenueTab from "./AdminRevenueTab";
@@ -91,6 +92,8 @@ export default function AdminDashboardView({
       {adminTab === "instructors" && <AdminInstructorsTab />}
 
       {adminTab === "batches" && <AdminBatchesTab />}
+
+      {adminTab === "recordings" && <AdminRecordingsTab />}
 
       {adminTab === "modules" && <AdminModulesTab />}
 

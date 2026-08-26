@@ -45,7 +45,7 @@ export const INSTRUCTOR_NAV_ITEMS: NavItem[] = [
   { id: "overview", label: "Overview", icon: Sparkles },
   { id: "batches", label: "Batches & Live Studio", icon: Video, badge: "Tonight" },
   { id: "grading", label: "Review Submissions", icon: FileCheck, badge: "3 Due" },
-  { id: "materials", label: "Upload Lectures & Files", icon: Upload },
+  { id: "materials", label: "Handover Class Recordings", icon: Upload, badge: "Handover" },
   { id: "profile", label: "Trainer Profile", icon: User },
 ];
 
@@ -63,6 +63,7 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
     ],
   },
   { id: "batches", label: "Batch Manager", icon: Layers },
+  { id: "recordings", label: "Recordings Queue", icon: Video, badge: "3 New" },
   { id: "modules", label: "Module Uploader", icon: FolderTree, badge: "New" },
   { id: "coupons", label: "Coupon Engine", icon: TicketPercent, badge: "Active" },
   { id: "revenue", label: "Financial Reports", icon: BarChart3 },
