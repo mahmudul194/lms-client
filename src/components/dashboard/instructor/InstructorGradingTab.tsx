@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { FileCheck, Check } from "lucide-react";
+import { FileCheck, Check, Filter } from "lucide-react";
 import { StudentSubmission } from "@/data/instructorMockData";
 import InstructorEvaluationModal from "./InstructorEvaluationModal";
 import InstructorSubmissionCard from "./InstructorSubmissionCard";
@@ -12,10 +12,16 @@ interface InstructorGradingTabProps {
 
 export default function InstructorGradingTab({ submissions }: InstructorGradingTabProps) {
   const [list, setList] = useState<StudentSubmission[]>(submissions);
+  const [filterStatus, setFilterStatus] = useState<"All" | "Pending" | "Graded">("All");
   const [selectedSubmission, setSelectedSubmission] = useState<StudentSubmission | null>(null);
   const [scoreInput, setScoreInput] = useState<string>("");
   const [feedbackInput, setFeedbackInput] = useState<string>("");
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  const filtered = list.filter((s) => {
+    if (filterStatus === "All") return true;
+    return s.status === filterStatus;
+  });
 
   const handleOpenEvaluate = (sub: StudentSubmission) => {
     setSelectedSubmission(sub);
@@ -32,36 +38,44 @@ export default function InstructorGradingTab({ submissions }: InstructorGradingT
     setList((prev) =>
       prev.map((item) =>
         item.id === selectedSubmission.id
-          ? {
-              ...item,
-              score: Number(scoreInput),
-              feedback: feedbackInput,
-              status: "Graded",
-            }
+          ? { ...item, score: Number(scoreInput), feedback: feedbackInput, status: "Graded" }
           : item
       )
     );
 
-    setSuccessMsg(`Evaluation and marks published for ${selectedSubmission.studentName}!`);
+    setSuccessMsg(`Marks and feedback published for ${selectedSubmission.studentName}!`);
     setSelectedSubmission(null);
     setTimeout(() => setSuccessMsg(null), 3000);
   };
 
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6 font-sans">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
         <div>
-          <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <FileCheck className="w-5 h-5 text-rose-500" />
-            <span>Student Submission & Grading Console</span>
+          <h3 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2.5">
+            <FileCheck className="w-6 h-6 text-[#0077b6]" />
+            <span>Student Assignments & Submissions Review</span>
           </h3>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Inspect student answer notes, download .rvt / .dwg models, and publish verified scores
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Review BIM project submissions, test .rvt / .dwg models, and assign grades
           </p>
         </div>
-        <span className="px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-bold w-fit">
-          {list.filter((s) => s.status === "Pending").length} Due Evaluations
-        </span>
+
+        <div className="flex items-center gap-2">
+          {["All", "Pending", "Graded"].map((st) => (
+            <button
+              key={st}
+              onClick={() => setFilterStatus(st as any)}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                filterStatus === st
+                  ? "bg-[#002b5b] text-white shadow-xs"
+                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              }`}
+            >
+              {st === "Pending" ? "Pending Review" : st}
+            </button>
+          ))}
+        </div>
       </div>
 
       {successMsg && (
@@ -71,14 +85,10 @@ export default function InstructorGradingTab({ submissions }: InstructorGradingT
         </div>
       )}
 
-      {/* Submissions List */}
+      {/* Submissions Cards */}
       <div className="space-y-4">
-        {list.map((sub) => (
-          <InstructorSubmissionCard
-            key={sub.id}
-            sub={sub}
-            onEvaluate={handleOpenEvaluate}
-          />
+        {filtered.map((sub) => (
+          <InstructorSubmissionCard key={sub.id} sub={sub} onEvaluate={handleOpenEvaluate} />
         ))}
       </div>
 
