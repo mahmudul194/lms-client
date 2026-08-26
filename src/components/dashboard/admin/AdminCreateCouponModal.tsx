@@ -30,7 +30,7 @@ export default function AdminCreateCouponModal({
 
   if (!mounted || !isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     onCreateCoupon({
       id: `cp-${Date.now()}`,

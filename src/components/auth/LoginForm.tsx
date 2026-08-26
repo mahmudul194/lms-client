@@ -15,7 +15,7 @@ export default function LoginForm({ loading, onLoginSubmit }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     onLoginSubmit(username, password);
   };

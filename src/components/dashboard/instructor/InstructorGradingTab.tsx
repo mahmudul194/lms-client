@@ -31,7 +31,7 @@ export default function InstructorGradingTab({ submissions }: InstructorGradingT
     );
   };
 
-  const handleSaveGrade = (e: React.FormEvent) => {
+  const handleSaveGrade = (e: React.SubmitEvent) => {
     e.preventDefault();
     if (!selectedSubmission) return;
 

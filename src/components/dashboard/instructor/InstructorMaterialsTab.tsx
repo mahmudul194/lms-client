@@ -15,7 +15,7 @@ export default function InstructorMaterialsTab() {
   const [notes, setNotes] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     const newSubmission: ClassRecordingSubmission = {
       id: `rec-${Date.now()}`,

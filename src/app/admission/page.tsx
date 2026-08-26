@@ -32,7 +32,7 @@ export default function AdmissionPage() {
   const dueToday = paymentType === "installment" ? installmentAmount : selectedCourse.price;
   const savings = selectedCourse.originalPrice ? selectedCourse.originalPrice - selectedCourse.price : 0;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     setIsSubmitted(true);
     window.scrollTo({ top: 0, behavior: "smooth" });

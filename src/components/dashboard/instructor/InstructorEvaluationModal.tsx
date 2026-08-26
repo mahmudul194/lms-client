@@ -12,7 +12,7 @@ interface InstructorEvaluationModalProps {
   setScoreInput: (val: string) => void;
   feedbackInput: string;
   setFeedbackInput: (val: string) => void;
-  onSave: (e: React.FormEvent) => void;
+  onSave: (e: React.SubmitEvent) => void;
   onClose: () => void;
 }
 

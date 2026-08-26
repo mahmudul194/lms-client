@@ -14,7 +14,7 @@ export default function StudentProfileTab({ currentUser }: StudentProfileTabProp
   const [phone, setPhone] = useState("01711-223344");
   const [saved, setSaved] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);

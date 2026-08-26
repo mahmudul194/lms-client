@@ -31,7 +31,7 @@ export default function AdminCreateBatchModal({
 
   if (!mounted || !isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     onCreate({
       id: `bat-${Date.now()}`,

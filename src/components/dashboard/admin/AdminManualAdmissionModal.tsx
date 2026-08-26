@@ -32,7 +32,7 @@ export default function AdminManualAdmissionModal({
   const due = Math.max(0, total - advance);
   const update = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     onEnroll({
       id: `adm-${Date.now()}`,

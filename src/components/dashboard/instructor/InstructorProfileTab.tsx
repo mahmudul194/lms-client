@@ -14,7 +14,7 @@ export default function InstructorProfileTab({ currentUser }: InstructorProfileT
   const [bio, setBio] = useState("Lead Structural BIM Engineer & Autodesk Certified Instructor with 6+ years AEC industry expertise.");
   const [saved, setSaved] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);

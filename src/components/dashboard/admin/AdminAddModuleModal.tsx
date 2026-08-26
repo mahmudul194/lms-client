@@ -38,7 +38,7 @@ export default function AdminAddModuleModal({
   const addLesson = () => setLessons([...lessons, { title: "", videoUrl: "", duration: "" }]);
   const removeLesson = (idx: number) => setLessons(lessons.filter((_, i) => i !== idx));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     onAddModule({
       id: `mod-${Date.now()}`,

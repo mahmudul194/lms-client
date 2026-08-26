@@ -11,7 +11,7 @@ export default function AdminSettingsTab() {
   const [admissionOpen, setAdmissionOpen] = useState(true);
   const [saved, setSaved] = useState(false);
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = (e: React.SubmitEvent) => {
     e.preventDefault();
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);

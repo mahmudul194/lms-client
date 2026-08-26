@@ -32,7 +32,7 @@ export default function AdminAddInstructorModal({
 
   const update = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     onAdd({
       id: `ins-${Date.now()}`,
