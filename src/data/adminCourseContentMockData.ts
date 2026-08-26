@@ -9,8 +9,8 @@ export const MOCK_COURSE_MODULES: CourseModuleItem[] = [
     moduleTitle: "BIM Fundamentals & UI Navigation",
     duration: "6 Hours",
     lessons: [
-      { id: "les-101", title: "Introduction to BIM Levels & LOD Standards", videoUrl: "https://vimeo.com/76979871", duration: "45m", resourcesCount: 3 },
-      { id: "les-102", title: "Project Levels, Grids & CAD Linking", videoUrl: "https://vimeo.com/76979871", duration: "52m", resourcesCount: 2 },
+      { id: "les-101", title: "Introduction to BIM Levels & LOD Standards", videoUrl: "https://youtu.be/JMF1I6_OsgQ", duration: "45m", resourcesCount: 3 },
+      { id: "les-102", title: "Project Levels, Grids & CAD Linking", videoUrl: "https://youtu.be/IXf3LHpDgaM", duration: "52m", resourcesCount: 2 },
     ],
   },
   {
@@ -21,8 +21,8 @@ export const MOCK_COURSE_MODULES: CourseModuleItem[] = [
     moduleTitle: "Architectural Wall Systems & Custom Families",
     duration: "10 Hours",
     lessons: [
-      { id: "les-201", title: "Curtain Walls, Mullions & Panel Grids", videoUrl: "https://vimeo.com/76979871", duration: "58m", resourcesCount: 4 },
-      { id: "les-202", title: "Custom Parametric Door & Window Families", videoUrl: "https://vimeo.com/76979871", duration: "64m", resourcesCount: 5 },
+      { id: "les-201", title: "Curtain Walls, Mullions & Panel Grids", videoUrl: "https://youtu.be/wZaxQW6m_iY", duration: "58m", resourcesCount: 4 },
+      { id: "les-202", title: "Custom Parametric Door & Window Families", videoUrl: "https://youtu.be/JMF1I6_OsgQ", duration: "64m", resourcesCount: 5 },
     ],
   },
   {
@@ -33,7 +33,7 @@ export const MOCK_COURSE_MODULES: CourseModuleItem[] = [
     moduleTitle: "Steel Modeling & Connection Design",
     duration: "8 Hours",
     lessons: [
-      { id: "les-301", title: "Base Plates, Anchor Bolts & Column Splice", videoUrl: "https://vimeo.com/76979871", duration: "50m", resourcesCount: 2 },
+      { id: "les-301", title: "Base Plates, Anchor Bolts & Column Splice", videoUrl: "https://youtu.be/IXf3LHpDgaM", duration: "50m", resourcesCount: 2 },
     ],
   },
 ];
