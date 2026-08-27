@@ -8,18 +8,21 @@ import StudentCourseHub from "./StudentCourseHub";
 import StudentClassroomPlayer from "./StudentClassroomPlayer";
 
 export default function StudentCoursePlayerTab() {
-  const [selectedCourse, setSelectedCourse] = useState<EnrolledCourse | null>(() => {
-    if (typeof window === "undefined") return null;
+  const [selectedCourse, setSelectedCourse] = useState<EnrolledCourse | null>(null);
+  const [isPlayingVideo, setIsPlayingVideo] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
     const sp = new URLSearchParams(window.location.search);
     const cId = sp.get("courseId") || localStorage.getItem("bim_active_course_id");
-    return MOCK_STUDENT_ENROLLED_COURSES.find((c) => c.id === cId) || null;
-  });
-
-  const [isPlayingVideo, setIsPlayingVideo] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    const sp = new URLSearchParams(window.location.search);
-    return sp.get("play") === "true";
-  });
+    if (cId) {
+      const found = MOCK_STUDENT_ENROLLED_COURSES.find((c) => c.id === cId);
+      if (found) {
+        setSelectedCourse(found);
+        if (sp.get("play") === "true") setIsPlayingVideo(true);
+      }
+    }
+  }, []);
 
   const handleSelectCourse = (course: EnrolledCourse) => {
     setSelectedCourse(course);

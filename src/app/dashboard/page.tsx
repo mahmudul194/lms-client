@@ -11,35 +11,37 @@ import AssignmentUploadModal from "@/components/dashboard/student/AssignmentUplo
 import InstructorDashboardView from "@/components/dashboard/instructor/InstructorDashboardView";
 import AdminDashboardView from "@/components/dashboard/admin/AdminDashboardView";
 
-function getInitialRole(): "student" | "instructor" | "admin" {
-  if (typeof window === "undefined") return "student";
-  const sp = new URLSearchParams(window.location.search);
-  const r = sp.get("role") || localStorage.getItem("bim_user_role");
-  return r === "instructor" || r === "admin" ? r : "student";
-}
-
-function getInitialTab(): string {
-  if (typeof window === "undefined") return "overview";
-  const sp = new URLSearchParams(window.location.search);
-  return sp.get("tab") || localStorage.getItem("bim_active_tab") || "overview";
-}
-
 export default function UnifiedDashboardPage() {
-  const [currentRole, setCurrentRole] = useState<"student" | "instructor" | "admin">(getInitialRole);
-  const [currentUser, setCurrentUser] = useState<UserAccount>(() => {
-    const role = getInitialRole();
-    return DUMMY_ACCOUNTS.find((a) => a.role === role) || DUMMY_ACCOUNTS[0];
-  });
+  const [currentRole, setCurrentRole] = useState<"student" | "instructor" | "admin">("student");
+  const [currentUser, setCurrentUser] = useState<UserAccount>(DUMMY_ACCOUNTS[0]);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [studentTab, setStudentTabState] = useState<StudentDashboardTab>(() => getInitialTab() as StudentDashboardTab);
-  const [instructorTab, setInstructorTabState] = useState<InstructorDashboardTab>(() => getInitialTab() as InstructorDashboardTab);
-  const [adminTab, setAdminTabState] = useState<AdminDashboardTab>(() => getInitialTab() as AdminDashboardTab);
+  const [studentTab, setStudentTabState] = useState<StudentDashboardTab>("overview");
+  const [instructorTab, setInstructorTabState] = useState<InstructorDashboardTab>("overview");
+  const [adminTab, setAdminTabState] = useState<AdminDashboardTab>("overview");
 
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [activeAssignmentId, setActiveAssignmentId] = useState<number | null>(null);
   const [selectedClassVideo, setSelectedClassVideo] = useState<ClassVideo | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const sp = new URLSearchParams(window.location.search);
+    const r = sp.get("role") || localStorage.getItem("bim_user_role");
+    const t = sp.get("tab") || localStorage.getItem("bim_active_tab");
+
+    const validRole: "student" | "instructor" | "admin" =
+      r === "instructor" || r === "admin" ? r : "student";
+    setCurrentRole(validRole);
+    setCurrentUser(DUMMY_ACCOUNTS.find((a) => a.role === validRole) || DUMMY_ACCOUNTS[0]);
+
+    if (t) {
+      if (validRole === "student") setStudentTabState(t as StudentDashboardTab);
+      else if (validRole === "instructor") setInstructorTabState(t as InstructorDashboardTab);
+      else if (validRole === "admin") setAdminTabState(t as AdminDashboardTab);
+    }
+  }, []);
 
   const syncUrl = (role: string, tab: string) => {
     if (typeof window === "undefined") return;
