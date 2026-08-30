@@ -29,13 +29,25 @@ export default function DashboardSidebarFooter() {
       </div>
 
       {/* Full-width Styled Log Out Button */}
-      <Link
-        href="/login"
+      <button
+        type="button"
+        onClick={async () => {
+          try {
+            const { authApi } = await import("@/services/api/authApi");
+            await authApi.logout();
+          } catch {}
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("bim_access_token");
+            localStorage.removeItem("bim_user_role");
+            localStorage.removeItem("bim_active_tab");
+            window.location.href = "/login";
+          }
+        }}
         className="w-full py-2.5 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-300 hover:text-rose-200 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
       >
         <LogOut className="w-4 h-4" />
         <span>Log Out</span>
-      </Link>
+      </button>
     </div>
   );
 }

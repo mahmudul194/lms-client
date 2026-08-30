@@ -15,8 +15,24 @@ export default function AssignmentUploadModal({
   onClose,
 }: AssignmentUploadModalProps) {
   const mounted = useIsMounted();
+  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+  const [uploading, setUploading] = React.useState(false);
 
   if (!mounted || !isOpen) return null;
+
+  const handleSubmit = async (e: React.SubmitEvent) => {
+    e.preventDefault();
+    if (selectedFile) {
+      setUploading(true);
+      try {
+        const { uploadApi } = await import("@/services/api/uploadApi");
+        await uploadApi.uploadFile(selectedFile);
+      } catch {}
+      setUploading(false);
+    }
+    onClose();
+    alert("Assignment model submitted successfully!");
+  };
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 font-sans animate-fade-in">
@@ -30,7 +46,7 @@ export default function AssignmentUploadModal({
               <h3 className="text-lg font-black text-slate-900 tracking-tight">
                 Submit Assignment Model
               </h3>
-              <p className="text-xs text-slate-500">Supports .rvt, .dwg, .ifc, or .zip archive</p>
+              <p className="text-xs text-slate-500">Supports images, models or archive files</p>
             </div>
           </div>
           <button
@@ -42,21 +58,15 @@ export default function AssignmentUploadModal({
           </button>
         </div>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            onClose();
-            alert("Assignment model submitted successfully!");
-          }}
-          className="space-y-4 text-xs sm:text-sm"
-        >
+        <form onSubmit={handleSubmit} className="space-y-4 text-xs sm:text-sm">
           <div className="p-4 rounded-2xl border-2 border-dashed border-sky-200 bg-sky-50/50 text-center space-y-2">
             <input
               type="file"
               required
+              onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
               className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#0077b6] file:text-white hover:file:bg-[#005a8c] file:cursor-pointer"
             />
-            <span className="text-[11px] text-slate-400 block font-semibold">Maximum file upload size: 150 MB</span>
+            <span className="text-[11px] text-slate-400 block font-semibold">Supported formats: .jpg, .png, .gif, models</span>
           </div>
 
           <div>

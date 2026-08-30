@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Users, Search, Mail, Phone } from "lucide-react";
 import { ALL_COURSES_STUDENTS } from "@/data/studentsCatalog20";
 import { AdminStudent } from "@/data/adminMockData";
@@ -11,16 +11,37 @@ export default function AdminStudentsTab() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [batchFilter, setBatchFilter] = useState("all");
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const { usersApi } = await import("@/services/api/usersApi");
+        const res = await usersApi.getAllUsers();
+        if (res.statusCode === 200 && Array.isArray(res.data)) {
+          const apiStudents: AdminStudent[] = res.data
+            .filter((u) => u.role?.toLowerCase() === "student")
+            .map((u, i) => ({
+              id: u.id,
+              name: u.name,
+              roll: `BIM-2026-${(i + 1).toString().padStart(3, "0")}`,
+              course: "Revit Combo Pro (Arch + Struct + MEP)",
+              batch: "8th Live Batch (2026)",
+              email: u.email,
+              phone: u.phone || "N/A",
+              paymentStatus: (u.isBanned ? "Partial" : "Paid") as "Paid" | "Partial",
+              paidAmount: "৳16,000",
+              totalFee: "৳16,000",
+              joinDate: u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "Just now",
+            }));
+          if (apiStudents.length > 0) setStudents([...apiStudents, ...ALL_COURSES_STUDENTS]);
+        }
+      } catch {}
+    })();
+  }, []);
+
   const filtered = students.filter((s) => {
-    const matchSearch =
-      s.name.toLowerCase().includes(search.toLowerCase()) ||
-      s.roll.toLowerCase().includes(search.toLowerCase()) ||
-      s.phone.includes(search) ||
-      s.course.toLowerCase().includes(search.toLowerCase());
-    const matchStatus =
-      statusFilter === "all" || s.paymentStatus.toLowerCase() === statusFilter.toLowerCase();
-    const matchBatch =
-      batchFilter === "all" || s.batch.toLowerCase().includes(batchFilter.toLowerCase());
+    const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) || s.roll.toLowerCase().includes(search.toLowerCase()) || s.phone.includes(search) || s.course.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = statusFilter === "all" || s.paymentStatus.toLowerCase() === statusFilter.toLowerCase();
+    const matchBatch = batchFilter === "all" || s.batch.toLowerCase().includes(batchFilter.toLowerCase());
     return matchSearch && matchStatus && matchBatch;
   });
 
@@ -32,48 +53,24 @@ export default function AdminStudentsTab() {
             <Users className="w-6 h-6 text-[#0077b6]" />
             <span>Enrolled Students Directory (Across 20 Courses & 8 Batches)</span>
           </h3>
-          <p className="text-sm text-slate-500 mt-1">
-            Search student records, track 8th batch enrollments, and check tuition installments
-          </p>
+          <p className="text-sm text-slate-500 mt-1">Search student records, track 8th batch enrollments, and check tuition installments</p>
         </div>
-        <span className="px-4 py-1.5 rounded-full bg-sky-50 text-[#0077b6] text-xs sm:text-sm font-bold border border-sky-200 w-fit">
-          {students.length} Active Records
-        </span>
+        <span className="px-4 py-1.5 rounded-full bg-sky-50 text-[#0077b6] text-xs sm:text-sm font-bold border border-sky-200 w-fit">{students.length} Active Records</span>
       </div>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="relative max-w-md w-full">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Search by name, roll, course or batch..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:bg-white focus:border-[#0077b6] focus:outline-none"
-          />
+          <input type="text" placeholder="Search by name, roll, course or batch..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:bg-white focus:border-[#0077b6] focus:outline-none" />
         </div>
-
         <div className="flex flex-wrap items-center gap-2">
-          <select
-            value={batchFilter}
-            onChange={(e) => setBatchFilter(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
-          >
+          <select value={batchFilter} onChange={(e) => setBatchFilter(e.target.value)} className="px-3 py-2 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none cursor-pointer">
             <option value="all">All Batches (1-8)</option>
             <option value="8th Batch">8th Batch (Current)</option>
             <option value="7th Batch">7th Batch (Archived)</option>
           </select>
-
           {["all", "Paid", "Partial"].map((status) => (
-            <button
-              key={status}
-              onClick={() => setStatusFilter(status)}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                statusFilter === status
-                  ? "bg-[#002b5b] text-white shadow-xs"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-              }`}
-            >
+            <button key={status} onClick={() => setStatusFilter(status)} className={`px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${statusFilter === status ? "bg-[#002b5b] text-white shadow-xs" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
               {status === "all" ? "All Payment Status" : status}
             </button>
           ))}
@@ -95,45 +92,12 @@ export default function AdminStudentsTab() {
           <tbody className="divide-y divide-slate-100 font-medium">
             {filtered.map((s) => (
               <tr key={s.id} className="hover:bg-slate-50 transition-colors">
-                <td className="p-4">
-                  <strong className="text-slate-900 block font-bold text-sm sm:text-base">{s.name}</strong>
-                  <span className="text-xs text-[#0077b6] font-bold">{s.roll}</span>
-                </td>
-                <td className="p-4">
-                  <span className="font-semibold text-slate-800 block">{s.course}</span>
-                  <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block mt-0.5">{s.batch}</span>
-                </td>
-                <td className="p-4 space-y-1">
-                  <span className="flex items-center gap-1.5 text-xs text-slate-600">
-                    <Mail className="w-3.5 h-3.5 text-slate-400" /> {s.email}
-                  </span>
-                  <span className="flex items-center gap-1.5 text-xs text-slate-600">
-                    <Phone className="w-3.5 h-3.5 text-slate-400" /> {s.phone}
-                  </span>
-                </td>
-                <td className="p-4">
-                  <strong className="text-slate-900 block font-black text-sm sm:text-base">{s.paidAmount}</strong>
-                  <span className="text-xs text-slate-500 font-medium">of {s.totalFee}</span>
-                </td>
-                <td className="p-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold ${
-                      s.paymentStatus === "Paid"
-                        ? "bg-emerald-100 text-emerald-800"
-                        : "bg-amber-100 text-amber-800"
-                    }`}
-                  >
-                    {s.paymentStatus}
-                  </span>
-                </td>
-                <td className="p-4 text-right">
-                  <button
-                    onClick={() => alert(`Academic Profile: ${s.name} (${s.roll})\nCourse: ${s.course}\nBatch: ${s.batch}\nPaid: ${s.paidAmount}`)}
-                    className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-[#0077b6] hover:text-white text-slate-700 font-bold text-xs transition-colors cursor-pointer"
-                  >
-                    View Details
-                  </button>
-                </td>
+                <td className="p-4"><strong className="text-slate-900 block font-bold text-sm sm:text-base">{s.name}</strong><span className="text-xs text-[#0077b6] font-bold">{s.roll}</span></td>
+                <td className="p-4"><span className="font-semibold text-slate-800 block">{s.course}</span><span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block mt-0.5">{s.batch}</span></td>
+                <td className="p-4 space-y-1"><span className="flex items-center gap-1.5 text-xs text-slate-600"><Mail className="w-3.5 h-3.5 text-slate-400" /> {s.email}</span><span className="flex items-center gap-1.5 text-xs text-slate-600"><Phone className="w-3.5 h-3.5 text-slate-400" /> {s.phone}</span></td>
+                <td className="p-4"><strong className="text-slate-900 block font-black text-sm sm:text-base">{s.paidAmount}</strong><span className="text-xs text-slate-500 font-medium">of {s.totalFee}</span></td>
+                <td className="p-4"><span className={`px-3 py-1 rounded-full text-xs font-bold ${s.paymentStatus === "Paid" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>{s.paymentStatus}</span></td>
+                <td className="p-4 text-right"><button onClick={() => alert(`Academic Profile: ${s.name} (${s.roll})\nCourse: ${s.course}\nBatch: ${s.batch}\nPaid: ${s.paidAmount}`)} className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-[#0077b6] hover:text-white text-slate-700 font-bold text-xs transition-colors cursor-pointer">View Details</button></td>
               </tr>
             ))}
           </tbody>

@@ -32,8 +32,18 @@ export default function AdminAddInstructorModal({
 
   const update = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
 
-  const handleSubmit = (e: React.SubmitEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
+    try {
+      const { usersApi } = await import("@/services/api/usersApi");
+      await usersApi.createUser({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        password: "password123",
+        role: "instructor",
+      });
+    } catch {}
     onAdd({
       id: `ins-${Date.now()}`,
       name: form.name.trim(),

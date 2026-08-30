@@ -32,8 +32,19 @@ export default function AdminManualAdmissionModal({
   const due = Math.max(0, total - advance);
   const update = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
 
-  const handleSubmit = (e: React.SubmitEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
+    try {
+      const { usersApi } = await import("@/services/api/usersApi");
+      const email = `${form.name.trim().toLowerCase().replace(/\s+/g, "")}${form.phone.slice(-4)}@gmail.com`;
+      await usersApi.createUser({
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        email,
+        password: "password123",
+        role: "student",
+      });
+    } catch {}
     onEnroll({
       id: `adm-${Date.now()}`,
       name: form.name.trim(),
