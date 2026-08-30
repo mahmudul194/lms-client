@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${jakarta.variable} font-sans h-full antialiased overflow-x-clip w-full max-w-full`}>
+    <html lang="en" data-scroll-behavior="smooth" className={`${jakarta.variable} font-sans h-full antialiased overflow-x-clip w-full max-w-full`}>
       <body className="min-h-full flex flex-col bg-white text-slate-900 selection:bg-[#0077b6] selection:text-white font-sans overflow-x-clip w-full max-w-full">
         {/* Global Route Loading Bar */}
         <RouteProgressBar />
