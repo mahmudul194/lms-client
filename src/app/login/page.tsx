@@ -23,8 +23,39 @@ export default function LoginPage() {
     }, 400);
   };
 
-  const handleLoginSubmit = (username: string) => {
+  const handleLoginSubmit = async (username: string, password = "123") => {
     const input = username.trim().toLowerCase();
+    setLoading(true);
+    setErrorMsg("");
+
+    // If input is an email, try connecting to the real LMS API backend
+    if (input.includes("@")) {
+      try {
+        const { authApi } = await import("@/services/api/authApi");
+        const res = await authApi.login(username, password);
+
+        if (res.statusCode === 200 && res.data?.user) {
+          const apiRole = res.data.user.role?.toLowerCase();
+          const validRole: "student" | "instructor" | "admin" =
+            apiRole === "admin" || apiRole === "instructor" ? apiRole : "student";
+          if (typeof window !== "undefined") {
+            localStorage.setItem("bim_user_name", res.data.user.name || "");
+            localStorage.setItem("bim_user_email", res.data.user.email);
+          }
+          performLogin(validRole);
+          return;
+        } else if (res.statusCode !== 503) {
+          // If server responded with 400/401/404 invalid credentials
+          setErrorMsg(res.message || "Invalid email or password");
+          setLoading(false);
+          return;
+        }
+      } catch {
+        // Network / API offline - fallback to role matching
+      }
+    }
+
+    // Demo / Role-based matching fallback
     if (input.includes("admin")) {
       performLogin("admin");
     } else if (input.includes("instructor") || input.includes("trainer") || input.includes("teacher")) {
