@@ -37,7 +37,11 @@ export default function LoginPage() {
         if (res.statusCode === 200 && res.data?.user) {
           const apiRole = res.data.user.role?.toLowerCase();
           const validRole: "student" | "instructor" | "admin" =
-            apiRole === "admin" || apiRole === "instructor" ? apiRole : "student";
+            apiRole === "admin" || apiRole === "developer" || apiRole === "manager"
+              ? "admin"
+              : apiRole === "instructor" || apiRole === "mentor"
+              ? "instructor"
+              : "student";
           if (typeof window !== "undefined") {
             localStorage.setItem("bim_user_name", res.data.user.name || "");
             localStorage.setItem("bim_user_email", res.data.user.email);
