@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { UserCheck, Search, Plus, Phone, Mail, Star } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { UserCheck, Search, Plus, Phone, Mail } from "lucide-react";
 import AdminAddInstructorModal from "./AdminAddInstructorModal";
 
 export interface InstructorRecord {
@@ -28,13 +28,33 @@ export default function AdminInstructorsTab() {
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const filtered = instructors.filter((ins) =>
-    ins.name.toLowerCase().includes(search.toLowerCase()) ||
-    ins.specialty.toLowerCase().includes(search.toLowerCase()) ||
-    ins.email.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    (async () => {
+      try {
+        const { mentorsApi } = await import("@/services/api/mentorsApi");
+        const res = await mentorsApi.getAllMentors({ limit: 20 });
+        if (res.statusCode === 200 && res.data?.items?.length) {
+          const apiMentors: InstructorRecord[] = res.data.items.map((m) => ({
+            id: m.id,
+            name: m.user?.name || "Mentor Profile",
+            role: m.designation,
+            specialty: m.subject || m.skills?.join(", ") || "BIM Engineering",
+            phone: m.user?.phone || "+880 1700-000000",
+            email: m.user?.email || "mentor@bimbuildbd.com",
+            batchesCount: 1,
+            studentsCount: 65,
+            rating: 4.9,
+            status: m.user?.isBanned ? "On Leave" : "Active",
+          }));
+          setInstructors([...apiMentors, ...INITIAL_INSTRUCTORS]);
+        }
+      } catch {}
+    })();
+  }, []);
 
-  const handleAddInstructor = (t: InstructorRecord) => setInstructors((p) => [t, ...p]);
+  const filtered = instructors.filter((ins) =>
+    ins.name.toLowerCase().includes(search.toLowerCase()) || ins.specialty.toLowerCase().includes(search.toLowerCase()) || ins.email.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6 font-sans">
@@ -44,15 +64,9 @@ export default function AdminInstructorsTab() {
             <UserCheck className="w-6 h-6 text-[#0077b6]" />
             <span>Instructor & Mentor Management Directory</span>
           </h3>
-          <p className="text-sm text-slate-500 mt-1">
-            Assigned lead BIM instructors, active live batches, student ratios & performance ratings
-          </p>
+          <p className="text-sm text-slate-500 mt-1">Assigned lead BIM instructors, active live batches, student ratios & performance ratings</p>
         </div>
-
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#002b5b] to-[#0077b6] hover:from-[#001830] hover:to-[#005a8c] text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all cursor-pointer hover:scale-102 shrink-0"
-        >
+        <button onClick={() => setIsModalOpen(true)} className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#002b5b] to-[#0077b6] hover:from-[#001830] hover:to-[#005a8c] text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all cursor-pointer hover:scale-102 shrink-0">
           <Plus className="w-4 h-4 text-sky-300" />
           <span>Add New Trainer</span>
         </button>
@@ -61,17 +75,9 @@ export default function AdminInstructorsTab() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="relative max-w-md w-full">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Search by trainer name, email or specialty..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:bg-white focus:border-[#0077b6] focus:outline-none"
-          />
+          <input type="text" placeholder="Search by trainer name, email or specialty..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:bg-white focus:border-[#0077b6] focus:outline-none" />
         </div>
-        <span className="px-4 py-1.5 rounded-full bg-sky-50 text-[#0077b6] text-xs sm:text-sm font-bold border border-sky-200 shrink-0">
-          {filtered.length} Active Mentors
-        </span>
+        <span className="px-4 py-1.5 rounded-full bg-sky-50 text-[#0077b6] text-xs sm:text-sm font-bold border border-sky-200 shrink-0">{filtered.length} Active Mentors</span>
       </div>
 
       <div className="overflow-x-auto border border-slate-200 rounded-2xl">
@@ -92,47 +98,29 @@ export default function AdminInstructorsTab() {
               <tr key={ins.id} className="hover:bg-slate-50 transition-colors">
                 <td className="p-4 font-bold text-slate-900">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-sky-50 text-[#0077b6] flex items-center justify-center font-black text-sm border border-sky-200 shrink-0">
-                      {ins.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
-                    </div>
+                    <div className="w-10 h-10 rounded-2xl bg-sky-50 text-[#0077b6] flex items-center justify-center font-black text-sm border border-sky-200 shrink-0">{ins.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}</div>
                     <div>
                       <div className="font-black text-slate-900 text-sm sm:text-base">{ins.name}</div>
                       <div className="text-xs text-[#0077b6] font-bold mt-0.5">{ins.role}</div>
                     </div>
                   </div>
                 </td>
-                <td className="p-4">
-                  <span className="px-3 py-1 rounded-xl bg-slate-100 text-slate-800 font-semibold text-xs">
-                    {ins.specialty}
-                  </span>
-                </td>
-                <td className="p-4">
-                  <span className="px-3 py-1 rounded-xl bg-sky-50 text-[#0077b6] text-xs font-bold border border-sky-200">
-                    {ins.batchesCount} Batches
-                  </span>
-                </td>
-                <td className="p-4 font-bold text-slate-800">
-                  {ins.studentsCount.toLocaleString()}
-                </td>
-                <td className="p-4 font-extrabold text-amber-800">
-                  ★ {ins.rating}
-                </td>
+                <td className="p-4"><span className="px-3 py-1 rounded-xl bg-slate-100 text-slate-800 font-semibold text-xs">{ins.specialty}</span></td>
+                <td className="p-4"><span className="px-3 py-1 rounded-xl bg-sky-50 text-[#0077b6] text-xs font-bold border border-sky-200">{ins.batchesCount} Batches</span></td>
+                <td className="p-4 font-bold text-slate-800">{ins.studentsCount.toLocaleString()}</td>
+                <td className="p-4 font-extrabold text-amber-800">★ {ins.rating}</td>
                 <td className="p-4 text-slate-600 text-xs space-y-1">
                   <div className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-[#0077b6]" /> {ins.phone}</div>
                   <div className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-[#0077b6]" /> {ins.email}</div>
                 </td>
-                <td className="p-4 text-right">
-                  <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
-                    {ins.status}
-                  </span>
-                </td>
+                <td className="p-4 text-right"><span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">{ins.status}</span></td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <AdminAddInstructorModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAdd={handleAddInstructor} />
+      <AdminAddInstructorModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAdd={(t) => setInstructors((p) => [t, ...p])} />
     </div>
   );
 }

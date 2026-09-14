@@ -14,25 +14,23 @@ export default function AdminStudentsTab() {
   useEffect(() => {
     (async () => {
       try {
-        const { usersApi } = await import("@/services/api/usersApi");
-        const res = await usersApi.getAllUsers();
-        if (res.statusCode === 200 && Array.isArray(res.data)) {
-          const apiStudents: AdminStudent[] = res.data
-            .filter((u) => u.role?.toLowerCase() === "student")
-            .map((u, i) => ({
-              id: u.id,
-              name: u.name,
-              roll: `BIM-2026-${(i + 1).toString().padStart(3, "0")}`,
-              course: "Revit Combo Pro (Arch + Struct + MEP)",
-              batch: "8th Live Batch (2026)",
-              email: u.email,
-              phone: u.phone || "N/A",
-              paymentStatus: (u.isBanned ? "Partial" : "Paid") as "Paid" | "Partial",
-              paidAmount: "৳16,000",
-              totalFee: "৳16,000",
-              joinDate: u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "Just now",
-            }));
-          if (apiStudents.length > 0) setStudents([...apiStudents, ...ALL_COURSES_STUDENTS]);
+        const { studentsApi } = await import("@/services/api/studentsApi");
+        const res = await studentsApi.getAllStudents({ limit: 50 });
+        if (res.statusCode === 200 && res.data?.items?.length) {
+          const apiStudents: AdminStudent[] = res.data.items.map((s, i) => ({
+            id: s.id,
+            name: s.name,
+            roll: s.roll || `BIM-2026-${(i + 1).toString().padStart(3, "0")}`,
+            course: s.technology || "Revit Combo Pro (Arch + Struct + MEP)",
+            batch: s.session || "8th Live Batch (2026)",
+            email: s.email,
+            phone: s.phone || "N/A",
+            paymentStatus: (s.user?.isBanned ? "Partial" : "Paid") as "Paid" | "Partial",
+            paidAmount: "৳16,000",
+            totalFee: "৳16,000",
+            joinDate: s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "Just now",
+          }));
+          setStudents([...apiStudents, ...ALL_COURSES_STUDENTS]);
         }
       } catch {}
     })();

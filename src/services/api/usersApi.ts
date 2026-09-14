@@ -14,6 +14,14 @@ export interface UserRecord {
   updatedAt?: string;
 }
 
+export interface PaginatedUsers {
+  items: UserRecord[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export interface CreateUserPayload {
   name: string;
   email: string;
@@ -30,16 +38,21 @@ export const usersApi = {
     });
   },
 
-  async getAllUsers(): Promise<ApiResponse<UserRecord[]>> {
-    return apiFetch<UserRecord[]>("/users", {
-      method: "GET",
-    });
+  async getAllUsers(params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+  }): Promise<ApiResponse<PaginatedUsers | UserRecord[]>> {
+    const sp = new URLSearchParams();
+    if (params?.page) sp.set("page", params.page.toString());
+    if (params?.limit) sp.set("limit", params.limit.toString());
+    if (params?.search) sp.set("search", params.search);
+    const qs = sp.toString();
+    return apiFetch<PaginatedUsers | UserRecord[]>(`/users${qs ? `?${qs}` : ""}`);
   },
 
   async getUserById(id: string): Promise<ApiResponse<UserRecord>> {
-    return apiFetch<UserRecord>(`/users/${id}`, {
-      method: "GET",
-    });
+    return apiFetch<UserRecord>(`/users/${id}`);
   },
 
   async updateUser(id: string, payload: Partial<CreateUserPayload>): Promise<ApiResponse<UserRecord>> {

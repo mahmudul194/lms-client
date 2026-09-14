@@ -28,8 +28,9 @@ export default function AdmissionPage() {
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     try {
-      const { usersApi } = await import("@/services/api/usersApi");
+      const { usersApi, studentsApi } = await import("@/services/api");
       await usersApi.createUser({ name: formData.fullName, email: formData.email, phone: formData.phone, password: "password123", role: "student" });
+      await studentsApi.createStudent({ name: formData.fullName, email: formData.email, phone: formData.phone, technology: selectedCourse.title, session: "8th Live Batch (2026)" });
     } catch {}
     setIsSubmitted(true);
     window.scrollTo({ top: 0, behavior: "smooth" });

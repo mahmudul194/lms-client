@@ -14,8 +14,15 @@ export default function StudentProfileTab({ currentUser }: StudentProfileTabProp
   const [phone, setPhone] = useState("01711-223344");
   const [saved, setSaved] = useState(false);
 
-  const handleSubmit = (e: React.SubmitEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
+    try {
+      const { usersApi } = await import("@/services/api/usersApi");
+      const userId = typeof window !== "undefined" ? localStorage.getItem("bim_user_id") : null;
+      if (userId) {
+        await usersApi.updateUser(userId, { name, phone });
+      }
+    } catch {}
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
