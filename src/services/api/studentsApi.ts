@@ -97,6 +97,25 @@ export const studentsApi = {
     });
   },
 
+  async checkStudent(params: {
+    phone?: string;
+    roll?: string;
+    registrationNumber?: string;
+  }): Promise<ApiResponse<{ exists: boolean; student?: StudentRecord; userExists?: boolean; message?: string }>> {
+    const sp = new URLSearchParams();
+    if (params.phone) sp.set("phone", params.phone);
+    if (params.roll) sp.set("roll", params.roll);
+    if (params.registrationNumber) sp.set("registrationNumber", params.registrationNumber);
+    return apiFetch(`/students/check?${sp.toString()}`);
+  },
+
+  async registerStudent(payload: Record<string, any>): Promise<ApiResponse<{ student: StudentRecord; user: any }>> {
+    return apiFetch("/students/register", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+
   async deleteStudent(id: string): Promise<ApiResponse<{ id: string }>> {
     return apiFetch<{ id: string }>(`/students/${id}`, {
       method: "DELETE",
