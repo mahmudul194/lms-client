@@ -1,30 +1,41 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { TrendingUp, Users, Layers, Award, DollarSign } from "lucide-react";
+import { overviewApi, AdminOverviewReport } from "@/services/api";
 
 export default function AdminMetricsGrid() {
+  const [data, setData] = useState<AdminOverviewReport | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    overviewApi.getAdminOverview()
+      .then(setData)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
   const metrics = [
     {
-      label: "Monthly Revenue",
-      value: "৳4,85,000",
-      trend: "+14.2% Growth",
+      label: "Total Revenue",
+      value: loading ? "..." : `৳${data?.totalRevenue?.toLocaleString() || 0}`,
+      trend: "Overall Collection",
       icon: DollarSign,
       sub: "Gross Tuition Collection",
     },
     {
       label: "Enrolled Students",
-      value: "5,240",
-      trend: "+182 New This Month",
+      value: loading ? "..." : (data?.totalEnrollments || 0).toString(),
+      trend: "Total Enrollments",
       icon: Users,
-      sub: "Active in 8 Programs",
+      sub: "Active in all Programs",
     },
     {
-      label: "Active Live Batches",
-      value: "6 Batches",
-      trend: "480 Total Seats",
+      label: "Total Dues",
+      value: loading ? "..." : `৳${data?.totalDues?.toLocaleString() || 0}`,
+      trend: "Pending amounts",
       icon: Layers,
-      sub: "Revit, Tekla, Dynamo",
+      sub: "From installments",
     },
     {
       label: "Issued Certificates",

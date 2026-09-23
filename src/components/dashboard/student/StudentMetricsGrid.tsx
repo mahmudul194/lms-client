@@ -1,15 +1,40 @@
 "use client";
 
-import React from "react";
-import { BookOpen, Video, Award, TrendingUp } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { BookOpen, Video, DollarSign, Wallet } from "lucide-react";
+import { overviewApi, StudentOverviewReport } from "@/services/api";
 
 export default function StudentMetricsGrid() {
+  const [data, setData] = useState<StudentOverviewReport | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    overviewApi.getStudentOverview()
+      .then(setData)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
   const cards = [
     {
-      label: "Enrolled Course",
-      value: "1 Active",
-      sub: "Revit Combo Pro (8th Batch)",
+      label: "Total Payable",
+      value: loading ? "..." : `৳${data?.totalPayable?.toLocaleString() || 0}`,
+      sub: "Total course fees",
       badge: "In Progress",
+      icon: DollarSign,
+    },
+    {
+      label: "Total Paid",
+      value: loading ? "..." : `৳${data?.totalPaid?.toLocaleString() || 0}`,
+      sub: "Amount cleared",
+      badge: "Confirmed",
+      icon: Wallet,
+    },
+    {
+      label: "Total Due",
+      value: loading ? "..." : `৳${data?.totalDue?.toLocaleString() || 0}`,
+      sub: "Pending installments",
+      badge: "Action Needed",
       icon: BookOpen,
     },
     {
@@ -18,20 +43,6 @@ export default function StudentMetricsGrid() {
       sub: "62% Course Completed",
       badge: "17 Remaining",
       icon: Video,
-    },
-    {
-      label: "Assignment Score",
-      value: "94% (A+)",
-      sub: "7 Evaluated Tasks",
-      badge: "Top 5% Rank",
-      icon: TrendingUp,
-    },
-    {
-      label: "Official Certificate",
-      value: "In Progress",
-      sub: "QR Code Verified",
-      badge: "Unlocks at 100%",
-      icon: Award,
     },
   ];
 
