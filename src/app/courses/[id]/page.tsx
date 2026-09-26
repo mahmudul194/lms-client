@@ -19,45 +19,43 @@ export async function generateStaticParams() {
 
 export default async function CourseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  let course: any = COURSES.find((c) => c.id === id);
+  let course: any = null;
+
+  try {
+    const { coursesApi } = await import("@/services/api/coursesApi");
+    const res = await coursesApi.getCourseById(id);
+    if (res.statusCode === 200 && res.data) {
+      const item = res.data;
+      course = {
+        id: item.id,
+        title: item.title,
+        description: item.description || item.short_description || "Comprehensive hands-on training program.",
+        price: Number(item.discount_price || item.price || 5000),
+        originalPrice: item.price ? `৳${Number(item.price).toLocaleString()}` : "৳10,000",
+        discount: item.discount_price ? `৳${Number(item.discount_price).toLocaleString()}` : "৳5,000",
+        rating: 4.9,
+        reviews: 120,
+        category: item.category?.name || "Web Development",
+        instructor: item.mentors?.[0]?.user?.name || "Lead Instructor",
+        duration: `${item.duration || 45} ${item.duration_unit || "Hours"}`,
+        lessons: 30,
+        modulesCount: 8,
+        level: item.level || "Beginner",
+        image: item.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
+        syllabus: [],
+        features: [
+          "Project-Based Live Training",
+          "Lifetime Class Recordings",
+          "Resource Materials & Source Code",
+          "Verified Certificate of Completion",
+          "Job & Career Support",
+        ],
+      };
+    }
+  } catch {}
 
   if (!course) {
-    try {
-      const { coursesApi } = await import("@/services/api/coursesApi");
-      const res = await coursesApi.getCourseById(id);
-      if (res.statusCode === 200 && res.data) {
-        const item = res.data;
-        course = {
-          id: item.id,
-          title: item.title,
-          description: item.description || item.short_description || "Comprehensive hands-on training program.",
-          price: item.discount_price || item.price || 12000,
-          originalPrice: item.price ? `৳${item.price.toLocaleString()}` : "৳16,000",
-          discount: item.discount_price ? `৳${item.discount_price.toLocaleString()}` : "৳12,000",
-          rating: 4.9,
-          reviews: 120,
-          category: "Technology",
-          instructor: "Lead Instructor",
-          duration: `${item.duration || 40} Hours`,
-          lessons: 30,
-          modulesCount: 8,
-          level: item.level || "Intermediate",
-          image: item.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
-          syllabus: [],
-          features: [
-            "Project-Based Live Training",
-            "Lifetime Class Recordings",
-            "Resource Materials & Model Library",
-            "Verified Certificate of Completion",
-            "Job & Freelancing Support",
-          ],
-        };
-      }
-    } catch {}
-  }
-
-  if (!course) {
-    course = COURSES[0];
+    course = COURSES.find((c) => c.id === id) || COURSES[0];
   }
 
   const installmentAmount = Math.round((course.price || 12000) / 3);

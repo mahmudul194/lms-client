@@ -21,6 +21,8 @@ export interface CourseItem {
   status?: "draft" | "published" | "archived" | "upcoming";
   visibility?: "public" | "private" | "unlisted";
   mentor_ids?: string[];
+  category?: { id: string; name: string; slug?: string };
+  mentors?: { id: string; user?: { name: string; email?: string }; profileImage?: string; designation?: string }[];
   createdAt?: string;
   updatedAt?: string;
 }

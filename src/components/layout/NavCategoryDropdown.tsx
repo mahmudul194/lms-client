@@ -3,23 +3,26 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { LayoutGrid } from "lucide-react";
-import { CATEGORIES } from "@/data/mockData";
+
+interface CategoryNavItem {
+  id: string;
+  name: string;
+  slug: string;
+  count: number;
+}
 
 export default function NavCategoryDropdown() {
-  const [categories, setCategories] = useState(
-    CATEGORIES.filter((c) => c.id !== "all").map((c) => ({
-      id: c.id,
-      name: c.name,
-      slug: c.id,
-      count: c.count,
-    }))
-  );
+  const [categories, setCategories] = useState<CategoryNavItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     (async () => {
       try {
         const { categoryApi } = await import("@/services/api/categoryApi");
-        const res = await categoryApi.getAllCategories({ limit: 8 });
+        const res = await categoryApi.getAllCategories({ limit: 12 });
+        if (!isMounted) return;
+
         if (res.statusCode === 200 && res.data?.items?.length) {
           setCategories(
             res.data.items.map((item) => ({
@@ -30,8 +33,16 @@ export default function NavCategoryDropdown() {
             }))
           );
         }
-      } catch {}
+      } catch {
+        // Fallback
+      } finally {
+        if (isMounted) setLoading(false);
+      }
     })();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
@@ -46,18 +57,34 @@ export default function NavCategoryDropdown() {
           <div className="px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-400">
             Course Categories
           </div>
-          {categories.map((cat) => (
+
+          {loading ? (
+            <div className="px-4 py-3 text-xs text-slate-400 font-medium animate-pulse">
+              Loading categories...
+            </div>
+          ) : categories.length > 0 ? (
+            categories.map((cat) => (
+              <Link
+                key={cat.id}
+                href={`/courses?category=${cat.slug}`}
+                className="flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-sky-50 hover:text-[#0077b6] transition-colors"
+              >
+                <span>{cat.name}</span>
+                {cat.count > 0 && (
+                  <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold">
+                    {cat.count}
+                  </span>
+                )}
+              </Link>
+            ))
+          ) : (
             <Link
-              key={cat.id}
-              href={`/courses?category=${cat.slug}`}
-              className="flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-sky-50 hover:text-[#0077b6] transition-colors"
+              href="/courses"
+              className="block px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-sky-50 hover:text-[#0077b6] transition-colors"
             >
-              <span>{cat.name}</span>
-              <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold">
-                {cat.count}
-              </span>
+              Browse All Courses
             </Link>
-          ))}
+          )}
         </div>
       </div>
     </div>

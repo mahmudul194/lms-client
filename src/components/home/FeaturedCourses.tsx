@@ -4,28 +4,23 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import CourseCard, { CourseCardItem } from "@/components/courses/CourseCard";
 
-const INITIAL_COURSES: CourseCardItem[] = [
-  { id: "revit-combo-pro", title: "Professional Revit Combo Course (Architecture, Structure & MEP)", tag: "COMBO", discount: "-40%", badge: "Expert", duration: "Duration: 5 to 6 Months", price: "15,000.00", originalPrice: "25,000.00", image: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80" },
-  { id: "revit-arch-struct", title: "Professional Revit Architecture & Structure", tag: "ARCH + STRUCT", discount: "-38%", badge: "Expert", duration: "Duration: 4 to 5 Months", price: "12,500.00", originalPrice: "20,000.00", image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80" },
-  { id: "revit-mep", title: "Professional Revit MEP & HVAC Masterclass", tag: "MEP & HVAC", discount: "-30%", badge: "Expert", duration: "Duration: 2 to 3 Months", price: "7,000.00", originalPrice: "10,000.00", image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=800&q=80" },
-  { id: "revit-architecture-only", title: "Professional Revit Architecture Course", tag: "ARCHITECTURE", discount: "-30%", badge: "Expert", duration: "Duration: 2 to 3 Months", price: "7,000.00", originalPrice: "10,000.00", image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80" },
-  { id: "revit-structure-only", title: "Professional Revit Structure Course", tag: "STRUCTURE", discount: "-30%", badge: "Expert", duration: "Duration: 2 to 3 Months", price: "7,000.00", originalPrice: "10,000.00", image: "https://images.unsplash.com/photo-1541888946425-d0fbb186156a?auto=format&fit=crop&w=800&q=80" },
-  { id: "dynamo-only", title: "Professional Revit Dynamo Course", tag: "DYNAMO", discount: "-33%", badge: "Expert", duration: "Duration: 2 to 3 Months", price: "10,000.00", originalPrice: "15,000.00", image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80" },
-];
-
 export default function FeaturedCourses() {
-  const [courses, setCourses] = useState<CourseCardItem[]>(INITIAL_COURSES);
+  const [courses, setCourses] = useState<CourseCardItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     (async () => {
       try {
         const { coursesApi } = await import("@/services/api");
         const res = await coursesApi.getAllCourses({ limit: 12 });
+        if (!isMounted) return;
+
         if (res.statusCode === 200 && res.data?.items?.length) {
           const apiCourses = res.data.items.map((c) => ({
             id: c.slug || c.id,
             title: c.title,
-            tag: c.level?.toUpperCase() || "BIM",
+            tag: c.level?.toUpperCase() || "WEB",
             discount: c.discount_price ? `৳${c.price - c.discount_price} OFF` : "-30%",
             badge: c.level || "Professional",
             duration: `Duration: ${c.duration || 3} ${c.duration_unit || "Months"}`,
@@ -35,8 +30,16 @@ export default function FeaturedCourses() {
           }));
           setCourses(apiCourses);
         }
-      } catch {}
+      } catch {
+        // Fallback
+      } finally {
+        if (isMounted) setLoading(false);
+      }
     })();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
@@ -51,11 +54,25 @@ export default function FeaturedCourses() {
             Page)
           </h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
-          {courses.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))}
-        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="rounded-3xl border border-slate-200 bg-white p-6 space-y-4 animate-pulse">
+                <div className="h-52 bg-slate-200 rounded-2xl w-full" />
+                <div className="h-4 bg-slate-200 rounded w-1/3" />
+                <div className="h-6 bg-slate-200 rounded w-4/5" />
+                <div className="h-8 bg-slate-200 rounded w-full" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+            {courses.map((course) => (
+              <CourseCard key={course.id} course={course} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
