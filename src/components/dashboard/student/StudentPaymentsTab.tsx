@@ -1,36 +1,41 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
-import { CheckCircle2, Clock, CreditCard, ShieldCheck, Download } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { CheckCircle2, Clock, CreditCard, ShieldCheck } from "lucide-react";
+import { InstallmentItem } from "@/services/api/installmentsApi";
 
 export default function StudentPaymentsTab() {
-  const installments = [
-    {
-      no: "1st Installment",
-      amount: "৳4,000",
-      status: "Paid",
-      gateway: "bKash: 9J87K65LM4",
-      date: "12 June 2026",
-      isPaid: true,
-    },
-    {
-      no: "2nd Installment",
-      amount: "৳4,000",
-      status: "Paid",
-      gateway: "Nagad: 8K72M90P11",
-      date: "15 July 2026",
-      isPaid: true,
-    },
-    {
-      no: "3rd Installment",
-      amount: "৳4,000",
-      status: "Upcoming Due",
-      gateway: "Due by 25 August 2026",
-      date: "Pending Payment",
-      isPaid: false,
-    },
-  ];
+  const [installments, setInstallments] = useState<InstallmentItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { installmentsApi } = await import("@/services/api");
+        const res = await installmentsApi.getAllInstallments();
+        if (res.statusCode === 200 && res.data?.items?.length) {
+          setInstallments(res.data.items);
+        }
+      } catch {} finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const handlePay = async (instId: string, amount: number) => {
+    try {
+      const { paymentsApi } = await import("@/services/api");
+      const res = await paymentsApi.initiatePayment({ installment_id: instId, amount });
+      if (res.data?.payment_url) {
+        window.location.href = res.data.payment_url;
+      }
+    } catch {
+      alert("Payment gateway connection error.");
+    }
+  };
+
+  const totalPaid = installments.filter((i) => i.status === "paid").reduce((s, i) => s + i.amount, 0);
+  const totalDue = installments.filter((i) => i.status !== "paid").reduce((s, i) => s + i.amount, 0);
 
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-8 font-sans">
@@ -40,9 +45,7 @@ export default function StudentPaymentsTab() {
             <CreditCard className="w-6 h-6 text-[#0077b6]" />
             <span>Installment Ledger & Invoices</span>
           </h3>
-          <p className="text-sm text-slate-500 mt-1">
-            Track your 3-month course tuition plan, verify transactions, and download receipts
-          </p>
+          <p className="text-sm text-slate-500 mt-1">Live installment tracking connected with SSLCOMMERZ gateway</p>
         </div>
         <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs sm:text-sm font-bold">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
@@ -50,69 +53,46 @@ export default function StudentPaymentsTab() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 bg-slate-50 p-6 rounded-3xl border border-slate-200/80">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 bg-slate-50 p-6 rounded-3xl border border-slate-200/80">
         <div>
-          <span className="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wide block">Total Course Fee</span>
-          <strong className="text-2xl sm:text-3xl font-black text-[#002b5b] block mt-1">৳12,000 BDT</strong>
-          <span className="text-xs text-slate-500 font-medium">Revit Combo Pro (8th Batch)</span>
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wide block">Total Paid</span>
+          <strong className="text-2xl font-black text-emerald-600 block mt-1">৳{totalPaid.toLocaleString()} BDT</strong>
         </div>
         <div>
-          <span className="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wide block">Total Amount Paid</span>
-          <strong className="text-2xl sm:text-3xl font-black text-emerald-700 block mt-1">৳8,000 BDT</strong>
-          <span className="text-xs text-emerald-600 font-semibold">2 of 3 Installments Cleared</span>
-        </div>
-        <div>
-          <span className="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wide block">Next Payable Due</span>
-          <strong className="text-2xl sm:text-3xl font-black text-amber-700 block mt-1">৳4,000 BDT</strong>
-          <span className="text-xs text-amber-600 font-semibold">Due by 25 August 2026</span>
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wide block">Remaining Due</span>
+          <strong className="text-2xl font-black text-amber-600 block mt-1">৳{totalDue.toLocaleString()} BDT</strong>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {installments.map((inst, idx) => (
-          <div
-            key={idx}
-            className={`p-6 rounded-3xl border space-y-4 flex flex-col justify-between transition-all ${
-              inst.isPaid
-                ? "bg-emerald-50/50 border-emerald-200/90"
-                : "bg-amber-50/50 border-amber-200/90 shadow-xs"
-            }`}
-          >
-            <div className="space-y-2.5">
-              <div className="flex justify-between items-center text-sm font-extrabold">
-                <span className={inst.isPaid ? "text-emerald-900" : "text-amber-900"}>{inst.no}</span>
-                {inst.isPaid ? (
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                ) : (
-                  <Clock className="w-5 h-5 text-amber-600" />
+      <div className="space-y-4">
+        {loading ? (
+          <div className="p-8 text-center text-slate-400">Loading ledger...</div>
+        ) : installments.length === 0 ? (
+          <div className="p-8 text-center text-slate-400 bg-slate-50 rounded-2xl border border-slate-200">No installments due at this time.</div>
+        ) : (
+          installments.map((inst, idx) => (
+            <div key={inst.id} className="p-5 sm:p-6 rounded-3xl border border-slate-200 bg-white hover:border-[#0077b6] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-extrabold text-slate-900 text-base">Installment #{inst.installment_number || idx + 1}</span>
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold flex items-center gap-1 ${inst.status === "paid" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>
+                    {inst.status === "paid" ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
+                    <span>{inst.status === "paid" ? "Paid" : "Due"}</span>
+                  </span>
+                </div>
+                <div className="text-xs text-slate-500">Due Date: {new Date(inst.due_date).toLocaleDateString()}</div>
+              </div>
+              <div className="flex items-center gap-4 justify-between sm:justify-end">
+                <strong className="text-xl font-black text-slate-900">৳{inst.amount.toLocaleString()}</strong>
+                {inst.status !== "paid" && (
+                  <button onClick={() => handlePay(inst.id, inst.amount)} className="px-4 py-2 rounded-xl bg-[#0077b6] hover:bg-[#002b5b] text-white text-xs font-bold cursor-pointer shadow-sm">
+                    Pay Online
+                  </button>
                 )}
               </div>
-
-              <div className="text-3xl font-black text-slate-900">{inst.amount}</div>
-
-              <div className="text-xs sm:text-sm text-slate-600 space-y-1 pt-1">
-                <p className="font-medium">{inst.gateway}</p>
-                <p className="text-slate-500">{inst.date}</p>
-              </div>
             </div>
-
-            <div className="pt-2">
-              {inst.isPaid ? (
-                <button className="w-full py-2.5 rounded-xl bg-white border border-emerald-200 text-emerald-800 hover:bg-emerald-600 hover:text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer">
-                  <Download className="w-4 h-4" />
-                  <span>Download Invoice</span>
-                </button>
-              ) : (
-                <Link
-                  href="/admission"
-                  className="block w-full py-2.5 text-center rounded-xl bg-[#0077b6] hover:bg-[#002b5b] text-white font-extrabold text-xs sm:text-sm transition-all shadow-md"
-                >
-                  Pay Online (bKash / Nagad)
-                </Link>
-              )}
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

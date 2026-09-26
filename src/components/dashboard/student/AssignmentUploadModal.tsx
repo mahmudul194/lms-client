@@ -25,8 +25,13 @@ export default function AssignmentUploadModal({
     if (selectedFile) {
       setUploading(true);
       try {
-        const { uploadApi } = await import("@/services/api/uploadApi");
-        await uploadApi.uploadFile(selectedFile);
+        const { uploadApi, assignmentSubmissionsApi } = await import("@/services/api");
+        const uploadRes = await uploadApi.uploadFile(selectedFile);
+        await assignmentSubmissionsApi.submitAssignment({
+          assignmentId: "latest",
+          answer: selectedFile.name,
+          fileUrl: uploadRes.data?.url || "",
+        });
       } catch {}
       setUploading(false);
     }

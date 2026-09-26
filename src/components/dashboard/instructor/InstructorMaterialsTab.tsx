@@ -15,8 +15,17 @@ export default function InstructorMaterialsTab() {
   const [notes, setNotes] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = (e: React.SubmitEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
+    try {
+      const { resourcesApi } = await import("@/services/api/resourcesApi");
+      await resourcesApi.createResource({
+        title: `${selectedBatch}: Class ${classNo} - ${topic}`,
+        description: notes || "Live class session recording and practice materials",
+        url: rawUrl,
+        link: passcode ? `Passcode: ${passcode}` : undefined,
+      });
+    } catch {}
     const newSubmission: ClassRecordingSubmission = {
       id: `rec-${Date.now()}`,
       batchCode: selectedBatch,

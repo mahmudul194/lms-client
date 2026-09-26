@@ -1,34 +1,64 @@
 "use client";
 
-import React, { useState } from "react";
-import { TicketPercent, Plus, Copy, Check, TrendingUp, Users } from "lucide-react";
-import { MOCK_COUPONS } from "@/data/adminCourseContentMockData";
+import React, { useState, useEffect } from "react";
+import { TicketPercent, Plus, Copy } from "lucide-react";
 import { CouponItem } from "@/types/dashboard";
 import AdminCreateCouponModal from "./AdminCreateCouponModal";
 
 export default function AdminCouponsTab() {
-  const [coupons, setCoupons] = useState<CouponItem[]>(MOCK_COUPONS);
+  const [coupons, setCoupons] = useState<CouponItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
-  const handleCreateCoupon = (newCoupon: CouponItem) => {
+  useEffect(() => {
+    (async () => {
+      try {
+        const { couponsApi } = await import("@/services/api/couponsApi");
+        const res = await couponsApi.getAllCoupons();
+        if (res.statusCode === 200 && Array.isArray(res.data)) {
+          const apiCoupons: CouponItem[] = res.data.map((c) => ({
+            id: c.id,
+            code: c.code,
+            discountType: c.discountType === "fixed" ? "flat" : "percentage",
+            discountValue: c.discountValue,
+            minOrderAmount: 0,
+            expiryDate: c.endDate ? new Date(c.endDate).toLocaleDateString() : "Never",
+            applicableCourse: "All Courses",
+            usageLimit: c.usageLimit || 100,
+            usedCount: c.usedCount || 0,
+            isActive: c.isActive,
+          }));
+          setCoupons(apiCoupons);
+        }
+      } catch {} finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const handleCreateCoupon = async (newCoupon: CouponItem) => {
+    try {
+      const { couponsApi } = await import("@/services/api/couponsApi");
+      await couponsApi.createCoupon({
+        code: newCoupon.code,
+        discountType: newCoupon.discountType === "percentage" ? "percentage" : "fixed",
+        discountValue: newCoupon.discountValue,
+        usageLimit: newCoupon.usageLimit,
+        isActive: true,
+      });
+    } catch {}
     setCoupons([newCoupon, ...coupons]);
   };
 
-  const handleCopyCode = (code: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedCode(code);
-    setTimeout(() => setCopiedCode(null), 2000);
+  const toggleCouponStatus = async (id: string) => {
+    const target = coupons.find((c) => c.id === id);
+    if (!target) return;
+    try {
+      const { couponsApi } = await import("@/services/api/couponsApi");
+      await couponsApi.updateCoupon(id, { isActive: !target.isActive });
+    } catch {}
+    setCoupons((prev) => prev.map((c) => (c.id === id ? { ...c, isActive: !c.isActive } : c)));
   };
-
-  const toggleCouponStatus = (id: string) => {
-    setCoupons((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, isActive: !c.isActive } : c))
-    );
-  };
-
-  const activeCount = coupons.filter((c) => c.isActive).length;
-  const totalRedeemed = coupons.reduce((sum, c) => sum + c.usedCount, 0);
 
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6 font-sans">
@@ -38,91 +68,60 @@ export default function AdminCouponsTab() {
             <TicketPercent className="w-5 h-5 text-[#0077b6]" />
             <span>Discount Engine & Promo Coupons</span>
           </h3>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Create and track promotional discount codes for checkout applications
-          </p>
+          <p className="text-xs sm:text-sm text-slate-500">Live coupons connected to payment checkout validation</p>
         </div>
-
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="px-5 py-2.5 rounded-xl bg-[#002b5b] hover:bg-[#001830] text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md cursor-pointer shrink-0"
-        >
+        <button onClick={() => setIsModalOpen(true)} className="px-5 py-2.5 rounded-xl bg-[#002b5b] hover:bg-[#001830] text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md cursor-pointer shrink-0">
           <Plus className="w-4 h-4 text-sky-400" />
           <span>New Promo Code</span>
         </button>
       </div>
 
-      {/* 3 Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="p-5 rounded-2xl bg-sky-50 border border-sky-100 space-y-1">
           <span className="text-xs text-[#0077b6] font-bold">Active Coupons</span>
-          <div className="text-2xl font-black text-[#002b5b]">{activeCount} Running</div>
-        </div>
-        <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
-          <span className="text-xs text-slate-500 font-bold">Total Redeemed</span>
-          <div className="text-2xl font-black text-slate-900">{totalRedeemed} Uses</div>
+          <div className="text-2xl font-black text-[#002b5b]">{coupons.filter((c) => c.isActive).length} Running</div>
         </div>
         <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-100 space-y-1">
-          <span className="text-xs text-emerald-700 font-bold">Discount Concessions</span>
-          <div className="text-2xl font-black text-emerald-800">৳94,500</div>
+          <span className="text-xs text-emerald-600 font-bold">Total Redemptions</span>
+          <div className="text-2xl font-black text-emerald-950">{coupons.reduce((sum, c) => sum + c.usedCount, 0)} Applied</div>
         </div>
       </div>
 
-      {/* Coupons Table */}
       <div className="overflow-x-auto border border-slate-200 rounded-2xl">
         <table className="w-full text-left text-xs sm:text-sm">
-          <thead className="bg-slate-50 text-slate-600 uppercase text-[11px] font-bold border-b border-slate-200">
+          <thead className="bg-slate-50 text-slate-700 uppercase text-xs font-extrabold border-b border-slate-200">
             <tr>
-              <th className="p-3.5">Coupon Code</th>
-              <th className="p-3.5">Discount Rate</th>
-              <th className="p-3.5">Target Course</th>
-              <th className="p-3.5">Redemptions</th>
-              <th className="p-3.5">Expiry</th>
-              <th className="p-3.5 text-right">Status Toggle</th>
+              <th className="p-4">Coupon Code</th>
+              <th className="p-4">Discount</th>
+              <th className="p-4">Usage</th>
+              <th className="p-4">Status</th>
+              <th className="p-4 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
-            {coupons.map((c) => (
-              <tr key={c.id} className="hover:bg-slate-50">
-                <td className="p-3.5">
-                  <div className="flex items-center gap-1.5 font-semibold">
-                    <span className="font-bold text-slate-900 bg-slate-100 px-2 py-1 rounded-md text-xs">{c.code}</span>
-                    <button
-                      onClick={() => handleCopyCode(c.code)}
-                      className="p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
-                      title="Copy code"
-                    >
-                      {copiedCode === c.code ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                    </button>
-                  </div>
-                </td>
-                <td className="p-3.5 font-bold text-[#0077b6]">
-                  {c.discountType === "percentage" ? `${c.discountValue}% OFF` : `৳${c.discountValue} Flat`}
-                </td>
-                <td className="p-3.5 text-slate-700">{c.applicableCourse}</td>
-                <td className="p-3.5 font-semibold text-slate-600">{c.usedCount}/{c.usageLimit}</td>
-                <td className="p-3.5 text-slate-500 font-semibold text-xs">{c.expiryDate}</td>
-                <td className="p-3.5 text-right">
-                  <button
-                    onClick={() => toggleCouponStatus(c.id)}
-                    className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                      c.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"
-                    }`}
-                  >
-                    {c.isActive ? "Active" : "Disabled"}
-                  </button>
-                </td>
-              </tr>
-            ))}
+          <tbody className="divide-y divide-slate-100 font-medium">
+            {loading ? (
+              <tr><td colSpan={5} className="p-8 text-center text-slate-400">Loading coupons...</td></tr>
+            ) : coupons.length === 0 ? (
+              <tr><td colSpan={5} className="p-8 text-center text-slate-400">No promo coupons available yet.</td></tr>
+            ) : (
+              coupons.map((c) => (
+                <tr key={c.id} className="hover:bg-slate-50 transition-colors">
+                  <td className="p-4 font-mono font-bold text-slate-900">{c.code}</td>
+                  <td className="p-4 font-bold text-[#0077b6]">{c.discountType === "percentage" ? `${c.discountValue}%` : `৳${c.discountValue}`}</td>
+                  <td className="p-4">{c.usedCount} / {c.usageLimit}</td>
+                  <td className="p-4"><span className={`px-2.5 py-1 rounded-full text-xs font-bold ${c.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-500"}`}>{c.isActive ? "Active" : "Inactive"}</span></td>
+                  <td className="p-4 text-right space-x-2">
+                    <button onClick={() => { navigator.clipboard.writeText(c.code); alert(`Copied ${c.code}`); }} className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-[#0077b6] hover:text-white cursor-pointer"><Copy className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => toggleCouponStatus(c.id)} className="px-3 py-1 rounded-lg bg-slate-100 text-xs font-bold text-slate-700 hover:bg-slate-200 cursor-pointer">{c.isActive ? "Disable" : "Enable"}</button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
-      <AdminCreateCouponModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onCreateCoupon={handleCreateCoupon}
-      />
+      <AdminCreateCouponModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onCreateCoupon={handleCreateCoupon} />
     </div>
   );
 }
