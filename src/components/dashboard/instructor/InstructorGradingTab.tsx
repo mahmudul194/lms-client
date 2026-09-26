@@ -31,9 +31,17 @@ export default function InstructorGradingTab({ submissions }: InstructorGradingT
     );
   };
 
-  const handleSaveGrade = (e: React.SubmitEvent) => {
+  const handleSaveGrade = async (e: React.SubmitEvent) => {
     e.preventDefault();
     if (!selectedSubmission) return;
+
+    try {
+      const { assignmentSubmissionsApi } = await import("@/services/api/assignmentSubmissionsApi");
+      await assignmentSubmissionsApi.reviewSubmission(selectedSubmission.id, {
+        marks: Number(scoreInput),
+        feedback: feedbackInput,
+      });
+    } catch {}
 
     setList((prev) =>
       prev.map((item) =>

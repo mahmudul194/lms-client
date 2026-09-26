@@ -32,8 +32,11 @@ export interface InitiatePaymentPayload {
 }
 
 export interface InitiatePaymentResponse {
-  payment_url: string;
+  payment_url?: string;
+  gateway_url?: string;
   transaction_id: string;
+  payment_id?: string;
+  sessionkey?: string;
 }
 
 export const paymentsApi = {
@@ -50,12 +53,16 @@ export const paymentsApi = {
     page?: number;
     limit?: number;
     status?: string;
+    enrollment_id?: string;
+    installment_id?: string;
     student_id?: string;
   }): Promise<ApiResponse<PaginatedPayments>> {
     const sp = new URLSearchParams();
     if (params?.page) sp.set("page", params.page.toString());
     if (params?.limit) sp.set("limit", params.limit.toString());
     if (params?.status) sp.set("status", params.status);
+    if (params?.enrollment_id) sp.set("enrollment_id", params.enrollment_id);
+    if (params?.installment_id) sp.set("installment_id", params.installment_id);
     if (params?.student_id) sp.set("student_id", params.student_id);
     const qs = sp.toString();
     return apiFetch<PaginatedPayments>(`/payments${qs ? `?${qs}` : ""}`);

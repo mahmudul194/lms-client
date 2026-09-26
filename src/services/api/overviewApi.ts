@@ -15,9 +15,13 @@ export interface StudentOverviewReport {
 }
 
 export const overviewApi = {
-  getAdminOverview: async (): Promise<AdminOverviewReport> => {
-    const response = await apiFetch<AdminOverviewReport>("/overview/admin");
-    return response.data as AdminOverviewReport;
+  getAdminOverview: async (params?: { startDate?: string; endDate?: string }): Promise<AdminOverviewReport> => {
+    const sp = new URLSearchParams();
+    if (params?.startDate) sp.set("startDate", params.startDate);
+    if (params?.endDate) sp.set("endDate", params.endDate);
+    const qs = sp.toString();
+    const response = await apiFetch<AdminOverviewReport>(`/overview/admin${qs ? `?${qs}` : ""}`);
+    return (response.data || {}) as AdminOverviewReport;
   },
 
   getStudentOverview: async (): Promise<StudentOverviewReport> => {

@@ -39,7 +39,14 @@ export default function AdminPaymentQueueTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 font-medium">
-            {pendingApprovals.map((item) => (
+            {pendingApprovals.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="p-8 text-center text-slate-500 font-semibold">
+                  No admission or payment records found in database.
+                </td>
+              </tr>
+            ) : (
+              pendingApprovals.map((item) => (
               <tr key={item.id} className="hover:bg-slate-50 transition-colors">
                 <td className="p-4 font-bold text-slate-900">
                   <div className="flex items-center gap-2">
@@ -99,7 +106,7 @@ export default function AdminPaymentQueueTable({
                   )}
                 </td>
               </tr>
-            ))}
+            )))}
           </tbody>
         </table>
       </div>

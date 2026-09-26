@@ -80,7 +80,7 @@ export const enrollmentsApi = {
 
   async updateEnrollment(
     id: string,
-    payload: Partial<CreateEnrollmentPayload>
+    payload: Partial<CreateEnrollmentPayload & { status?: "pending" | "active" | "completed" | "cancelled" }>
   ): Promise<ApiResponse<EnrollmentItem>> {
     return apiFetch<EnrollmentItem>(`/enrollments/${id}`, {
       method: "PATCH",

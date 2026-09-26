@@ -50,19 +50,29 @@ export async function apiFetch<T>(
       headers,
     });
 
-    const data = await res.json().catch(() => ({}));
+    const json = await res.json().catch(() => ({}));
 
     if (!res.ok) {
       return {
         statusCode: res.status,
-        message: data.message || "An error occurred during API request",
-        error: data.error || res.statusText,
+        message: json.message || "An error occurred during API request",
+        error: json.error || res.statusText,
       };
     }
 
+    const payload =
+      json && typeof json === "object"
+        ? "data" in json
+          ? json.data
+          : "user" in json
+          ? json.user
+          : json
+        : json;
+
     return {
       statusCode: res.status,
-      ...data,
+      ...(typeof json === "object" && !Array.isArray(json) ? json : {}),
+      data: payload as T,
     };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Network error / API unavailable";

@@ -1,32 +1,68 @@
 import React from "react";
-import { notFound } from "next/navigation";
 import { COURSES } from "@/data/mockData";
 import CourseHeroHeader from "@/components/course-details/CourseHeroHeader";
 import CoursePricingCard from "@/components/course-details/CoursePricingCard";
 import CourseDetailsOverview from "@/components/course-details/CourseDetailsOverview";
 
-export function generateStaticParams() {
-  return COURSES.map((course) => ({
-    id: course.id,
-  }));
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  try {
+    const { coursesApi } = await import("@/services/api/coursesApi");
+    const res = await coursesApi.getAllCourses({ limit: 50 });
+    if (res.statusCode === 200 && res.data?.items?.length) {
+      return res.data.items.map((c) => ({ id: c.slug || c.id }));
+    }
+  } catch {}
+  return COURSES.map((course) => ({ id: course.id }));
 }
 
-export default async function CourseDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function CourseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const course = COURSES.find((c) => c.id === id) || COURSES[0];
+  let course: any = COURSES.find((c) => c.id === id);
 
   if (!course) {
-    notFound();
+    try {
+      const { coursesApi } = await import("@/services/api/coursesApi");
+      const res = await coursesApi.getCourseById(id);
+      if (res.statusCode === 200 && res.data) {
+        const item = res.data;
+        course = {
+          id: item.id,
+          title: item.title,
+          description: item.description || item.short_description || "Comprehensive hands-on training program.",
+          price: item.discount_price || item.price || 12000,
+          originalPrice: item.price ? `৳${item.price.toLocaleString()}` : "৳16,000",
+          discount: item.discount_price ? `৳${item.discount_price.toLocaleString()}` : "৳12,000",
+          rating: 4.9,
+          reviews: 120,
+          category: "Technology",
+          instructor: "Lead Instructor",
+          duration: `${item.duration || 40} Hours`,
+          lessons: 30,
+          modulesCount: 8,
+          level: item.level || "Intermediate",
+          image: item.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
+          syllabus: [],
+          features: [
+            "Project-Based Live Training",
+            "Lifetime Class Recordings",
+            "Resource Materials & Model Library",
+            "Verified Certificate of Completion",
+            "Job & Freelancing Support",
+          ],
+        };
+      }
+    } catch {}
   }
 
-  const installmentAmount = Math.round(course.price / 3);
-  const instructorName = typeof course.instructor === "object" ? course.instructor.name : (course.instructor || "Lead BIM Specialist");
-  const instructorRole = typeof course.instructor === "object" ? course.instructor.role : "Senior BIM Consultant";
+  if (!course) {
+    course = COURSES[0];
+  }
 
+  const installmentAmount = Math.round((course.price || 12000) / 3);
+  const instructorName = typeof course.instructor === "object" ? course.instructor.name : (course.instructor || "Lead Specialist");
+  const instructorRole = typeof course.instructor === "object" ? course.instructor.role : "Senior Consultant";
   const defaultSoftwares = ["Autodesk Revit", "AutoCAD", "Navisworks", "Dynamo"];
   const defaultFeatures = course.features || [
     "Project-Based Live Training",
@@ -37,17 +73,14 @@ export default async function CourseDetailPage({
   ];
 
   return (
-    <div className="py-12 bg-slate-50 min-h-screen">
+    <div className="py-12 bg-slate-50 min-h-screen font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-        {/* Header Hero + Pricing Card Grid */}
         <div className="bg-[#002b5b] text-white rounded-3xl p-8 lg:p-12 shadow-xl">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <CourseHeroHeader course={course} />
             <CoursePricingCard course={course} installmentAmount={installmentAmount} />
           </div>
         </div>
-
-        {/* Detailed Curriculum, Features & Instructor Meta */}
         <CourseDetailsOverview
           course={course}
           instructorName={instructorName}

@@ -22,7 +22,7 @@ export default function UnifiedDashboardPage() {
   const [adminTab, setAdminTabState] = useState<AdminDashboardTab>("overview");
 
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
-  const [activeAssignmentId, setActiveAssignmentId] = useState<number | null>(null);
+  const [, setActiveAssignmentId] = useState<number | null>(null);
   const [selectedClassVideo, setSelectedClassVideo] = useState<ClassVideo | null>(null);
 
   useEffect(() => {
@@ -30,9 +30,7 @@ export default function UnifiedDashboardPage() {
     const sp = new URLSearchParams(window.location.search);
     const r = sp.get("role") || localStorage.getItem("bim_user_role");
     const t = sp.get("tab") || localStorage.getItem("bim_active_tab");
-
-    const validRole: "student" | "instructor" | "admin" =
-      r === "instructor" || r === "admin" ? r : "student";
+    const validRole: "student" | "instructor" | "admin" = r === "instructor" || r === "admin" ? r : "student";
     setCurrentRole(validRole);
     setCurrentUser(DUMMY_ACCOUNTS.find((a) => a.role === validRole) || DUMMY_ACCOUNTS[0]);
 
@@ -41,6 +39,17 @@ export default function UnifiedDashboardPage() {
       else if (validRole === "instructor") setInstructorTabState(t as InstructorDashboardTab);
       else if (validRole === "admin") setAdminTabState(t as AdminDashboardTab);
     }
+
+    (async () => {
+      try {
+        const { authApi } = await import("@/services/api/authApi");
+        const res = await authApi.getMe();
+        const user = res.data;
+        if (res.statusCode === 200 && user) {
+          setCurrentUser((prev) => ({ ...prev, name: user.name || prev.name, nameEn: user.name || prev.nameEn, email: user.email || prev.email }));
+        }
+      } catch {}
+    })();
   }, []);
 
   const syncUrl = (role: string, tab: string) => {
@@ -53,29 +62,9 @@ export default function UnifiedDashboardPage() {
     window.history.replaceState(null, "", `${window.location.pathname}?${sp.toString()}`);
   };
 
-  const handleSetStudentTab = (t: StudentDashboardTab) => {
-    setStudentTabState(t);
-    syncUrl("student", t);
-  };
-
-  const handleSetInstructorTab = (t: InstructorDashboardTab) => {
-    setInstructorTabState(t);
-    syncUrl("instructor", t);
-  };
-
-  const handleSetAdminTab = (t: AdminDashboardTab) => {
-    setAdminTabState(t);
-    syncUrl("admin", t);
-  };
-
-  const switchRole = (role: "student" | "instructor" | "admin") => {
-    setCurrentRole(role);
-    const acc = DUMMY_ACCOUNTS.find((a) => a.role === role) || DUMMY_ACCOUNTS[0];
-    setCurrentUser(acc);
-    setIsMobileSidebarOpen(false);
-    const activeT = role === "student" ? studentTab : role === "instructor" ? instructorTab : adminTab;
-    syncUrl(role, activeT);
-  };
+  const handleSetStudentTab = (t: StudentDashboardTab) => { setStudentTabState(t); syncUrl("student", t); };
+  const handleSetInstructorTab = (t: InstructorDashboardTab) => { setInstructorTabState(t); syncUrl("instructor", t); };
+  const handleSetAdminTab = (t: AdminDashboardTab) => { setAdminTabState(t); syncUrl("admin", t); };
 
   const activeVideo = selectedClassVideo || MOCK_DASHBOARD_CLASSES[0];
 
@@ -119,26 +108,16 @@ export default function UnifiedDashboardPage() {
           )}
 
           {currentRole === "instructor" && (
-            <InstructorDashboardView
-              currentUser={currentUser}
-              instructorTab={instructorTab}
-              setInstructorTab={handleSetInstructorTab}
-            />
+            <InstructorDashboardView currentUser={currentUser} instructorTab={instructorTab} setInstructorTab={handleSetInstructorTab} />
           )}
 
           {currentRole === "admin" && (
-            <AdminDashboardView
-              adminTab={adminTab}
-              setAdminTab={handleSetAdminTab}
-            />
+            <AdminDashboardView adminTab={adminTab} setAdminTab={handleSetAdminTab} />
           )}
         </main>
       </div>
 
-      <AssignmentUploadModal
-        isOpen={uploadModalOpen}
-        onClose={() => setUploadModalOpen(false)}
-      />
+      <AssignmentUploadModal isOpen={uploadModalOpen} onClose={() => setUploadModalOpen(false)} />
     </div>
   );
 }

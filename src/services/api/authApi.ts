@@ -28,8 +28,9 @@ export const authApi = {
       method: "POST",
       body: JSON.stringify({ phone, otpCode, device }),
     });
-    if (res.statusCode === 200 && res.data?.accessToken) {
-      setAuthToken(res.data.accessToken);
+    const token = (res.data as any)?.access_token || res.data?.accessToken;
+    if (res.statusCode === 200 && token) {
+      setAuthToken(token);
     }
     return res;
   },
@@ -39,8 +40,9 @@ export const authApi = {
       method: "POST",
       body: JSON.stringify({ email, password, device }),
     });
-    if (res.statusCode === 200 && res.data?.accessToken) {
-      setAuthToken(res.data.accessToken);
+    const token = (res.data as any)?.access_token || res.data?.accessToken;
+    if (res.statusCode === 200 && token) {
+      setAuthToken(token);
     }
     return res;
   },

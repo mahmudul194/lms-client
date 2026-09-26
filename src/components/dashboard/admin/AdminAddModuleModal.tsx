@@ -38,8 +38,16 @@ export default function AdminAddModuleModal({
   const addLesson = () => setLessons([...lessons, { title: "", videoUrl: "", duration: "" }]);
   const removeLesson = (idx: number) => setLessons(lessons.filter((_, i) => i !== idx));
 
-  const handleSubmit = (e: React.SubmitEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
+    try {
+      const { lessonsApi } = await import("@/services/api/lessonsApi");
+      for (const les of lessons) {
+        if (les.title) {
+          await lessonsApi.createLesson({ module_id: "mod-default", title: les.title.trim(), video_url: les.videoUrl.trim() || undefined, type: "video", status: "published" });
+        }
+      }
+    } catch {}
     onAddModule({
       id: `mod-${Date.now()}`,
       courseId: "revit-combo-pro",
