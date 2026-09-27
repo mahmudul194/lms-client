@@ -19,14 +19,21 @@ export default function StudentCertificateTab({ currentUser }: StudentCertificat
         const { certificatesApi } = await import("@/services/api/certificatesApi");
         const res = await certificatesApi.getAllCertificates();
         if (res.statusCode === 200 && res.data?.items?.length) {
-          const found = res.data.items.find((c) => c.status === "issued");
+          const uName = (currentUser.name || currentUser.nameEn || "").trim().toLowerCase();
+          const uEmail = (currentUser.email || "").trim().toLowerCase();
+          const found = res.data.items.find(
+            (c) =>
+              c.status === "issued" &&
+              ((c.studentName && c.studentName.trim().toLowerCase() === uName) ||
+               (c.student?.name && c.student.name.trim().toLowerCase() === uName))
+          );
           if (found) setCert(found);
         }
       } catch {} finally {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [currentUser.name, currentUser.nameEn, currentUser.email]);
 
   const criteria = [
     { title: "Course Syllabus Completion", status: cert ? "100% Done" : "In Progress", isDone: !!cert },
@@ -58,7 +65,7 @@ export default function StudentCertificateTab({ currentUser }: StudentCertificat
         <div className="space-y-1">
           <span className="text-xs uppercase font-extrabold tracking-widest text-slate-400">This certifies that</span>
           <h2 className="text-2xl sm:text-4xl font-black text-slate-950 underline decoration-[#0077b6] decoration-2 underline-offset-8">
-            {cert?.studentName || currentUser.nameEn}
+            {cert?.studentName || currentUser.name || currentUser.nameEn}
           </h2>
           <p className="text-sm text-slate-600 pt-3">
             has demonstrated professional competence in <strong>{cert?.courseName || "Revit Architecture, Structural & MEP BIM Lifecycles"}</strong>

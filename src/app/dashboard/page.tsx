@@ -13,14 +13,28 @@ import AdminDashboardView from "@/components/dashboard/admin/AdminDashboardView"
 
 export default function UnifiedDashboardPage() {
   const [currentRole, setCurrentRole] = useState<"student" | "instructor" | "admin">("student");
-  const [currentUser, setCurrentUser] = useState<UserAccount>(DUMMY_ACCOUNTS[0]);
+  const [currentUser, setCurrentUser] = useState<UserAccount>(() => {
+    if (typeof window !== "undefined") {
+      const name = localStorage.getItem("bim_user_name");
+      const email = localStorage.getItem("bim_user_email");
+      const role = (localStorage.getItem("bim_user_role") || "student") as "student" | "instructor" | "admin";
+      if (name) {
+        return {
+          username: role, email: email || "user@bimbuild.com", password: "", name, nameEn: name,
+          role: role === "instructor" || role === "admin" ? role : "student",
+          roleTitle: role === "admin" ? "Admin" : role === "instructor" ? "Instructor" : "BIM Student",
+          avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
+          details: "Verified Account",
+        };
+      }
+    }
+    return DUMMY_ACCOUNTS[0];
+  });
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-
   const [studentTab, setStudentTabState] = useState<StudentDashboardTab>("overview");
   const [instructorTab, setInstructorTabState] = useState<InstructorDashboardTab>("overview");
   const [adminTab, setAdminTabState] = useState<AdminDashboardTab>("overview");
-
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [, setActiveAssignmentId] = useState<number | null>(null);
   const [selectedClassVideo, setSelectedClassVideo] = useState<ClassVideo | null>(null);
@@ -32,7 +46,14 @@ export default function UnifiedDashboardPage() {
     const t = sp.get("tab") || localStorage.getItem("bim_active_tab");
     const validRole: "student" | "instructor" | "admin" = r === "instructor" || r === "admin" ? r : "student";
     setCurrentRole(validRole);
-    setCurrentUser(DUMMY_ACCOUNTS.find((a) => a.role === validRole) || DUMMY_ACCOUNTS[0]);
+
+    const storedName = localStorage.getItem("bim_user_name");
+    const storedEmail = localStorage.getItem("bim_user_email");
+    if (storedName) {
+      setCurrentUser((prev) => ({ ...prev, name: storedName, nameEn: storedName, email: storedEmail || prev.email, role: validRole }));
+    } else {
+      setCurrentUser(DUMMY_ACCOUNTS.find((a) => a.role === validRole) || DUMMY_ACCOUNTS[0]);
+    }
 
     if (t) {
       if (validRole === "student") setStudentTabState(t as StudentDashboardTab);
@@ -46,6 +67,8 @@ export default function UnifiedDashboardPage() {
         const res = await authApi.getMe();
         const user = res.data;
         if (res.statusCode === 200 && user) {
+          if (user.name) localStorage.setItem("bim_user_name", user.name);
+          if (user.email) localStorage.setItem("bim_user_email", user.email);
           setCurrentUser((prev) => ({ ...prev, name: user.name || prev.name, nameEn: user.name || prev.nameEn, email: user.email || prev.email }));
         }
       } catch {}
@@ -65,52 +88,34 @@ export default function UnifiedDashboardPage() {
   const handleSetStudentTab = (t: StudentDashboardTab) => { setStudentTabState(t); syncUrl("student", t); };
   const handleSetInstructorTab = (t: InstructorDashboardTab) => { setInstructorTabState(t); syncUrl("instructor", t); };
   const handleSetAdminTab = (t: AdminDashboardTab) => { setAdminTabState(t); syncUrl("admin", t); };
-
   const activeVideo = selectedClassVideo || MOCK_DASHBOARD_CLASSES[0];
 
   return (
     <div className="bg-[#f8fafc] bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:24px_24px] min-h-screen text-slate-900 flex font-sans w-full">
       <DashboardSidebar
-        currentRole={currentRole}
-        isMobileOpen={isMobileSidebarOpen}
-        onCloseMobile={() => setIsMobileSidebarOpen(false)}
-        studentTab={studentTab}
-        setStudentTab={handleSetStudentTab}
-        instructorTab={instructorTab}
-        setInstructorTab={handleSetInstructorTab}
-        adminTab={adminTab}
-        setAdminTab={handleSetAdminTab}
+        currentRole={currentRole} isMobileOpen={isMobileSidebarOpen} onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        studentTab={studentTab} setStudentTab={handleSetStudentTab} instructorTab={instructorTab}
+        setInstructorTab={handleSetInstructorTab} adminTab={adminTab} setAdminTab={handleSetAdminTab}
       />
 
       <div className="flex-1 flex flex-col min-w-0">
         <DashboardHeader
-          currentRole={currentRole}
-          currentUser={currentUser}
-          onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
+          currentRole={currentRole} currentUser={currentUser} onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
+          searchQuery={searchQuery} setSearchQuery={setSearchQuery}
         />
 
         <main className="flex-1 p-4 sm:p-7 lg:p-9 space-y-7 max-w-[1600px] w-full">
           {currentRole === "student" && (
             <StudentTabRouter
-              studentTab={studentTab}
-              setStudentTab={handleSetStudentTab}
-              currentUser={currentUser}
-              classesList={MOCK_DASHBOARD_CLASSES}
-              liveClasses={MOCK_LIVE_CLASSES}
-              resources={MOCK_RESOURCES}
-              assignments={MOCK_ASSIGNMENTS}
-              activeVideo={activeVideo}
-              onSelectVideo={setSelectedClassVideo}
+              studentTab={studentTab} setStudentTab={handleSetStudentTab} currentUser={currentUser}
+              classesList={MOCK_DASHBOARD_CLASSES} liveClasses={MOCK_LIVE_CLASSES} resources={MOCK_RESOURCES}
+              assignments={MOCK_ASSIGNMENTS} activeVideo={activeVideo} onSelectVideo={setSelectedClassVideo}
               onOpenUpload={(id) => { setActiveAssignmentId(id); setUploadModalOpen(true); }}
             />
           )}
-
           {currentRole === "instructor" && (
             <InstructorDashboardView currentUser={currentUser} instructorTab={instructorTab} setInstructorTab={handleSetInstructorTab} />
           )}
-
           {currentRole === "admin" && (
             <AdminDashboardView adminTab={adminTab} setAdminTab={handleSetAdminTab} />
           )}
