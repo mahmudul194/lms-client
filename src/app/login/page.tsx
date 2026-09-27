@@ -39,6 +39,7 @@ export default function LoginPage() {
             ? "instructor"
             : "student";
         if (typeof window !== "undefined") {
+          localStorage.setItem("bim_user_id", res.data.user.id || "");
           localStorage.setItem("bim_user_name", res.data.user.name || "");
           localStorage.setItem("bim_user_email", res.data.user.email);
         }
