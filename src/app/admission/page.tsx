@@ -11,16 +11,38 @@ import AdmissionSummaryCard from "@/components/admission/AdmissionSummaryCard";
 import AdmissionSuccessSlip from "@/components/admission/AdmissionSuccessSlip";
 
 export default function AdmissionPage() {
+  const [courses, setCourses] = useState(COURSES);
   const [selectedCourseId, setSelectedCourseId] = useState(COURSES[0].id);
   const [batchTiming, setBatchTiming] = useState("night");
   const [classFormat, setClassFormat] = useState("live");
   const [paymentType, setPaymentType] = useState<"installment" | "full">("installment");
   const [paymentMethod, setPaymentMethod] = useState<"bkash" | "nagad" | "rocket" | "sslcommerz" | "bank">("bkash");
   const [trxId, setTrxId] = useState("");
-  const [formData, setFormData] = useState({ fullName: "", phone: "", email: "", profession: "Civil Engineer / Diploma", notes: "" });
+  const [formData, setFormData] = useState({ fullName: "", phone: "", email: "", profession: "Software / Engineering", notes: "" });
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const selectedCourse = COURSES.find((c) => c.id === selectedCourseId) || COURSES[0];
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const { coursesApi } = await import("@/services/api/coursesApi");
+        const res = await coursesApi.getAllCourses({ limit: 50 });
+        if (res.statusCode === 200 && res.data?.items?.length) {
+          const apiCourses = res.data.items.map((c) => ({
+            id: c.slug || c.id,
+            title: c.title,
+            price: Number(c.discount_price || c.price || 5000),
+            originalPrice: Number(c.price || 10000),
+            installment: Math.round(Number(c.discount_price || c.price || 5000) / 3),
+            software: ["Web Dev", "Full Stack"],
+          }));
+          setCourses(apiCourses as any);
+          if (apiCourses[0]) setSelectedCourseId(apiCourses[0].id);
+        }
+      } catch {}
+    })();
+  }, []);
+
+  const selectedCourse = courses.find((c) => c.id === selectedCourseId) || courses[0];
   const installmentAmount = Math.round(selectedCourse.price / 3);
   const dueToday = paymentType === "installment" ? installmentAmount : selectedCourse.price;
   const savings = selectedCourse.originalPrice ? selectedCourse.originalPrice - selectedCourse.price : 0;
@@ -28,9 +50,37 @@ export default function AdmissionPage() {
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     try {
-      const { usersApi, studentsApi } = await import("@/services/api");
-      await usersApi.createUser({ name: formData.fullName, email: formData.email, phone: formData.phone, password: "password123", role: "student" });
-      await studentsApi.createStudent({ name: formData.fullName, email: formData.email, phone: formData.phone, technology: selectedCourse.title, session: "8th Live Batch (2026)" });
+      const { usersApi, studentsApi, enrollmentsApi, batchesApi } = await import("@/services/api");
+      const userRes = await usersApi.createUser({
+        name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        password: "Password123!",
+        role: "student",
+      });
+      const userId = userRes.data?.id;
+      const studentRes = await studentsApi.createStudent({
+        name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        technology: selectedCourse.title,
+        session: "2026 Batch",
+        userId,
+      });
+      const studentId = studentRes.data?.id;
+      if (studentId) {
+        const batchRes = await batchesApi.getAllBatches({ limit: 1 });
+        const batchId = batchRes.data?.items?.[0]?.id;
+        if (batchId) {
+          await enrollmentsApi.manualEnrollment({
+            student_id: studentId,
+            batch_id: batchId,
+            total_amount: Number(selectedCourse.price || 5000),
+            paid_amount: Number(dueToday || 1667),
+            transaction_id: trxId || `TXN-${Date.now()}`,
+          });
+        }
+      }
     } catch {}
     setIsSubmitted(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -64,7 +114,7 @@ export default function AdmissionPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
             <div className="lg:col-span-7 space-y-6">
               <form onSubmit={handleSubmit} className="space-y-6">
-                <AdmissionCourseStep courses={COURSES} selectedCourseId={selectedCourseId} onSelectCourseId={setSelectedCourseId} classFormat={classFormat} onSelectClassFormat={setClassFormat} batchTiming={batchTiming} onSelectBatchTiming={setBatchTiming} />
+                <AdmissionCourseStep courses={courses} selectedCourseId={selectedCourseId} onSelectCourseId={setSelectedCourseId} classFormat={classFormat} onSelectClassFormat={setClassFormat} batchTiming={batchTiming} onSelectBatchTiming={setBatchTiming} />
                 <AdmissionStudentInfoStep formData={formData} setFormData={setFormData} />
                 <AdmissionPaymentStep selectedCourse={selectedCourse} paymentType={paymentType} onSelectPaymentType={setPaymentType} paymentMethod={paymentMethod} onSelectPaymentMethod={setPaymentMethod} trxId={trxId} setTrxId={setTrxId} installmentAmount={installmentAmount} dueToday={dueToday} />
                 <div className="pt-2">

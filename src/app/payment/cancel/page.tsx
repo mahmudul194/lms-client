@@ -1,11 +1,12 @@
 import Link from 'next/link';
 
-export default function PaymentCancelPage({
+export default async function PaymentCancelPage({
   searchParams,
 }: {
-  searchParams: { tran_id?: string };
+  searchParams: Promise<{ tran_id?: string }>;
 }) {
-  const transactionId = searchParams?.tran_id;
+  const params = await searchParams;
+  const transactionId = params?.tran_id;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

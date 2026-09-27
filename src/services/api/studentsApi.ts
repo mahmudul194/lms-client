@@ -46,6 +46,7 @@ export interface PaginatedStudents {
 export type CreateStudentPayload = Partial<Omit<StudentRecord, "id" | "user" | "createdAt" | "updatedAt">> & {
   name: string;
   email: string;
+  userId?: string;
 };
 
 export const studentsApi = {
