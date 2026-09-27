@@ -93,4 +93,8 @@ export const enrollmentsApi = {
       method: "DELETE",
     });
   },
+
+  async getMyEnrollments(): Promise<ApiResponse<EnrollmentItem[]>> {
+    return apiFetch<EnrollmentItem[]>("/enrollments/my");
+  },
 };

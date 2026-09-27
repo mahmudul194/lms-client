@@ -26,13 +26,36 @@ export default function StudentOverviewTab({
   onNavigateToCourses,
   onNavigateToResources,
 }: StudentOverviewTabProps) {
-  const upcomingClass = liveClasses[0];
+  const [enrolledCourse, setEnrolledCourse] = React.useState<{ title: string; batch?: string } | null>(null);
+
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const { enrollmentsApi } = await import("@/services/api/enrollmentsApi");
+        const res = await enrollmentsApi.getMyEnrollments();
+        if (res.statusCode === 200 && Array.isArray(res.data) && res.data.length > 0) {
+          const first = res.data[0];
+          setEnrolledCourse({
+            title: first.batch?.course?.title || first.batch?.name || "Active BIM Course",
+            batch: first.batch?.name || "Active Batch",
+          });
+        } else {
+          setEnrolledCourse(null);
+        }
+      } catch {
+        setEnrolledCourse(null);
+      }
+    })();
+  }, []);
+
+  const upcomingClass = enrolledCourse ? liveClasses[0] : null;
 
   return (
     <div className="space-y-8 font-sans">
       <StudentHeroProgressBanner
         currentUser={currentUser}
         classesList={classesList}
+        enrolledCourse={enrolledCourse}
         onSelectVideo={onSelectVideo}
         onNavigateToCourses={onNavigateToCourses}
       />

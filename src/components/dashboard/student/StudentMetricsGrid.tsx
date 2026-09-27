@@ -39,9 +39,9 @@ export default function StudentMetricsGrid() {
     },
     {
       label: "Classes Completed",
-      value: "28 / 45",
-      sub: "62% Course Completed",
-      badge: "17 Remaining",
+      value: loading ? "..." : (data?.totalPayable || 0) > 0 ? "28 / 45" : "0 / 0",
+      sub: (data?.totalPayable || 0) > 0 ? "62% Course Completed" : "No active courses",
+      badge: (data?.totalPayable || 0) > 0 ? "In Progress" : "Not Enrolled",
       icon: Video,
     },
   ];

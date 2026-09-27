@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { BookOpen, ArrowRight } from "lucide-react";
 import { EnrolledCourse } from "@/types/dashboard";
 import StudentEnrolledCoursesGrid from "./StudentEnrolledCoursesGrid";
 import StudentCourseHub from "./StudentCourseHub";
@@ -14,24 +16,28 @@ export default function StudentCoursePlayerTab() {
   useEffect(() => {
     (async () => {
       try {
-        const { coursesApi } = await import("@/services/api/coursesApi");
-        const res = await coursesApi.getAllCourses({ limit: 20 });
-        if (res.statusCode === 200 && res.data?.items?.length) {
-          const apiCourses: EnrolledCourse[] = res.data.items.map((c) => ({
-            id: c.id,
-            title: c.title,
+        const { enrollmentsApi } = await import("@/services/api/enrollmentsApi");
+        const res = await enrollmentsApi.getMyEnrollments();
+        if (res.statusCode === 200 && Array.isArray(res.data) && res.data.length > 0) {
+          const apiCourses: EnrolledCourse[] = res.data.map((enr: any) => ({
+            id: enr.batch?.course?.id || enr.batch_id || enr.id,
+            title: enr.batch?.course?.title || enr.batch?.name || "Enrolled Course",
             category: "BIM Engineering",
-            batch: "8th Batch",
-            instructor: "Engr. Ashikur Rahman",
-            thumbnail: c.thumbnail || "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=800&auto=format&fit=crop",
+            batch: enr.batch?.name || "Active Batch",
+            instructor: "Course Instructor",
+            thumbnail: enr.batch?.course?.thumbnail || "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=800&auto=format&fit=crop",
             totalLessons: 24,
-            completedLessons: 12,
-            progressPercent: 50,
+            completedLessons: 0,
+            progressPercent: 0,
             modules: [],
           }));
           setCourses(apiCourses);
+        } else {
+          setCourses([]);
         }
-      } catch {}
+      } catch {
+        setCourses([]);
+      }
     })();
 
     if (typeof window === "undefined") return;
@@ -96,9 +102,23 @@ export default function StudentCoursePlayerTab() {
 
   if (courses.length === 0) {
     return (
-      <div className="bg-white rounded-3xl p-8 border border-slate-200 text-center font-sans space-y-2">
-        <h3 className="text-xl font-bold text-slate-800">No Enrolled Courses</h3>
-        <p className="text-sm text-slate-500">You do not have any active course enrollments yet.</p>
+      <div className="bg-white rounded-3xl p-10 sm:p-14 border border-slate-200 text-center font-sans space-y-4 max-w-xl mx-auto shadow-xs">
+        <div className="w-16 h-16 rounded-3xl bg-sky-50 text-[#0077b6] flex items-center justify-center mx-auto border border-sky-100 shadow-xs">
+          <BookOpen className="w-8 h-8" />
+        </div>
+        <h3 className="text-xl sm:text-2xl font-bold text-slate-900">No Enrolled Courses Yet</h3>
+        <p className="text-sm text-slate-500 max-w-md mx-auto">
+          You have not enrolled in any BIM or engineering courses yet. Browse our course catalog to find the right training for you.
+        </p>
+        <div className="pt-2">
+          <Link
+            href="/courses"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#0077b6] hover:bg-[#005a8c] text-white font-bold text-sm shadow-md transition-all hover:scale-105"
+          >
+            <span>Browse All Courses</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
       </div>
     );
   }
