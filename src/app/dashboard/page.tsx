@@ -12,24 +12,9 @@ import InstructorDashboardView from "@/components/dashboard/instructor/Instructo
 import AdminDashboardView from "@/components/dashboard/admin/AdminDashboardView";
 
 export default function UnifiedDashboardPage() {
+  const [mounted, setMounted] = useState(false);
   const [currentRole, setCurrentRole] = useState<"student" | "instructor" | "admin">("student");
-  const [currentUser, setCurrentUser] = useState<UserAccount>(() => {
-    if (typeof window !== "undefined") {
-      const name = localStorage.getItem("bim_user_name");
-      const email = localStorage.getItem("bim_user_email");
-      const role = (localStorage.getItem("bim_user_role") || "student") as "student" | "instructor" | "admin";
-      if (name) {
-        return {
-          username: role, email: email || "user@bimbuild.com", password: "", name, nameEn: name,
-          role: role === "instructor" || role === "admin" ? role : "student",
-          roleTitle: role === "admin" ? "Admin" : role === "instructor" ? "Instructor" : "BIM Student",
-          avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
-          details: "Verified Account",
-        };
-      }
-    }
-    return DUMMY_ACCOUNTS[0];
-  });
+  const [currentUser, setCurrentUser] = useState<UserAccount>(DUMMY_ACCOUNTS[0]);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [studentTab, setStudentTabState] = useState<StudentDashboardTab>("overview");
@@ -40,6 +25,7 @@ export default function UnifiedDashboardPage() {
   const [selectedClassVideo, setSelectedClassVideo] = useState<ClassVideo | null>(null);
 
   useEffect(() => {
+    setMounted(true);
     if (typeof window === "undefined") return;
     const sp = new URLSearchParams(window.location.search);
     const r = sp.get("role") || localStorage.getItem("bim_user_role");
@@ -89,6 +75,17 @@ export default function UnifiedDashboardPage() {
   const handleSetInstructorTab = (t: InstructorDashboardTab) => { setInstructorTabState(t); syncUrl("instructor", t); };
   const handleSetAdminTab = (t: AdminDashboardTab) => { setAdminTabState(t); syncUrl("admin", t); };
   const activeVideo = selectedClassVideo || MOCK_DASHBOARD_CLASSES[0];
+
+  if (!mounted) {
+    return (
+      <div className="bg-[#f8fafc] min-h-screen flex items-center justify-center font-sans">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-9 h-9 rounded-full border-3 border-[#0077b6]/30 border-t-[#0077b6] animate-spin" />
+          <span className="text-xs font-bold text-slate-400 tracking-wide uppercase">Loading Dashboard...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#f8fafc] bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:24px_24px] min-h-screen text-slate-900 flex font-sans w-full">
