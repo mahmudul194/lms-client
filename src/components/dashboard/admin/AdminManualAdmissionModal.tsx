@@ -35,15 +35,15 @@ export default function AdminManualAdmissionModal({
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     try {
-      const { usersApi } = await import("@/services/api/usersApi");
+      const { usersApi, studentsApi, enrollmentsApi, batchesApi } = await import("@/services/api");
       const email = `${form.name.trim().toLowerCase().replace(/\s+/g, "")}${form.phone.slice(-4)}@gmail.com`;
-      await usersApi.createUser({
-        name: form.name.trim(),
-        phone: form.phone.trim(),
-        email,
-        password: "password123",
-        role: "student",
-      });
+      const uRes = await usersApi.createUser({ name: form.name.trim(), phone: form.phone.trim(), email, password: "password123", role: "student" });
+      const sRes = await studentsApi.createStudent({ name: form.name.trim(), email, phone: form.phone.trim(), userId: uRes.data?.id, technology: form.course });
+      const bRes = await batchesApi.getAllBatches({ limit: 1 });
+      const bId = bRes.data?.items?.[0]?.id;
+      if (bId && (sRes.data?.id || uRes.data?.id)) {
+        await enrollmentsApi.manualEnrollment({ student_id: sRes.data?.id || uRes.data?.id || "", batch_id: bId, total_amount: total, paid_amount: advance, transaction_id: form.trxId.trim() || undefined });
+      }
     } catch {}
     onEnroll({
       id: `adm-${Date.now()}`,

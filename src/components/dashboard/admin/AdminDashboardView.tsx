@@ -48,7 +48,7 @@ export default function AdminDashboardView({ adminTab, setAdminTab }: { adminTab
   const handleApprove = async (id: string) => {
     try {
       const { enrollmentsApi } = await import("@/services/api/enrollmentsApi");
-      await enrollmentsApi.updateEnrollment(id, { discount_amount: 0 });
+      await enrollmentsApi.updateEnrollment(id, { status: "active" });
     } catch {}
     setPendingApprovals((prev) => prev.map((item) => (item.id === id ? { ...item, status: "Approved" } : item)));
   };
@@ -56,9 +56,23 @@ export default function AdminDashboardView({ adminTab, setAdminTab }: { adminTab
   const handleReject = async (id: string) => {
     try {
       const { enrollmentsApi } = await import("@/services/api/enrollmentsApi");
-      await enrollmentsApi.deleteEnrollment(id);
+      await enrollmentsApi.updateEnrollment(id, { status: "cancelled" });
     } catch {}
     setPendingApprovals((prev) => prev.map((item) => (item.id === id ? { ...item, status: "Rejected" } : item)));
+  };
+
+  const handleLaunchBatch = async (newBatch: AdminBatch) => {
+    try {
+      const { batchesApi } = await import("@/services/api/batchesApi");
+      await batchesApi.createBatch({
+        name: newBatch.name,
+        code: newBatch.code,
+        capacity: newBatch.maxSeats,
+        mode: "online",
+        class_type: "live",
+      });
+    } catch {}
+    alert(`Batch ${newBatch.name} (${newBatch.code}) launched!`);
   };
 
   return (
@@ -75,7 +89,7 @@ export default function AdminDashboardView({ adminTab, setAdminTab }: { adminTab
       {adminTab === "coupons" && <AdminCouponsTab />}
       {adminTab === "revenue" && <AdminRevenueTab />}
       {adminTab === "settings" && <AdminSettingsTab />}
-      <AdminCreateBatchModal isOpen={isCreateBatchModalOpen} onClose={() => setIsCreateBatchModalOpen(false)} onCreate={(newBatch: AdminBatch) => alert(`Batch ${newBatch.name} (${newBatch.code}) launched!`)} />
+      <AdminCreateBatchModal isOpen={isCreateBatchModalOpen} onClose={() => setIsCreateBatchModalOpen(false)} onCreate={handleLaunchBatch} />
     </div>
   );
 }

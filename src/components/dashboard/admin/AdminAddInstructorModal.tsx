@@ -35,14 +35,22 @@ export default function AdminAddInstructorModal({
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     try {
-      const { usersApi } = await import("@/services/api/usersApi");
-      await usersApi.createUser({
+      const { usersApi, mentorsApi } = await import("@/services/api");
+      const uRes = await usersApi.createUser({
         name: form.name.trim(),
         email: form.email.trim(),
         phone: form.phone.trim(),
         password: "password123",
         role: "instructor",
       });
+      if (uRes.data?.id) {
+        await mentorsApi.createMentor({
+          userId: uRes.data.id,
+          designation: form.role.trim(),
+          subject: form.specialty.trim(),
+          skills: [form.specialty.trim()],
+        });
+      }
     } catch {}
     onAdd({
       id: `ins-${Date.now()}`,

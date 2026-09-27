@@ -14,8 +14,15 @@ export default function InstructorProfileTab({ currentUser }: InstructorProfileT
   const [bio, setBio] = useState("Lead Structural BIM Engineer & Autodesk Certified Instructor with 6+ years AEC industry expertise.");
   const [saved, setSaved] = useState(false);
 
-  const handleSubmit = (e: React.SubmitEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
+    try {
+      const { usersApi } = await import("@/services/api/usersApi");
+      const userId = typeof window !== "undefined" ? localStorage.getItem("bim_user_id") : null;
+      if (userId) {
+        await usersApi.updateUser(userId, { name });
+      }
+    } catch {}
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
