@@ -13,6 +13,7 @@ import {
   TicketPercent,
   BarChart3,
   User,
+  PlayCircle,
   LucideIcon,
 } from "lucide-react";
 
@@ -62,9 +63,14 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
       { id: "instructors", label: "Trainer & Mentors", badge: "3 Active" },
     ],
   },
+  { id: "categories", label: "Course Categories", icon: FolderTree },
+  { id: "courses", label: "Course Manager", icon: BookOpen },
   { id: "batches", label: "Batch Manager", icon: Layers },
-  { id: "recordings", label: "Recordings Queue", icon: Video, badge: "3 New" },
   { id: "modules", label: "Module Uploader", icon: FolderTree, badge: "New" },
+  { id: "lessons", label: "Lessons Manager", icon: PlayCircle },
+  { id: "assignments", label: "Assignments", icon: FileCheck },
+  { id: "resources", label: "Resources", icon: FolderDown },
+  { id: "certificates", label: "Certificates", icon: Award },
   { id: "coupons", label: "Coupon Engine", icon: TicketPercent, badge: "Active" },
   { id: "revenue", label: "Financial Reports", icon: BarChart3 },
   { id: "settings", label: "Settings", icon: User },

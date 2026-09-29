@@ -70,14 +70,13 @@ export interface CourseModuleItem {
 export interface CouponItem {
   id: string;
   code: string;
-  discountType: "percentage" | "flat";
+  batchId?: string;
+  discountType: "percentage" | "fixed";
   discountValue: number;
-  minOrderAmount: number;
-  maxDiscount?: number;
-  expiryDate: string;
-  usageLimit: number;
+  startDate?: string;
+  endDate?: string;
+  usageLimit?: number;
   usedCount: number;
-  applicableCourse: string;
   isActive: boolean;
 }
 
@@ -136,9 +135,15 @@ export type AdminDashboardTab =
   | "admissions"
   | "students"
   | "instructors"
+  | "categories"
+  | "courses"
   | "batches"
-  | "recordings"
   | "modules"
+  | "lessons"
+  | "assignments"
+  | "resources"
+  | "certificates"
   | "coupons"
   | "revenue"
   | "settings";
+

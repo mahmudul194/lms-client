@@ -1,59 +1,59 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { FolderTree, Search, Plus, Eye, ChevronLeft, ChevronRight } from "lucide-react";
-import AdminAddModuleView from "./AdminAddModuleView";
-import AdminModuleDetails from "./AdminModuleDetails";
-import { modulesApi, CourseModuleItem, CreateModulePayload } from "@/services/api/modulesApi";
+import { PlayCircle, Search, Plus, Eye, ChevronLeft, ChevronRight, Video, FileText } from "lucide-react";
+import AdminAddLessonView from "./AdminAddLessonView";
+import AdminLessonDetails from "./AdminLessonDetails";
+import { lessonsApi, LessonItem, CreateLessonPayload } from "@/services/api/lessonsApi";
 
-export default function AdminModulesTab() {
-  const [modules, setModules] = useState<CourseModuleItem[]>([]);
+export default function AdminLessonsTab() {
+  const [lessons, setLessons] = useState<LessonItem[]>([]);
   const [search, setSearch] = useState("");
-  const [isAddingModule, setIsAddingModule] = useState(false);
-  const [selectedModule, setSelectedModule] = useState<CourseModuleItem | null>(null);
+  const [isAddingLesson, setIsAddingLesson] = useState(false);
+  const [selectedLesson, setSelectedLesson] = useState<LessonItem | null>(null);
   
   // Pagination State
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalModules, setTotalModules] = useState(0);
+  const [totalLessons, setTotalLessons] = useState(0);
   const limit = 10;
   const [isLoading, setIsLoading] = useState(false);
 
-  const [coursesMap, setCoursesMap] = useState<Record<string, string>>({});
+  const [modulesMap, setModulesMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    import("@/services/api/coursesApi").then(({ coursesApi }) => {
-      coursesApi.getAllCourses({ limit: 100 }).then(res => {
+    import("@/services/api/modulesApi").then(({ modulesApi }) => {
+      modulesApi.getAllModules({ limit: 100 }).then(res => {
         if (res.data?.items) {
           const map: Record<string, string> = {};
-          res.data.items.forEach(c => { map[c.id] = c.title });
-          setCoursesMap(map);
+          res.data.items.forEach(m => { map[m.id] = m.title });
+          setModulesMap(map);
         }
       });
     });
   }, []);
 
-  const fetchModules = async () => {
+  const fetchLessons = async () => {
     setIsLoading(true);
     try {
-      const res = await modulesApi.getAllModules({ page, limit, search });
+      const res = await lessonsApi.getAllLessons({ page, limit, search });
       if (res.statusCode === 200 && res.data?.items) {
-        setModules(res.data.items);
+        setLessons(res.data.items);
         setTotalPages(res.data.totalPages || 1);
-        setTotalModules(res.data.total || res.data.items.length);
+        setTotalLessons(res.data.total || res.data.items.length);
       } else {
-        setModules([]);
+        setLessons([]);
       }
     } catch (error) {
-      console.error("Failed to fetch modules", error);
-      setModules([]);
+      console.error("Failed to fetch lessons", error);
+      setLessons([]);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchModules();
+    fetchLessons();
   }, [page, search]);
 
   const handlePageChange = (newPage: number) => {
@@ -62,17 +62,17 @@ export default function AdminModulesTab() {
     }
   };
 
-  const handleAddModule = async (payload: CreateModulePayload) => {
-    await modulesApi.createModule(payload);
-    fetchModules();
+  const handleAddLesson = async (payload: CreateLessonPayload) => {
+    await lessonsApi.createLesson(payload);
+    fetchLessons();
   };
 
-  if (selectedModule) {
-    return <AdminModuleDetails moduleData={selectedModule} onBack={() => setSelectedModule(null)} />;
+  if (selectedLesson) {
+    return <AdminLessonDetails lessonData={selectedLesson} onBack={() => setSelectedLesson(null)} />;
   }
 
-  if (isAddingModule) {
-    return <AdminAddModuleView onBack={() => setIsAddingModule(false)} onAdd={handleAddModule} />;
+  if (isAddingLesson) {
+    return <AdminAddLessonView onBack={() => setIsAddingLesson(false)} onAdd={handleAddLesson} />;
   }
 
   return (
@@ -80,14 +80,14 @@ export default function AdminModulesTab() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
         <div>
           <h3 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2.5">
-            <FolderTree className="w-6 h-6 text-[#0077b6]" />
-            <span>Modules Manager</span>
+            <PlayCircle className="w-6 h-6 text-[#0077b6]" />
+            <span>Lessons Manager</span>
           </h3>
-          <p className="text-sm text-slate-500 mt-1">Manage course modules and curricula</p>
+          <p className="text-sm text-slate-500 mt-1">Manage individual lessons, videos, and documents</p>
         </div>
-        <button onClick={() => setIsAddingModule(true)} className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#002b5b] to-[#0077b6] hover:from-[#001830] hover:to-[#005a8c] text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all cursor-pointer hover:scale-102 shrink-0">
+        <button onClick={() => setIsAddingLesson(true)} className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#002b5b] to-[#0077b6] hover:from-[#001830] hover:to-[#005a8c] text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all cursor-pointer hover:scale-102 shrink-0">
           <Plus className="w-4 h-4 text-sky-300" />
-          <span>Create New Module</span>
+          <span>Create New Lesson</span>
         </button>
       </div>
 
@@ -96,7 +96,7 @@ export default function AdminModulesTab() {
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input 
             type="text" 
-            placeholder="Search modules by title..." 
+            placeholder="Search lessons by title..." 
             value={search} 
             onChange={(e) => {
               setSearch(e.target.value);
@@ -106,7 +106,7 @@ export default function AdminModulesTab() {
           />
         </div>
         <span className="px-4 py-1.5 rounded-full bg-sky-50 text-[#0077b6] text-xs sm:text-sm font-bold border border-sky-200 shrink-0">
-          {totalModules} Modules Found
+          {totalLessons} Lessons Found
         </span>
       </div>
 
@@ -114,8 +114,9 @@ export default function AdminModulesTab() {
         <table className="w-full text-left text-xs sm:text-sm">
           <thead className="bg-slate-50 text-slate-700 uppercase text-xs font-extrabold border-b border-slate-200">
             <tr>
-              <th className="p-4">Module Details</th>
-              <th className="p-4">Order</th>
+              <th className="p-4">Lesson Details</th>
+              <th className="p-4">Type</th>
+              <th className="p-4">Order & Duration</th>
               <th className="p-4">Status</th>
               <th className="p-4 text-right">Actions</th>
             </tr>
@@ -123,54 +124,57 @@ export default function AdminModulesTab() {
           <tbody className="divide-y divide-slate-100 font-medium">
             {isLoading ? (
               <tr>
-                <td colSpan={4} className="p-8 text-center text-slate-500 font-semibold">
+                <td colSpan={5} className="p-8 text-center text-slate-500 font-semibold">
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-4 h-4 border-2 border-[#0077b6] border-t-transparent rounded-full animate-spin"></div>
-                    <span>Loading modules...</span>
+                    <span>Loading lessons...</span>
                   </div>
                 </td>
               </tr>
-            ) : modules.length === 0 ? (
+            ) : lessons.length === 0 ? (
               <tr>
-                <td colSpan={4} className="p-8 text-center text-slate-500 font-semibold">
-                  No modules found. Create one to get started!
+                <td colSpan={5} className="p-8 text-center text-slate-500 font-semibold">
+                  No lessons found. Create one to get started!
                 </td>
               </tr>
             ) : (
-              modules.map((mod) => (
-                <tr key={mod.id} className="hover:bg-slate-50 transition-colors">
+              lessons.map((lesson) => (
+                <tr key={lesson.id} className="hover:bg-slate-50 transition-colors">
                   <td className="p-4 font-bold text-slate-900">
                     <div className="flex items-center gap-3">
-                      {mod.thumbnail ? (
-                        <img src={mod.thumbnail} alt={mod.title} className="w-12 h-12 rounded-xl object-cover border border-slate-200" />
-                      ) : (
-                        <div className="w-12 h-12 rounded-xl bg-sky-50 text-[#0077b6] flex items-center justify-center font-black text-sm border border-sky-200 shrink-0">
-                          <FolderTree className="w-5 h-5" />
-                        </div>
-                      )}
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm border shrink-0 ${
+                        lesson.type === 'video' ? 'bg-sky-50 text-[#0077b6] border-sky-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                      }`}>
+                        {lesson.type === 'video' ? <Video className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
+                      </div>
                       <div>
-                        <div className="font-black text-slate-900 text-sm sm:text-base max-w-xs truncate" title={mod.title}>{mod.title}</div>
+                        <div className="font-black text-slate-900 text-sm sm:text-base max-w-xs truncate" title={lesson.title}>{lesson.title}</div>
                         <div className="text-xs text-slate-500 mt-0.5 max-w-xs truncate">
-                          Course: <span className="font-semibold text-[#0077b6]">{coursesMap[mod.course_id] || "Unknown Course"}</span>
+                          Module: <span className="font-semibold text-[#0077b6]">{modulesMap[lesson.module_id] || "Unknown Module"}</span>
                         </div>
+                        {lesson.is_preview && <span className="text-[10px] uppercase font-bold text-[#0077b6] bg-sky-100 px-1.5 py-0.5 rounded ml-1 mt-1 inline-block">Preview</span>}
                       </div>
                     </div>
                   </td>
-                  <td className="p-4 text-slate-600 font-semibold">
-                    <span className="px-3 py-1 rounded-xl bg-slate-100 text-slate-700 text-xs inline-block">Module {mod.order}</span>
+                  <td className="p-4 text-slate-600 font-semibold capitalize">
+                    {lesson.type || "unknown"}
+                  </td>
+                  <td className="p-4">
+                    <div className="font-bold text-slate-800">Lesson {lesson.order}</div>
+                    <div className="text-slate-500 text-xs mt-0.5">{lesson.duration || 0} mins</div>
                   </td>
                   <td className="p-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                      mod.status === "published" ? "bg-emerald-100 text-emerald-800" : 
-                      mod.status === "draft" ? "bg-amber-100 text-amber-800" :
+                      lesson.status === "published" ? "bg-emerald-100 text-emerald-800" : 
+                      lesson.status === "draft" ? "bg-amber-100 text-amber-800" :
                       "bg-slate-100 text-slate-800"
                     }`}>
-                      {mod.status}
+                      {lesson.status}
                     </span>
                   </td>
                   <td className="p-4 text-right">
                     <button 
-                      onClick={() => setSelectedModule(mod)}
+                      onClick={() => setSelectedLesson(lesson)}
                       className="p-2 rounded-lg bg-sky-50 text-[#0077b6] hover:bg-[#0077b6] hover:text-white transition-colors"
                       title="View Details"
                     >

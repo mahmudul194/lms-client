@@ -7,12 +7,19 @@ import AdminAdmissionsTab from "./AdminAdmissionsTab";
 import AdminStudentsTab from "./AdminStudentsTab";
 import AdminInstructorsTab from "./AdminInstructorsTab";
 import AdminBatchesTab from "./AdminBatchesTab";
-import AdminRecordingsTab from "./AdminRecordingsTab";
 import AdminModulesTab from "./AdminModulesTab";
+import AdminLessonsTab from "./AdminLessonsTab";
 import AdminCouponsTab from "./AdminCouponsTab";
+import AdminAssignmentsTab from "./AdminAssignmentsTab";
+import AdminResourcesTab from "./AdminResourcesTab";
+import AdminCertificatesTab from "./AdminCertificatesTab";
 import AdminRevenueTab from "./AdminRevenueTab";
 import AdminSettingsTab from "./AdminSettingsTab";
+import AdminCategoriesTab from "./AdminCategoriesTab";
+import AdminCoursesTab from "./AdminCoursesTab";
 import AdminCreateBatchModal from "./AdminCreateBatchModal";
+import { CreateBatchPayload } from "@/services/api/batchesApi";
+
 import { AdminBatch } from "@/data/adminMockData";
 
 export default function AdminDashboardView({ adminTab, setAdminTab }: { adminTab: AdminDashboardTab; setAdminTab: (tab: AdminDashboardTab) => void }) {
@@ -41,7 +48,7 @@ export default function AdminDashboardView({ adminTab, setAdminTab }: { adminTab
           }));
           setPendingApprovals(apiApprovals);
         }
-      } catch {}
+      } catch { }
     })();
   }, []);
 
@@ -49,7 +56,7 @@ export default function AdminDashboardView({ adminTab, setAdminTab }: { adminTab
     try {
       const { enrollmentsApi } = await import("@/services/api/enrollmentsApi");
       await enrollmentsApi.updateEnrollment(id, { status: "active" });
-    } catch {}
+    } catch { }
     setPendingApprovals((prev) => prev.map((item) => (item.id === id ? { ...item, status: "Approved" } : item)));
   };
 
@@ -57,21 +64,28 @@ export default function AdminDashboardView({ adminTab, setAdminTab }: { adminTab
     try {
       const { enrollmentsApi } = await import("@/services/api/enrollmentsApi");
       await enrollmentsApi.updateEnrollment(id, { status: "cancelled" });
-    } catch {}
+    } catch { }
     setPendingApprovals((prev) => prev.map((item) => (item.id === id ? { ...item, status: "Rejected" } : item)));
   };
 
-  const handleLaunchBatch = async (newBatch: AdminBatch) => {
+  const handleLaunchBatch = async (newBatch: CreateBatchPayload) => {
     try {
       const { batchesApi } = await import("@/services/api/batchesApi");
       await batchesApi.createBatch({
+        course_id: newBatch.course_id,
         name: newBatch.name,
         code: newBatch.code,
-        capacity: newBatch.maxSeats,
-        mode: "online",
-        class_type: "live",
+        capacity: newBatch.capacity,
+        mode: newBatch.mode,
+        class_type: newBatch.class_type,
+        price: newBatch.price,
+        discount_price: newBatch.discount_price,
+        start_date: newBatch.start_date,
+        end_date: newBatch.end_date,
+        registration_start: newBatch.registration_start,
+        registration_end: newBatch.registration_end,
       });
-    } catch {}
+    } catch { }
     alert(`Batch ${newBatch.name} (${newBatch.code}) launched!`);
   };
 
@@ -83,9 +97,14 @@ export default function AdminDashboardView({ adminTab, setAdminTab }: { adminTab
       {adminTab === "admissions" && <AdminAdmissionsTab pendingApprovals={pendingApprovals} onApprove={handleApprove} onReject={handleReject} />}
       {adminTab === "students" && <AdminStudentsTab />}
       {adminTab === "instructors" && <AdminInstructorsTab />}
+      {adminTab === "categories" && <AdminCategoriesTab />}
+      {adminTab === "courses" && <AdminCoursesTab />}
       {adminTab === "batches" && <AdminBatchesTab />}
-      {adminTab === "recordings" && <AdminRecordingsTab />}
       {adminTab === "modules" && <AdminModulesTab />}
+      {adminTab === "lessons" && <AdminLessonsTab />}
+      {adminTab === "assignments" && <AdminAssignmentsTab />}
+      {adminTab === "resources" && <AdminResourcesTab />}
+      {adminTab === "certificates" && <AdminCertificatesTab />}
       {adminTab === "coupons" && <AdminCouponsTab />}
       {adminTab === "revenue" && <AdminRevenueTab />}
       {adminTab === "settings" && <AdminSettingsTab />}

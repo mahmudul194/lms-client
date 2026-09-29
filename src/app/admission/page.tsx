@@ -27,14 +27,19 @@ export default function AdmissionPage() {
         const { coursesApi } = await import("@/services/api/coursesApi");
         const res = await coursesApi.getAllCourses({ limit: 50 });
         if (res.statusCode === 200 && res.data?.items?.length) {
-          const apiCourses = res.data.items.map((c) => ({
-            id: c.slug || c.id,
-            title: c.title,
-            price: Number(c.discount_price || c.price || 5000),
-            originalPrice: Number(c.price || 10000),
-            installment: Math.round(Number(c.discount_price || c.price || 5000) / 3),
-            software: ["Web Dev", "Full Stack"],
-          }));
+          const apiCourses = res.data.items.map((c) => {
+            const batch = c.batches?.[0];
+            const price = batch?.price || 16000;
+            const discountPrice = batch?.discount_price || 12000;
+            return {
+              id: c.slug || c.id,
+              title: c.title,
+              price: Number(discountPrice),
+              originalPrice: Number(price),
+              installment: Math.round(Number(discountPrice) / 3),
+              software: ["Web Dev", "Full Stack"],
+            };
+          });
           setCourses(apiCourses as any);
           if (apiCourses[0]) setSelectedCourseId(apiCourses[0].id);
         }

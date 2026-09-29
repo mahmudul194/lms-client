@@ -62,7 +62,16 @@ export default function LoginForm({ loading: parentLoading, onLoginSubmit }: Log
           localStorage.setItem("bim_user_id", meRes.data.id || "");
           localStorage.setItem("bim_user_name", meRes.data.name || "");
           localStorage.setItem("bim_user_email", meRes.data.email || "");
-          localStorage.setItem("bim_user_role", meRes.data.role || "student");
+          
+          const apiRole = (meRes.data.role || "").toLowerCase();
+          const mappedRole = 
+            apiRole === "admin" || apiRole === "developer" || apiRole === "manager" || apiRole === "moderator"
+              ? "admin"
+              : apiRole === "instructor" || apiRole === "mentor"
+              ? "instructor"
+              : "student";
+              
+          localStorage.setItem("bim_user_role", mappedRole);
         }
       }
     } catch {

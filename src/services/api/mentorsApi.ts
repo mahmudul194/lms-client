@@ -51,11 +51,13 @@ export const mentorsApi = {
     page?: number;
     limit?: number;
     search?: string;
+    role?: string;
   }): Promise<ApiResponse<PaginatedMentors>> {
     const sp = new URLSearchParams();
     if (params?.page) sp.set("page", params.page.toString());
     if (params?.limit) sp.set("limit", params.limit.toString());
     if (params?.search) sp.set("search", params.search);
+    if (params?.role) sp.set("role", params.role);
     const qs = sp.toString();
     return apiFetch<PaginatedMentors>(`/mentors${qs ? `?${qs}` : ""}`);
   },

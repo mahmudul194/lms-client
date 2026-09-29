@@ -16,13 +16,12 @@ export interface CourseItem {
   language?: string;
   duration?: number;
   duration_unit?: "hours" | "days" | "weeks" | "months" | "years";
-  price: number;
-  discount_price?: number;
   status?: "draft" | "published" | "archived" | "upcoming";
   visibility?: "public" | "private" | "unlisted";
   mentor_ids?: string[];
   category?: { id: string; name: string; slug?: string };
   mentors?: { id: string; user?: { name: string; email?: string }; profileImage?: string; designation?: string }[];
+  batches?: any[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -48,8 +47,6 @@ export interface CreateCoursePayload {
   language?: string;
   duration?: number;
   duration_unit?: string;
-  price: number;
-  discount_price?: number;
   status?: string;
   visibility?: string;
   mentor_ids?: string[];

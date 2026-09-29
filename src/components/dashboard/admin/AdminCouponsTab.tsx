@@ -11,43 +11,36 @@ export default function AdminCouponsTab() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
     (async () => {
       try {
         const { couponsApi } = await import("@/services/api/couponsApi");
         const res = await couponsApi.getAllCoupons();
-        if (res.statusCode === 200 && Array.isArray(res.data)) {
-          const apiCoupons: CouponItem[] = res.data.map((c) => ({
-            id: c.id,
-            code: c.code,
-            discountType: c.discountType === "fixed" ? "flat" : "percentage",
-            discountValue: c.discountValue,
-            minOrderAmount: 0,
-            expiryDate: c.endDate ? new Date(c.endDate).toLocaleDateString() : "Never",
-            applicableCourse: "All Courses",
-            usageLimit: c.usageLimit || 100,
-            usedCount: c.usedCount || 0,
-            isActive: c.isActive,
-          }));
-          setCoupons(apiCoupons);
+        if (isMounted && res.statusCode === 200 && Array.isArray(res.data)) {
+          setCoupons(res.data);
         }
-      } catch {} finally {
-        setLoading(false);
+      } catch (err) {
+        console.error("Failed to fetch coupons", err);
+      } finally {
+        if (isMounted) setLoading(false);
       }
     })();
+    return () => { isMounted = false; };
   }, []);
 
   const handleCreateCoupon = async (newCoupon: CouponItem) => {
     try {
       const { couponsApi } = await import("@/services/api/couponsApi");
-      await couponsApi.createCoupon({
-        code: newCoupon.code,
-        discountType: newCoupon.discountType === "percentage" ? "percentage" : "fixed",
-        discountValue: newCoupon.discountValue,
-        usageLimit: newCoupon.usageLimit,
-        isActive: true,
-      });
-    } catch {}
-    setCoupons([newCoupon, ...coupons]);
+      const res = await couponsApi.createCoupon(newCoupon);
+      if (res.statusCode === 201 && res.data) {
+        setCoupons([res.data, ...coupons]);
+      } else {
+        // Fallback for immediate UI update if needed
+        setCoupons([newCoupon, ...coupons]);
+      }
+    } catch (err) {
+      console.error("Error creating coupon", err);
+    }
   };
 
   const toggleCouponStatus = async (id: string) => {
@@ -83,7 +76,7 @@ export default function AdminCouponsTab() {
         </div>
         <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-100 space-y-1">
           <span className="text-xs text-emerald-600 font-bold">Total Redemptions</span>
-          <div className="text-2xl font-black text-emerald-950">{coupons.reduce((sum, c) => sum + c.usedCount, 0)} Applied</div>
+          <div className="text-2xl font-black text-emerald-950">{coupons.reduce((sum, c) => sum + (c.usedCount || 0), 0)} Applied</div>
         </div>
       </div>
 
@@ -108,7 +101,7 @@ export default function AdminCouponsTab() {
                 <tr key={c.id} className="hover:bg-slate-50 transition-colors">
                   <td className="p-4 font-mono font-bold text-slate-900">{c.code}</td>
                   <td className="p-4 font-bold text-[#0077b6]">{c.discountType === "percentage" ? `${c.discountValue}%` : `৳${c.discountValue}`}</td>
-                  <td className="p-4">{c.usedCount} / {c.usageLimit}</td>
+                  <td className="p-4">{c.usedCount || 0} / {c.usageLimit || "∞"}</td>
                   <td className="p-4"><span className={`px-2.5 py-1 rounded-full text-xs font-bold ${c.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-500"}`}>{c.isActive ? "Active" : "Inactive"}</span></td>
                   <td className="p-4 text-right space-x-2">
                     <button onClick={() => { navigator.clipboard.writeText(c.code); alert(`Copied ${c.code}`); }} className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-[#0077b6] hover:text-white cursor-pointer"><Copy className="w-3.5 h-3.5" /></button>

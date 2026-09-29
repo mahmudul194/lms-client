@@ -26,13 +26,17 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
     const res = await coursesApi.getCourseById(id);
     if (res.statusCode === 200 && res.data) {
       const item = res.data;
+      const batch = item.batches?.[0];
+      const batchPrice = batch?.price || 16000;
+      const batchDiscountPrice = batch?.discount_price || 12000;
+      
       course = {
         id: item.id,
         title: item.title,
         description: item.description || item.short_description || "Comprehensive hands-on training program.",
-        price: Number(item.discount_price || item.price || 5000),
-        originalPrice: item.price ? `৳${Number(item.price).toLocaleString()}` : "৳10,000",
-        discount: item.discount_price ? `৳${Number(item.discount_price).toLocaleString()}` : "৳5,000",
+        price: Number(batchDiscountPrice),
+        originalPrice: `৳${Number(batchPrice).toLocaleString()}`,
+        discount: `৳${Number(batchDiscountPrice).toLocaleString()}`,
         rating: 4.9,
         reviews: 120,
         category: item.category?.name || "Web Development",
