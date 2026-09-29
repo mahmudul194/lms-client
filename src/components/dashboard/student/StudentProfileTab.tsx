@@ -11,16 +11,31 @@ interface StudentProfileTabProps {
 export default function StudentProfileTab({ currentUser }: StudentProfileTabProps) {
   const [name, setName] = useState(currentUser.name);
   const [email, setEmail] = useState(currentUser.email);
-  const [phone, setPhone] = useState("01711-223344");
+  const [phone, setPhone] = useState("");
   const [saved, setSaved] = useState(false);
 
-  const handleSubmit = async (e: React.SubmitEvent) => {
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const { authApi } = await import("@/services/api/authApi");
+        const res = await authApi.getMe();
+        if (res.statusCode === 200 && res.data) {
+          if (res.data.name) setName(res.data.name);
+          if (res.data.email) setEmail(res.data.email);
+          if (res.data.phone) setPhone(res.data.phone);
+        }
+      } catch {}
+    })();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const { usersApi } = await import("@/services/api/usersApi");
       const userId = typeof window !== "undefined" ? localStorage.getItem("bim_user_id") : null;
       if (userId) {
         await usersApi.updateUser(userId, { name, phone });
+        if (typeof window !== "undefined") localStorage.setItem("bim_user_name", name);
       }
     } catch {}
     setSaved(true);
