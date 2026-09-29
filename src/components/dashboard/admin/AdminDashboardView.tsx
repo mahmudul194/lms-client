@@ -20,8 +20,6 @@ import AdminCoursesTab from "./AdminCoursesTab";
 import AdminCreateBatchModal from "./AdminCreateBatchModal";
 import { CreateBatchPayload } from "@/services/api/batchesApi";
 
-import { AdminBatch } from "@/data/adminMockData";
-
 export default function AdminDashboardView({ adminTab, setAdminTab }: { adminTab: AdminDashboardTab; setAdminTab: (tab: AdminDashboardTab) => void }) {
   const [isCreateBatchModalOpen, setIsCreateBatchModalOpen] = useState(false);
   const [pendingApprovals, setPendingApprovals] = useState<PendingApproval[]>([]);
