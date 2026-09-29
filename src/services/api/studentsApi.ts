@@ -30,7 +30,8 @@ export interface StudentRecord {
   attachmentCompany?: string;
   attachmentStatus?: string;
   profileImage?: string;
-  user?: { id: string; name: string; email: string; isBanned?: boolean };
+  role?: string;
+  user?: { id: string; name: string; email: string; isBanned?: boolean; role?: string };
   createdAt?: string;
   updatedAt?: string;
 }

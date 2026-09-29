@@ -17,17 +17,22 @@ export default function FeaturedCourses() {
         if (!isMounted) return;
 
         if (res.statusCode === 200 && res.data?.items?.length) {
-          const apiCourses = res.data.items.map((c) => ({
-            id: c.slug || c.id,
-            title: c.title,
-            tag: c.level?.toUpperCase() || "WEB",
-            discount: c.discount_price ? `৳${c.price - c.discount_price} OFF` : "-30%",
-            badge: c.level || "Professional",
-            duration: `Duration: ${c.duration || 3} ${c.duration_unit || "Months"}`,
-            price: (c.discount_price || c.price).toLocaleString(),
-            originalPrice: (c.price * 1.4).toLocaleString(),
-            image: c.thumbnail || "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
-          }));
+          const apiCourses = res.data.items.map((c) => {
+            const batch = c.batches?.[0];
+            const price = batch?.price || 16000;
+            const discountPrice = batch?.discount_price || 12000;
+            return {
+              id: c.slug || c.id,
+              title: c.title,
+              tag: c.level?.toUpperCase() || "WEB",
+              discount: `৳${price - discountPrice} OFF`,
+              badge: c.level || "Professional",
+              duration: `Duration: ${c.duration || 3} ${c.duration_unit || "Months"}`,
+              price: discountPrice.toLocaleString(),
+              originalPrice: price.toLocaleString(),
+              image: c.thumbnail || "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
+            };
+          });
           setCourses(apiCourses);
         }
       } catch {

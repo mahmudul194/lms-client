@@ -17,6 +17,9 @@ export interface BatchItem {
   mode?: "online" | "offline" | "hybrid";
   class_type?: "live" | "recorded" | "mixed";
   timezone?: string;
+  price?: number;
+  discount_price?: number;
+  fb_group_link?: string;
   course?: { id: string; title: string };
   createdAt?: string;
 }
@@ -42,6 +45,9 @@ export interface CreateBatchPayload {
   mode?: string;
   class_type?: string;
   timezone?: string;
+  price?: number;
+  discount_price?: number;
+  fb_group_link?: string;
 }
 
 export const batchesApi = {
@@ -70,6 +76,13 @@ export const batchesApi = {
 
   async createBatch(payload: CreateBatchPayload): Promise<ApiResponse<BatchItem>> {
     return apiFetch<BatchItem>("/batches", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async launchBatch(payload: CreateBatchPayload): Promise<ApiResponse<BatchItem>> {
+    return apiFetch<BatchItem>("/batches/launch", {
       method: "POST",
       body: JSON.stringify(payload),
     });

@@ -2,23 +2,11 @@
 
 import { apiFetch, ApiResponse } from "./apiClient";
 
-export interface CouponItem {
-  id: string;
-  code: string;
-  courseId?: string;
-  discountType: "percentage" | "fixed";
-  discountValue: number;
-  startDate?: string;
-  endDate?: string;
-  usageLimit?: number;
-  usedCount?: number;
-  isActive: boolean;
-  createdAt?: string;
-}
+import { CouponItem } from "@/types/dashboard";
 
 export interface ValidateCouponPayload {
   code: string;
-  courseId?: string;
+  batchId?: string;
 }
 
 export interface ValidatedCouponData {

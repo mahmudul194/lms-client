@@ -41,7 +41,7 @@ export const authApi = {
       body: JSON.stringify({ email, password, device }),
     });
     const token = (res.data as any)?.access_token || res.data?.accessToken;
-    if (res.statusCode === 200 && token) {
+    if ((res.statusCode === 200 || res.statusCode === 201) && token) {
       setAuthToken(token);
     }
     return res;

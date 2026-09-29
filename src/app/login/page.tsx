@@ -18,7 +18,7 @@ export default function LoginPage() {
     }
     setTimeout(() => {
       setLoading(false);
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
     }, 400);
   };
 
@@ -30,10 +30,10 @@ export default function LoginPage() {
       const { authApi } = await import("@/services/api/authApi");
       const res = await authApi.login(username.trim(), password);
 
-      if (res.statusCode === 200 && res.data?.user) {
+      if ((res.statusCode === 200 || res.statusCode === 201) && res.data?.user) {
         const apiRole = res.data.user.role?.toLowerCase();
         const validRole: "student" | "instructor" | "admin" =
-          apiRole === "admin" || apiRole === "developer" || apiRole === "manager"
+          apiRole === "admin" || apiRole === "developer" || apiRole === "manager" || apiRole === "moderator"
             ? "admin"
             : apiRole === "instructor" || apiRole === "mentor"
             ? "instructor"

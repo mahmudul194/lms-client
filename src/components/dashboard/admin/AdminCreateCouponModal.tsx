@@ -18,15 +18,52 @@ export default function AdminCreateCouponModal({
   onCreateCoupon,
 }: AdminCreateCouponModalProps) {
   const mounted = useIsMounted();
+  const [courses, setCourses] = useState<any[]>([]);
+  const [batches, setBatches] = useState<any[]>([]);
   const [form, setForm] = useState({
     code: "",
-    discountType: "percentage" as "percentage" | "flat",
+    discountType: "percentage" as "percentage" | "fixed",
     discountValue: "15",
-    minOrder: "10000",
-    expiryDate: "2026-10-31",
+    courseId: "",
+    batchId: "",
+    startDate: "",
+    endDate: "2026-10-31",
     usageLimit: "50",
-    applicableCourse: "All Courses",
   });
+
+  React.useEffect(() => {
+    if (isOpen) {
+      (async () => {
+        try {
+          const { coursesApi } = await import("@/services/api/coursesApi");
+          const res = await coursesApi.getAllCourses({ limit: 100 });
+          if (res.statusCode === 200 && res.data) {
+            setCourses(res.data.items);
+          }
+        } catch (e) {
+          console.error("Failed to fetch courses", e);
+        }
+      })();
+    }
+  }, [isOpen]);
+
+  React.useEffect(() => {
+    if (isOpen && form.courseId) {
+      (async () => {
+        try {
+          const { batchesApi } = await import("@/services/api/batchesApi");
+          const res = await batchesApi.getAllBatches({ course_id: form.courseId, limit: 100 });
+          if (res.statusCode === 200 && res.data) {
+            setBatches(res.data.items);
+          }
+        } catch (e) {
+          console.error("Failed to fetch batches", e);
+        }
+      })();
+    } else {
+      setBatches([]);
+    }
+  }, [isOpen, form.courseId]);
 
   if (!mounted || !isOpen) return null;
 
@@ -37,17 +74,21 @@ export default function AdminCreateCouponModal({
       code: form.code.toUpperCase(),
       discountType: form.discountType,
       discountValue: Number(form.discountValue),
-      minOrderAmount: Number(form.minOrder),
-      expiryDate: form.expiryDate,
+      batchId: form.batchId || undefined,
+      startDate: form.startDate || undefined,
+      endDate: form.endDate || undefined,
       usageLimit: Number(form.usageLimit),
       usedCount: 0,
-      applicableCourse: form.applicableCourse,
       isActive: true,
     });
     onClose();
   };
 
   const update = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
+  
+  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setForm(p => ({ ...p, courseId: e.target.value, batchId: "" }));
+  };
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 font-sans animate-fade-in overflow-y-auto">
@@ -70,7 +111,7 @@ export default function AdminCreateCouponModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="font-bold text-slate-700 block mb-1.5">Coupon Promo Code</label>
-            <input type="text" required placeholder="e.g. BIMPRO2026" value={form.code} onChange={(e) => update("code", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] uppercase font-semibold font-bold text-sm tracking-wider focus:outline-none" />
+            <input type="text" required placeholder="e.g. BIMPRO2026" value={form.code} onChange={(e) => update("code", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] uppercase font-semibold text-sm tracking-wider focus:outline-none" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -78,34 +119,61 @@ export default function AdminCreateCouponModal({
               <label className="font-bold text-slate-700 block mb-1.5">Discount Calculation Type</label>
               <select value={form.discountType} onChange={(e) => update("discountType", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none">
                 <option value="percentage">Percentage (% OFF)</option>
-                <option value="flat">Flat Amount (৳ BDT)</option>
+                <option value="fixed">Flat Amount (৳ BDT)</option>
               </select>
             </div>
             <div>
               <label className="font-bold text-slate-700 block mb-1.5">{form.discountType === "percentage" ? "Discount Rate (%)" : "Discount Amount (BDT ৳)"}</label>
-              <input type="number" required placeholder="15" value={form.discountValue} onChange={(e) => update("discountValue", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none font-semibold font-bold text-[#0077b6]" />
+              <input type="number" required placeholder="15" value={form.discountValue} onChange={(e) => update("discountValue", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none font-semibold text-[#0077b6]" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="font-bold text-slate-700 block mb-1.5">Expiration Date</label>
-              <input type="date" required value={form.expiryDate} onChange={(e) => update("expiryDate", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none" />
+              <label className="font-bold text-slate-700 block mb-1.5">Start Date (Optional)</label>
+              <input type="date" value={form.startDate} onChange={(e) => update("startDate", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none" />
             </div>
+            <div>
+              <label className="font-bold text-slate-700 block mb-1.5">Expiration Date</label>
+              <input type="date" required value={form.endDate} onChange={(e) => update("endDate", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
             <div>
               <label className="font-bold text-slate-700 block mb-1.5">Usage Redemption Limit</label>
               <input type="number" required placeholder="50" value={form.usageLimit} onChange={(e) => update("usageLimit", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none font-semibold" />
             </div>
           </div>
 
-          <div>
-            <label className="font-bold text-slate-700 block mb-1.5">Applicable Course Scope</label>
-            <select value={form.applicableCourse} onChange={(e) => update("applicableCourse", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none">
-              <option value="All Courses">All BIM Courses</option>
-              <option value="Revit Combo Pro">Revit Combo Pro</option>
-              <option value="Tekla Steel Detailing">Tekla Steel Detailing</option>
-              <option value="Revit Architecture + Structure">Revit Architecture + Structure</option>
-            </select>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="font-bold text-slate-700 block mb-1.5">Select Course</label>
+              <select value={form.courseId} onChange={handleCourseChange} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none">
+                <option value="">Global / All Courses</option>
+                {courses.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="font-bold text-slate-700 block mb-1.5">Applicable Batch Scope</label>
+              <select 
+                value={form.batchId} 
+                onChange={(e) => update("batchId", e.target.value)} 
+                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none disabled:opacity-50"
+                disabled={!form.courseId}
+              >
+                <option value="">All Batches for this course</option>
+                {batches.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name} ({b.code})
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">

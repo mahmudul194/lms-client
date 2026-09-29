@@ -31,8 +31,56 @@ export default function DashboardSidebar({
   setAdminTab,
 }: DashboardSidebarProps) {
   const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>({ user_management: true });
+  const [dynamicBadges, setDynamicBadges] = useState<Record<string, string>>({});
+  
   const activeTabId = currentRole === "student" ? studentTab : currentRole === "instructor" ? instructorTab : adminTab;
-  const currentNavItems = currentRole === "student" ? STUDENT_NAV_ITEMS : currentRole === "instructor" ? INSTRUCTOR_NAV_ITEMS : ADMIN_NAV_ITEMS;
+  
+  useEffect(() => {
+    if (currentRole !== "admin") return;
+
+    (async () => {
+      try {
+        const { enrollmentsApi } = await import("@/services/api/enrollmentsApi");
+        const { studentsApi } = await import("@/services/api/studentsApi");
+        const { mentorsApi } = await import("@/services/api/mentorsApi");
+        const { batchesApi } = await import("@/services/api/batchesApi");
+
+        const [enrollRes, stdRes, mentRes, btcRes] = await Promise.all([
+          enrollmentsApi.getAllEnrollments({ limit: 100 }),
+          studentsApi.getAllStudents({ limit: 1000 }),
+          mentorsApi.getAllMentors({ limit: 100 }),
+          batchesApi.getAllBatches({ limit: 100 }),
+        ]);
+
+        const pendingAdmissions = enrollRes.data?.items?.filter(e => e.status === "pending").length || 0;
+        const students = stdRes.data?.items?.filter(s => s.role?.toLowerCase() === "student" || s.user?.role?.toLowerCase() === "student").length || 0;
+        const mentors = mentRes.data?.items?.length || 0;
+        const batches = btcRes.data?.items?.length || 0;
+
+        setDynamicBadges({
+          admissions: pendingAdmissions > 0 ? `${pendingAdmissions} Pending` : "",
+          user_management: `${students + mentors}`,
+          students: `${students}`,
+          instructors: `${mentors} Active`,
+          batches: `${batches}`,
+        });
+      } catch (error) {
+        console.error("Failed to fetch sidebar counts:", error);
+      }
+    })();
+  }, [currentRole]);
+
+  const baseNavItems = currentRole === "student" ? STUDENT_NAV_ITEMS : currentRole === "instructor" ? INSTRUCTOR_NAV_ITEMS : ADMIN_NAV_ITEMS;
+  
+  const currentNavItems = baseNavItems.map(item => {
+    const badge = dynamicBadges[item.id] !== undefined ? dynamicBadges[item.id] : item.badge;
+    const children = item.children?.map(child => ({
+      ...child,
+      badge: dynamicBadges[child.id] !== undefined ? dynamicBadges[child.id] : child.badge
+    }));
+    return { ...item, badge, children };
+  });
+
   const toggleDropdown = (id: string) => setOpenDropdowns((p) => ({ ...p, [id]: !p[id] }));
 
   const handleNavClick = (id: string) => {
