@@ -1,15 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, Edit, Calendar, FileText, CheckCircle, Link as LinkIcon, BookOpen, Clock } from "lucide-react";
-import { assignmentsApi, AssignmentItem } from "@/services/api/assignmentsApi";
+import { ArrowLeft, Edit, Trash2, Calendar, FileText, CheckCircle, Link as LinkIcon, BookOpen, Clock } from "lucide-react";
+import { assignmentsApi, AssignmentItem, CreateAssignmentPayload } from "@/services/api/assignmentsApi";
+import AdminEditAssignmentModal from "./AdminEditAssignmentModal";
 
 interface AdminAssignmentDetailsProps {
   assignmentId: string;
   onBack: () => void;
+  onDelete?: (assignment: AssignmentItem) => void;
 }
 
-export default function AdminAssignmentDetails({ assignmentId, onBack }: AdminAssignmentDetailsProps) {
+export default function AdminAssignmentDetails({ assignmentId, onBack, onDelete }: AdminAssignmentDetailsProps) {
   const [assignment, setAssignment] = useState<AssignmentItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -28,6 +30,12 @@ export default function AdminAssignmentDetails({ assignmentId, onBack }: AdminAs
       }
     })();
   }, [assignmentId]);
+
+  const handleUpdate = async (id: string, payload: Partial<CreateAssignmentPayload>) => {
+    await assignmentsApi.updateAssignment(id, payload);
+    const res = await assignmentsApi.getAssignmentById(id);
+    if (res.data) setAssignment(res.data);
+  };
 
   if (loading) {
     return <div className="p-8 text-center text-slate-500 font-semibold animate-pulse">Loading assignment details...</div>;
@@ -68,10 +76,21 @@ export default function AdminAssignmentDetails({ assignmentId, onBack }: AdminAs
             </p>
           </div>
         </div>
-        <button onClick={() => setIsEditing(true)} className="px-6 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm flex items-center gap-2 transition-colors cursor-pointer shrink-0">
-          <Edit className="w-4 h-4" />
-          <span>Edit Details</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setIsEditing(true)} className="px-6 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm flex items-center gap-2 transition-colors cursor-pointer shrink-0">
+            <Edit className="w-4 h-4" />
+            <span>Edit Details</span>
+          </button>
+          {onDelete && (
+            <button 
+              onClick={() => onDelete(assignment)} 
+              className="p-2.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-colors cursor-pointer shrink-0" 
+              title="Delete Assignment"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -142,6 +161,13 @@ export default function AdminAssignmentDetails({ assignmentId, onBack }: AdminAs
           </div>
         </div>
       </div>
+
+      <AdminEditAssignmentModal
+        isOpen={isEditing}
+        assignment={assignment}
+        onClose={() => setIsEditing(false)}
+        onUpdate={handleUpdate}
+      />
     </div>
   );
 }

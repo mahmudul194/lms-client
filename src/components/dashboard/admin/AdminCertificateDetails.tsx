@@ -1,15 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, Edit, Award, User, BookOpen, Calendar, FileCheck, RefreshCw } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, Award, User, BookOpen, Calendar, FileCheck, RefreshCw } from "lucide-react";
 import { certificatesApi, CertificateItem } from "@/services/api/certificatesApi";
 
 interface AdminCertificateDetailsProps {
   certificateId: string;
   onBack: () => void;
+  onEdit?: (certificate: CertificateItem) => void;
+  onDelete?: (certificate: CertificateItem) => void;
 }
 
-export default function AdminCertificateDetails({ certificateId, onBack }: AdminCertificateDetailsProps) {
+export default function AdminCertificateDetails({ certificateId, onBack, onEdit, onDelete }: AdminCertificateDetailsProps) {
   const [certificate, setCertificate] = useState<CertificateItem | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -74,10 +76,24 @@ export default function AdminCertificateDetails({ certificateId, onBack }: Admin
               <span>View PDF</span>
             </a>
           )}
-          <button className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm flex items-center gap-2 transition-colors cursor-pointer shrink-0">
-            <Edit className="w-4 h-4" />
-            <span>Edit</span>
-          </button>
+          {onEdit && (
+            <button 
+              onClick={() => onEdit(certificate)} 
+              className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm flex items-center gap-2 transition-colors cursor-pointer shrink-0"
+            >
+              <Edit className="w-4 h-4" />
+              <span>Edit</span>
+            </button>
+          )}
+          {onDelete && (
+            <button 
+              onClick={() => onDelete(certificate)} 
+              className="p-2.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-colors cursor-pointer shrink-0" 
+              title="Delete Certificate"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 

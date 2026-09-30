@@ -5,6 +5,8 @@ import { FileCheck, Plus, Search, Edit, Eye, Trash2, Calendar, User } from "luci
 import { assignmentsApi, AssignmentItem, CreateAssignmentPayload } from "@/services/api/assignmentsApi";
 import AdminAddAssignmentView from "./AdminAddAssignmentView";
 import AdminAssignmentDetails from "./AdminAssignmentDetails";
+import AdminEditAssignmentModal from "./AdminEditAssignmentModal";
+import AdminDeleteConfirmModal from "./AdminDeleteConfirmModal";
 
 export default function AdminAssignmentsTab() {
   const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
@@ -12,6 +14,8 @@ export default function AdminAssignmentsTab() {
   const [isAddingAssignment, setIsAddingAssignment] = useState(false);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [editingAssignment, setEditingAssignment] = useState<AssignmentItem | null>(null);
+  const [deletingAssignment, setDeletingAssignment] = useState<AssignmentItem | null>(null);
 
   const fetchAssignments = async () => {
     setLoading(true);
@@ -46,18 +50,38 @@ export default function AdminAssignmentsTab() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this assignment?")) return;
-    try {
-      await assignmentsApi.deleteAssignment(id);
-      fetchAssignments();
-    } catch (e) {
-      alert("Failed to delete assignment.");
+  const handleUpdateAssignment = async (id: string, payload: Partial<CreateAssignmentPayload>) => {
+    await assignmentsApi.updateAssignment(id, payload);
+    fetchAssignments();
+  };
+
+  const handleDeleteAssignmentConfirm = async () => {
+    if (!deletingAssignment) return;
+    await assignmentsApi.deleteAssignment(deletingAssignment.id);
+    fetchAssignments();
+    if (selectedAssignmentId === deletingAssignment.id) {
+      setSelectedAssignmentId(null);
     }
   };
 
   if (selectedAssignmentId) {
-    return <AdminAssignmentDetails assignmentId={selectedAssignmentId} onBack={() => setSelectedAssignmentId(null)} />;
+    return (
+      <>
+        <AdminAssignmentDetails 
+          assignmentId={selectedAssignmentId} 
+          onBack={() => setSelectedAssignmentId(null)} 
+          onDelete={(a) => setDeletingAssignment(a)}
+        />
+        <AdminDeleteConfirmModal
+          isOpen={!!deletingAssignment}
+          title="Delete Assignment"
+          itemName={deletingAssignment?.title}
+          message="Are you sure you want to permanently delete this assignment? Student submissions may be affected."
+          onClose={() => setDeletingAssignment(null)}
+          onConfirm={handleDeleteAssignmentConfirm}
+        />
+      </>
+    );
   }
 
   if (isAddingAssignment) {
@@ -142,10 +166,13 @@ export default function AdminAssignmentsTab() {
                   </td>
                   <td className="p-4">
                     <div className="flex justify-end gap-2">
-                      <button onClick={() => setSelectedAssignmentId(assignment.id)} className="p-2 text-slate-400 hover:text-[#0077b6] hover:bg-sky-50 rounded-lg transition-colors" title="View Details">
+                      <button onClick={() => setSelectedAssignmentId(assignment.id)} className="p-2 text-slate-400 hover:text-[#0077b6] hover:bg-sky-50 rounded-lg transition-colors cursor-pointer" title="View Details">
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button onClick={() => handleDelete(assignment.id)} className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors" title="Delete Assignment">
+                      <button onClick={() => setEditingAssignment(assignment)} className="p-2 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer" title="Edit Assignment">
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => setDeletingAssignment(assignment)} className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer" title="Delete Assignment">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -156,6 +183,22 @@ export default function AdminAssignmentsTab() {
           </tbody>
         </table>
       </div>
+
+      <AdminEditAssignmentModal
+        isOpen={!!editingAssignment}
+        assignment={editingAssignment}
+        onClose={() => setEditingAssignment(null)}
+        onUpdate={handleUpdateAssignment}
+      />
+
+      <AdminDeleteConfirmModal
+        isOpen={!!deletingAssignment}
+        title="Delete Assignment"
+        itemName={deletingAssignment?.title}
+        message="Are you sure you want to permanently delete this assignment? Student submissions may be affected."
+        onClose={() => setDeletingAssignment(null)}
+        onConfirm={handleDeleteAssignmentConfirm}
+      />
     </div>
   );
 }

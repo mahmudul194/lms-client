@@ -1,15 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, PlayCircle, Edit, Video, FileText } from "lucide-react";
+import { ArrowLeft, PlayCircle, Edit, Trash2, Video, FileText } from "lucide-react";
 import { LessonItem } from "@/services/api/lessonsApi";
 
 interface AdminLessonDetailsProps {
   lessonData: LessonItem;
   onBack: () => void;
+  onEdit?: (lesson: LessonItem) => void;
+  onDelete?: (lesson: LessonItem) => void;
 }
 
-export default function AdminLessonDetails({ lessonData, onBack }: AdminLessonDetailsProps) {
+export default function AdminLessonDetails({ lessonData, onBack, onEdit, onDelete }: AdminLessonDetailsProps) {
   const [moduleName, setModuleName] = useState("Loading...");
 
   const getEmbedUrl = (url: string) => {
@@ -50,9 +52,25 @@ export default function AdminLessonDetails({ lessonData, onBack }: AdminLessonDe
             <p className="text-sm text-slate-500 mt-1">Lesson Details</p>
           </div>
         </div>
-        <button className="px-5 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-slate-200 transition-colors flex items-center gap-2">
-          <Edit className="w-4 h-4" /> Edit Lesson
-        </button>
+        <div className="flex items-center gap-2">
+          {onEdit && (
+            <button 
+              onClick={() => onEdit(lessonData)} 
+              className="px-4 py-2.5 rounded-xl bg-sky-50 text-[#0077b6] font-bold hover:bg-[#0077b6] hover:text-white transition-colors flex items-center gap-2 cursor-pointer text-xs sm:text-sm"
+            >
+              <Edit className="w-4 h-4" /> Edit Lesson
+            </button>
+          )}
+          {onDelete && (
+            <button 
+              onClick={() => onDelete(lessonData)} 
+              className="p-2.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-colors cursor-pointer" 
+              title="Delete Lesson"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

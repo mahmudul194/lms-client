@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { FolderTree, Search, Plus, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { FolderTree, Search, Plus, Eye, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import AdminAddModuleView from "./AdminAddModuleView";
 import AdminModuleDetails from "./AdminModuleDetails";
+import AdminEditModuleModal from "./AdminEditModuleModal";
+import AdminDeleteConfirmModal from "./AdminDeleteConfirmModal";
 import { modulesApi, CourseModuleItem, CreateModulePayload } from "@/services/api/modulesApi";
 
 export default function AdminModulesTab() {
@@ -11,6 +13,8 @@ export default function AdminModulesTab() {
   const [search, setSearch] = useState("");
   const [isAddingModule, setIsAddingModule] = useState(false);
   const [selectedModule, setSelectedModule] = useState<CourseModuleItem | null>(null);
+  const [editingModule, setEditingModule] = useState<CourseModuleItem | null>(null);
+  const [deletingModule, setDeletingModule] = useState<CourseModuleItem | null>(null);
   
   // Pagination State
   const [page, setPage] = useState(1);
@@ -67,8 +71,49 @@ export default function AdminModulesTab() {
     fetchModules();
   };
 
+  const handleUpdateModule = async (id: string, payload: Partial<CreateModulePayload>) => {
+    await modulesApi.updateModule(id, payload);
+    fetchModules();
+    if (selectedModule?.id === id) {
+      const res = await modulesApi.getModuleById(id);
+      if (res.data) setSelectedModule(res.data);
+    }
+  };
+
+  const handleDeleteModule = async () => {
+    if (!deletingModule) return;
+    await modulesApi.deleteModule(deletingModule.id);
+    fetchModules();
+    if (selectedModule?.id === deletingModule.id) {
+      setSelectedModule(null);
+    }
+  };
+
   if (selectedModule) {
-    return <AdminModuleDetails moduleData={selectedModule} onBack={() => setSelectedModule(null)} />;
+    return (
+      <>
+        <AdminModuleDetails 
+          moduleData={selectedModule} 
+          onBack={() => setSelectedModule(null)} 
+          onEdit={(mod) => setEditingModule(mod)}
+          onDelete={(mod) => setDeletingModule(mod)}
+        />
+        <AdminEditModuleModal
+          isOpen={!!editingModule}
+          moduleData={editingModule}
+          onClose={() => setEditingModule(null)}
+          onUpdate={handleUpdateModule}
+        />
+        <AdminDeleteConfirmModal
+          isOpen={!!deletingModule}
+          title="Delete Module"
+          itemName={deletingModule?.title}
+          message="Are you sure you want to delete this module? All lessons belonging to this module will be deleted."
+          onClose={() => setDeletingModule(null)}
+          onConfirm={handleDeleteModule}
+        />
+      </>
+    );
   }
 
   if (isAddingModule) {
@@ -169,13 +214,29 @@ export default function AdminModulesTab() {
                     </span>
                   </td>
                   <td className="p-4 text-right">
-                    <button 
-                      onClick={() => setSelectedModule(mod)}
-                      className="p-2 rounded-lg bg-sky-50 text-[#0077b6] hover:bg-[#0077b6] hover:text-white transition-colors"
-                      title="View Details"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center justify-end gap-1.5">
+                      <button 
+                        onClick={() => setSelectedModule(mod)}
+                        className="p-2 rounded-lg bg-sky-50 text-[#0077b6] hover:bg-[#0077b6] hover:text-white transition-colors cursor-pointer"
+                        title="View Details"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => setEditingModule(mod)}
+                        className="p-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white transition-colors cursor-pointer"
+                        title="Edit Module"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => setDeletingModule(mod)}
+                        className="p-2 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer"
+                        title="Delete Module"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -208,6 +269,22 @@ export default function AdminModulesTab() {
           </div>
         </div>
       )}
+
+      <AdminEditModuleModal
+        isOpen={!!editingModule}
+        moduleData={editingModule}
+        onClose={() => setEditingModule(null)}
+        onUpdate={handleUpdateModule}
+      />
+
+      <AdminDeleteConfirmModal
+        isOpen={!!deletingModule}
+        title="Delete Module"
+        itemName={deletingModule?.title}
+        message="Are you sure you want to delete this module? All lessons belonging to this module will be permanently deleted."
+        onClose={() => setDeletingModule(null)}
+        onConfirm={handleDeleteModule}
+      />
     </div>
   );
 }

@@ -1,15 +1,17 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ArrowLeft, Layers, Edit, Clock, DollarSign, Calendar, Users } from "lucide-react";
+import { ArrowLeft, Layers, Edit, Trash2, Clock, DollarSign, Calendar, Users } from "lucide-react";
 import { BatchItem, batchesApi } from "@/services/api/batchesApi";
 
 interface AdminBatchDetailsProps {
   batchId: string;
   onBack: () => void;
+  onEdit?: (batch: BatchItem) => void;
+  onDelete?: (batch: BatchItem) => void;
 }
 
-export default function AdminBatchDetails({ batchId, onBack }: AdminBatchDetailsProps) {
+export default function AdminBatchDetails({ batchId, onBack, onEdit, onDelete }: AdminBatchDetailsProps) {
   const [batch, setBatch] = useState<BatchItem | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -45,7 +47,7 @@ export default function AdminBatchDetails({ batchId, onBack }: AdminBatchDetails
     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6 font-sans animate-in fade-in duration-200">
       <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-5">
         <div className="flex items-center gap-4">
-          <button onClick={onBack} className="p-2.5 rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100 transition-colors">
+          <button onClick={onBack} className="p-2.5 rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
@@ -55,10 +57,25 @@ export default function AdminBatchDetails({ batchId, onBack }: AdminBatchDetails
             <p className="text-sm text-slate-500 mt-1 font-semibold font-mono">{batch.code} • Course: {batch.course?.title || "Unknown"}</p>
           </div>
         </div>
-        <div className="flex gap-2">
-          <button className="p-2.5 rounded-xl bg-sky-50 text-[#0077b6] hover:bg-[#0077b6] hover:text-white transition-colors" title="Edit Batch">
-            <Edit className="w-5 h-5" />
-          </button>
+        <div className="flex items-center gap-2">
+          {onEdit && (
+            <button 
+              onClick={() => onEdit(batch)}
+              className="p-2.5 rounded-xl bg-sky-50 text-[#0077b6] hover:bg-[#0077b6] hover:text-white transition-colors cursor-pointer" 
+              title="Edit Batch"
+            >
+              <Edit className="w-5 h-5" />
+            </button>
+          )}
+          {onDelete && (
+            <button 
+              onClick={() => onDelete(batch)}
+              className="p-2.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-colors cursor-pointer" 
+              title="Delete Batch"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
 

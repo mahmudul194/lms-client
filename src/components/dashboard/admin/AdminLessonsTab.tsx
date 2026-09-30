@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { PlayCircle, Search, Plus, Eye, ChevronLeft, ChevronRight, Video, FileText } from "lucide-react";
+import { PlayCircle, Search, Plus, Eye, Edit, Trash2, ChevronLeft, ChevronRight, Video, FileText } from "lucide-react";
 import AdminAddLessonView from "./AdminAddLessonView";
 import AdminLessonDetails from "./AdminLessonDetails";
+import AdminEditLessonModal from "./AdminEditLessonModal";
+import AdminDeleteConfirmModal from "./AdminDeleteConfirmModal";
 import { lessonsApi, LessonItem, CreateLessonPayload } from "@/services/api/lessonsApi";
 
 export default function AdminLessonsTab() {
@@ -11,6 +13,8 @@ export default function AdminLessonsTab() {
   const [search, setSearch] = useState("");
   const [isAddingLesson, setIsAddingLesson] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState<LessonItem | null>(null);
+  const [editingLesson, setEditingLesson] = useState<LessonItem | null>(null);
+  const [deletingLesson, setDeletingLesson] = useState<LessonItem | null>(null);
   
   // Pagination State
   const [page, setPage] = useState(1);
@@ -67,8 +71,49 @@ export default function AdminLessonsTab() {
     fetchLessons();
   };
 
+  const handleUpdateLesson = async (id: string, payload: Partial<CreateLessonPayload>) => {
+    await lessonsApi.updateLesson(id, payload);
+    fetchLessons();
+    if (selectedLesson?.id === id) {
+      const res = await lessonsApi.getLessonById(id);
+      if (res.data) setSelectedLesson(res.data);
+    }
+  };
+
+  const handleDeleteLesson = async () => {
+    if (!deletingLesson) return;
+    await lessonsApi.deleteLesson(deletingLesson.id);
+    fetchLessons();
+    if (selectedLesson?.id === deletingLesson.id) {
+      setSelectedLesson(null);
+    }
+  };
+
   if (selectedLesson) {
-    return <AdminLessonDetails lessonData={selectedLesson} onBack={() => setSelectedLesson(null)} />;
+    return (
+      <>
+        <AdminLessonDetails 
+          lessonData={selectedLesson} 
+          onBack={() => setSelectedLesson(null)} 
+          onEdit={(les) => setEditingLesson(les)}
+          onDelete={(les) => setDeletingLesson(les)}
+        />
+        <AdminEditLessonModal
+          isOpen={!!editingLesson}
+          lesson={editingLesson}
+          onClose={() => setEditingLesson(null)}
+          onUpdate={handleUpdateLesson}
+        />
+        <AdminDeleteConfirmModal
+          isOpen={!!deletingLesson}
+          title="Delete Lesson"
+          itemName={deletingLesson?.title}
+          message="Are you sure you want to delete this lesson? The associated video and documents will be removed."
+          onClose={() => setDeletingLesson(null)}
+          onConfirm={handleDeleteLesson}
+        />
+      </>
+    );
   }
 
   if (isAddingLesson) {
@@ -173,13 +218,29 @@ export default function AdminLessonsTab() {
                     </span>
                   </td>
                   <td className="p-4 text-right">
-                    <button 
-                      onClick={() => setSelectedLesson(lesson)}
-                      className="p-2 rounded-lg bg-sky-50 text-[#0077b6] hover:bg-[#0077b6] hover:text-white transition-colors"
-                      title="View Details"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center justify-end gap-1.5">
+                      <button 
+                        onClick={() => setSelectedLesson(lesson)}
+                        className="p-2 rounded-lg bg-sky-50 text-[#0077b6] hover:bg-[#0077b6] hover:text-white transition-colors cursor-pointer"
+                        title="View Details"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => setEditingLesson(lesson)}
+                        className="p-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white transition-colors cursor-pointer"
+                        title="Edit Lesson"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => setDeletingLesson(lesson)}
+                        className="p-2 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer"
+                        title="Delete Lesson"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -212,6 +273,22 @@ export default function AdminLessonsTab() {
           </div>
         </div>
       )}
+
+      <AdminEditLessonModal
+        isOpen={!!editingLesson}
+        lesson={editingLesson}
+        onClose={() => setEditingLesson(null)}
+        onUpdate={handleUpdateLesson}
+      />
+
+      <AdminDeleteConfirmModal
+        isOpen={!!deletingLesson}
+        title="Delete Lesson"
+        itemName={deletingLesson?.title}
+        message="Are you sure you want to delete this lesson? The associated video and documents will be permanently removed."
+        onClose={() => setDeletingLesson(null)}
+        onConfirm={handleDeleteLesson}
+      />
     </div>
   );
 }

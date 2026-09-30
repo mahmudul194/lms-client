@@ -1,17 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, Edit, FileText, Download, Link as LinkIcon, HardDrive, BookOpen } from "lucide-react";
-import { resourcesApi, ResourceItem } from "@/services/api/resourcesApi";
+import { ArrowLeft, Edit, Trash2, FileText, Download, Link as LinkIcon, HardDrive, BookOpen } from "lucide-react";
+import { resourcesApi, ResourceItem, CreateResourcePayload } from "@/services/api/resourcesApi";
+import AdminEditResourceModal from "./AdminEditResourceModal";
 
 interface AdminResourceDetailsProps {
   resourceId: string;
   onBack: () => void;
+  onDelete?: (resource: ResourceItem) => void;
 }
 
-export default function AdminResourceDetails({ resourceId, onBack }: AdminResourceDetailsProps) {
+export default function AdminResourceDetails({ resourceId, onBack, onDelete }: AdminResourceDetailsProps) {
   const [resource, setResource] = useState<ResourceItem | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -27,6 +30,12 @@ export default function AdminResourceDetails({ resourceId, onBack }: AdminResour
       }
     })();
   }, [resourceId]);
+
+  const handleUpdate = async (id: string, payload: Partial<CreateResourcePayload>) => {
+    await resourcesApi.updateResource(id, payload);
+    const res = await resourcesApi.getResourceById(id);
+    if (res.data) setResource(res.data);
+  };
 
   if (loading) {
     return <div className="p-8 text-center text-slate-500 font-semibold animate-pulse">Loading resource details...</div>;
@@ -60,10 +69,21 @@ export default function AdminResourceDetails({ resourceId, onBack }: AdminResour
             </p>
           </div>
         </div>
-        <button className="px-6 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm flex items-center gap-2 transition-colors cursor-pointer shrink-0">
-          <Edit className="w-4 h-4" />
-          <span>Edit Details</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setIsEditing(true)} className="px-6 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm flex items-center gap-2 transition-colors cursor-pointer shrink-0">
+            <Edit className="w-4 h-4" />
+            <span>Edit Details</span>
+          </button>
+          {onDelete && (
+            <button 
+              onClick={() => onDelete(resource)} 
+              className="p-2.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-colors cursor-pointer shrink-0" 
+              title="Delete Resource"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -142,6 +162,13 @@ export default function AdminResourceDetails({ resourceId, onBack }: AdminResour
           </div>
         </div>
       </div>
+
+      <AdminEditResourceModal
+        isOpen={isEditing}
+        resource={resource}
+        onClose={() => setIsEditing(false)}
+        onUpdate={handleUpdate}
+      />
     </div>
   );
 }

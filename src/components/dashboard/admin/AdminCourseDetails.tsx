@@ -7,9 +7,11 @@ import { CourseItem } from "@/services/api/coursesApi";
 interface AdminCourseDetailsProps {
   course: CourseItem;
   onBack: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
-export default function AdminCourseDetails({ course, onBack }: AdminCourseDetailsProps) {
+export default function AdminCourseDetails({ course, onBack, onEdit, onDelete }: AdminCourseDetailsProps) {
   const getEmbedUrl = (url?: string) => {
     if (!url) return undefined;
     if (url.includes("youtube.com/watch?v=")) {
@@ -35,10 +37,25 @@ export default function AdminCourseDetails({ course, onBack }: AdminCourseDetail
             <p className="text-sm text-slate-500 mt-1 font-semibold font-mono">{course.course_code || course.slug}</p>
           </div>
         </div>
-        <div className="flex gap-2">
-          <button className="p-2.5 rounded-xl bg-sky-50 text-[#0077b6] hover:bg-[#0077b6] hover:text-white transition-colors" title="Edit Course">
-            <Edit className="w-5 h-5" />
-          </button>
+        <div className="flex items-center gap-2">
+          {onEdit && (
+            <button 
+              onClick={onEdit} 
+              className="p-2.5 rounded-xl bg-sky-50 text-[#0077b6] hover:bg-[#0077b6] hover:text-white transition-colors cursor-pointer" 
+              title="Edit Course"
+            >
+              <Edit className="w-5 h-5" />
+            </button>
+          )}
+          {onDelete && (
+            <button 
+              onClick={onDelete} 
+              className="p-2.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-colors cursor-pointer" 
+              title="Delete Course"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
 

@@ -1,14 +1,18 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { TicketPercent, Plus, Copy } from "lucide-react";
+import { TicketPercent, Plus, Copy, Edit, Trash2 } from "lucide-react";
 import { CouponItem } from "@/types/dashboard";
 import AdminCreateCouponModal from "./AdminCreateCouponModal";
+import AdminEditCouponModal from "./AdminEditCouponModal";
+import AdminDeleteConfirmModal from "./AdminDeleteConfirmModal";
 
 export default function AdminCouponsTab() {
   const [coupons, setCoupons] = useState<CouponItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCoupon, setEditingCoupon] = useState<CouponItem | null>(null);
+  const [deletingCoupon, setDeletingCoupon] = useState<CouponItem | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -51,6 +55,24 @@ export default function AdminCouponsTab() {
       await couponsApi.updateCoupon(id, { isActive: !target.isActive });
     } catch {}
     setCoupons((prev) => prev.map((c) => (c.id === id ? { ...c, isActive: !c.isActive } : c)));
+  };
+
+  const handleUpdateCoupon = async (id: string, payload: Partial<CouponItem>) => {
+    const { couponsApi } = await import("@/services/api/couponsApi");
+    const res = await couponsApi.updateCoupon(id, payload);
+    if (res.statusCode === 200 && res.data) {
+      setCoupons((prev) => prev.map((c) => (c.id === id ? res.data! : c)));
+    } else {
+      const refreshed = await couponsApi.getAllCoupons();
+      if (refreshed.data) setCoupons(refreshed.data);
+    }
+  };
+
+  const handleDeleteCouponConfirm = async () => {
+    if (!deletingCoupon) return;
+    const { couponsApi } = await import("@/services/api/couponsApi");
+    await couponsApi.deleteCoupon(deletingCoupon.id);
+    setCoupons((prev) => prev.filter((c) => c.id !== deletingCoupon.id));
   };
 
   return (
@@ -103,9 +125,13 @@ export default function AdminCouponsTab() {
                   <td className="p-4 font-bold text-[#0077b6]">{c.discountType === "percentage" ? `${c.discountValue}%` : `৳${c.discountValue}`}</td>
                   <td className="p-4">{c.usedCount || 0} / {c.usageLimit || "∞"}</td>
                   <td className="p-4"><span className={`px-2.5 py-1 rounded-full text-xs font-bold ${c.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-500"}`}>{c.isActive ? "Active" : "Inactive"}</span></td>
-                  <td className="p-4 text-right space-x-2">
-                    <button onClick={() => { navigator.clipboard.writeText(c.code); alert(`Copied ${c.code}`); }} className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-[#0077b6] hover:text-white cursor-pointer"><Copy className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => toggleCouponStatus(c.id)} className="px-3 py-1 rounded-lg bg-slate-100 text-xs font-bold text-slate-700 hover:bg-slate-200 cursor-pointer">{c.isActive ? "Disable" : "Enable"}</button>
+                  <td className="p-4 text-right">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <button onClick={() => { navigator.clipboard.writeText(c.code); alert(`Copied ${c.code}`); }} className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-[#0077b6] hover:text-white transition-colors cursor-pointer" title="Copy Code"><Copy className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => setEditingCoupon(c)} className="p-1.5 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white transition-colors cursor-pointer" title="Edit Coupon"><Edit className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => toggleCouponStatus(c.id)} className="px-2.5 py-1 rounded-lg bg-slate-100 text-xs font-bold text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer">{c.isActive ? "Disable" : "Enable"}</button>
+                      <button onClick={() => setDeletingCoupon(c)} className="p-1.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer" title="Delete Coupon"><Trash2 className="w-3.5 h-3.5" /></button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -115,6 +141,22 @@ export default function AdminCouponsTab() {
       </div>
 
       <AdminCreateCouponModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onCreateCoupon={handleCreateCoupon} />
+
+      <AdminEditCouponModal
+        isOpen={!!editingCoupon}
+        coupon={editingCoupon}
+        onClose={() => setEditingCoupon(null)}
+        onUpdate={handleUpdateCoupon}
+      />
+
+      <AdminDeleteConfirmModal
+        isOpen={!!deletingCoupon}
+        title="Delete Promo Coupon"
+        itemName={deletingCoupon ? `Coupon Code: ${deletingCoupon.code}` : undefined}
+        message="Are you sure you want to permanently delete this discount coupon? Students will no longer be able to redeem it."
+        onClose={() => setDeletingCoupon(null)}
+        onConfirm={handleDeleteCouponConfirm}
+      />
     </div>
   );
 }

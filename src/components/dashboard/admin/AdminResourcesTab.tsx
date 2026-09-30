@@ -5,6 +5,8 @@ import { FolderDown, Plus, Search, Edit, Eye, Trash2, FileText, Download } from 
 import { resourcesApi, ResourceItem, CreateResourcePayload } from "@/services/api/resourcesApi";
 import AdminAddResourceView from "./AdminAddResourceView";
 import AdminResourceDetails from "./AdminResourceDetails";
+import AdminEditResourceModal from "./AdminEditResourceModal";
+import AdminDeleteConfirmModal from "./AdminDeleteConfirmModal";
 
 export default function AdminResourcesTab() {
   const [resources, setResources] = useState<ResourceItem[]>([]);
@@ -12,6 +14,8 @@ export default function AdminResourcesTab() {
   const [isAddingResource, setIsAddingResource] = useState(false);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [editingResource, setEditingResource] = useState<ResourceItem | null>(null);
+  const [deletingResource, setDeletingResource] = useState<ResourceItem | null>(null);
 
   const fetchResources = async () => {
     setLoading(true);
@@ -46,18 +50,38 @@ export default function AdminResourcesTab() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this resource?")) return;
-    try {
-      await resourcesApi.deleteResource(id);
-      fetchResources();
-    } catch (e) {
-      alert("Failed to delete resource.");
+  const handleUpdateResource = async (id: string, payload: Partial<CreateResourcePayload>) => {
+    await resourcesApi.updateResource(id, payload);
+    fetchResources();
+  };
+
+  const handleDeleteResourceConfirm = async () => {
+    if (!deletingResource) return;
+    await resourcesApi.deleteResource(deletingResource.id);
+    fetchResources();
+    if (selectedResourceId === deletingResource.id) {
+      setSelectedResourceId(null);
     }
   };
 
   if (selectedResourceId) {
-    return <AdminResourceDetails resourceId={selectedResourceId} onBack={() => setSelectedResourceId(null)} />;
+    return (
+      <>
+        <AdminResourceDetails 
+          resourceId={selectedResourceId} 
+          onBack={() => setSelectedResourceId(null)} 
+          onDelete={(r) => setDeletingResource(r)}
+        />
+        <AdminDeleteConfirmModal
+          isOpen={!!deletingResource}
+          title="Delete Resource"
+          itemName={deletingResource?.title}
+          message="Are you sure you want to permanently delete this resource file? Students will no longer have access to it."
+          onClose={() => setDeletingResource(null)}
+          onConfirm={handleDeleteResourceConfirm}
+        />
+      </>
+    );
   }
 
   if (isAddingResource) {
@@ -142,7 +166,10 @@ export default function AdminResourcesTab() {
                       <button onClick={() => setSelectedResourceId(resource.id)} className="p-2 text-slate-400 hover:text-[#0077b6] hover:bg-sky-50 rounded-lg transition-colors" title="View Details">
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button onClick={() => handleDelete(resource.id)} className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors" title="Delete Resource">
+                      <button onClick={() => setEditingResource(resource)} className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit Resource">
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => setDeletingResource(resource)} className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors" title="Delete Resource">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -153,6 +180,24 @@ export default function AdminResourcesTab() {
           </tbody>
         </table>
       </div>
+
+      {editingResource && (
+        <AdminEditResourceModal
+          isOpen={!!editingResource}
+          resource={editingResource}
+          onClose={() => setEditingResource(null)}
+          onUpdate={handleUpdateResource}
+        />
+      )}
+
+      <AdminDeleteConfirmModal
+        isOpen={!!deletingResource}
+        title="Delete Resource"
+        itemName={deletingResource?.title}
+        message="Are you sure you want to permanently delete this resource file? Students will no longer have access to it."
+        onClose={() => setDeletingResource(null)}
+        onConfirm={handleDeleteResourceConfirm}
+      />
     </div>
   );
 }

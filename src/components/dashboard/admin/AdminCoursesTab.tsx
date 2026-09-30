@@ -1,16 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { BookOpen, Search, Plus, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { BookOpen, Search, Plus, Eye, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import AdminAddCourseView from "./AdminAddCourseView";
 import AdminCourseDetails from "./AdminCourseDetails";
-import { coursesApi, CourseItem } from "@/services/api/coursesApi";
+import AdminEditCourseModal from "./AdminEditCourseModal";
+import AdminDeleteConfirmModal from "./AdminDeleteConfirmModal";
+import { coursesApi, CourseItem, CreateCoursePayload } from "@/services/api/coursesApi";
 
 export default function AdminCoursesTab() {
   const [courses, setCourses] = useState<CourseItem[]>([]);
   const [search, setSearch] = useState("");
   const [isAddingCourse, setIsAddingCourse] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<CourseItem | null>(null);
+  const [editingCourse, setEditingCourse] = useState<CourseItem | null>(null);
+  const [deletingCourse, setDeletingCourse] = useState<CourseItem | null>(null);
   
   // Pagination State
   const [page, setPage] = useState(1);
@@ -48,8 +52,49 @@ export default function AdminCoursesTab() {
     }
   };
 
+  const handleUpdateCourse = async (id: string, payload: Partial<CreateCoursePayload>) => {
+    await coursesApi.updateCourse(id, payload);
+    fetchCourses();
+    if (selectedCourse?.id === id) {
+      const res = await coursesApi.getCourseById(id);
+      if (res.data) setSelectedCourse(res.data);
+    }
+  };
+
+  const handleDeleteCourse = async () => {
+    if (!deletingCourse) return;
+    await coursesApi.deleteCourse(deletingCourse.id);
+    fetchCourses();
+    if (selectedCourse?.id === deletingCourse.id) {
+      setSelectedCourse(null);
+    }
+  };
+
   if (selectedCourse) {
-    return <AdminCourseDetails course={selectedCourse} onBack={() => setSelectedCourse(null)} />;
+    return (
+      <>
+        <AdminCourseDetails 
+          course={selectedCourse} 
+          onBack={() => setSelectedCourse(null)} 
+          onEdit={() => setEditingCourse(selectedCourse)}
+          onDelete={() => setDeletingCourse(selectedCourse)}
+        />
+        <AdminEditCourseModal
+          isOpen={!!editingCourse}
+          course={editingCourse}
+          onClose={() => setEditingCourse(null)}
+          onUpdate={handleUpdateCourse}
+        />
+        <AdminDeleteConfirmModal
+          isOpen={!!deletingCourse}
+          title="Delete Course"
+          itemName={deletingCourse?.title}
+          message="Are you sure you want to delete this course? Associated modules, lessons, and batches will be permanently affected."
+          onClose={() => setDeletingCourse(null)}
+          onConfirm={handleDeleteCourse}
+        />
+      </>
+    );
   }
 
   if (isAddingCourse) {
@@ -160,13 +205,29 @@ export default function AdminCoursesTab() {
                     </span>
                   </td>
                   <td className="p-4 text-right">
-                    <button 
-                      onClick={() => setSelectedCourse(course)}
-                      className="p-2 rounded-lg bg-sky-50 text-[#0077b6] hover:bg-[#0077b6] hover:text-white transition-colors"
-                      title="View Details"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center justify-end gap-1.5">
+                      <button 
+                        onClick={() => setSelectedCourse(course)}
+                        className="p-2 rounded-lg bg-sky-50 text-[#0077b6] hover:bg-[#0077b6] hover:text-white transition-colors cursor-pointer"
+                        title="View Details"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => setEditingCourse(course)}
+                        className="p-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white transition-colors cursor-pointer"
+                        title="Edit Course"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => setDeletingCourse(course)}
+                        className="p-2 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer"
+                        title="Delete Course"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -199,6 +260,22 @@ export default function AdminCoursesTab() {
           </div>
         </div>
       )}
+
+      <AdminEditCourseModal
+        isOpen={!!editingCourse}
+        course={editingCourse}
+        onClose={() => setEditingCourse(null)}
+        onUpdate={handleUpdateCourse}
+      />
+
+      <AdminDeleteConfirmModal
+        isOpen={!!deletingCourse}
+        title="Delete Course"
+        itemName={deletingCourse?.title}
+        message="Are you sure you want to delete this course? Associated modules, lessons, and batches will be permanently affected."
+        onClose={() => setDeletingCourse(null)}
+        onConfirm={handleDeleteCourse}
+      />
     </div>
   );
 }

@@ -13,8 +13,12 @@ export interface CertificateItem {
   certificateNumber?: string;
   issueDate: string;
   certificateUrl?: string;
+  signature1Name?: string;
+  signature1Designation?: string;
   status: "issued" | "revoked";
   student?: { id: string; name: string; roll?: string };
+  course?: { id: string; title: string };
+  batch?: { id: string; code: string };
   createdAt?: string;
 }
 

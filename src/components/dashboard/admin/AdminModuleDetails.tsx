@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, FolderTree, Edit, PlayCircle, Video, FileText, Eye } from "lucide-react";
+import { ArrowLeft, FolderTree, Edit, Trash2, PlayCircle, Video, FileText, Eye } from "lucide-react";
 import { CourseModuleItem } from "@/services/api/modulesApi";
 import { lessonsApi, LessonItem } from "@/services/api/lessonsApi";
 import AdminLessonDetails from "./AdminLessonDetails";
@@ -9,9 +9,11 @@ import AdminLessonDetails from "./AdminLessonDetails";
 interface AdminModuleDetailsProps {
   moduleData: CourseModuleItem;
   onBack: () => void;
+  onEdit?: (mod: CourseModuleItem) => void;
+  onDelete?: (mod: CourseModuleItem) => void;
 }
 
-export default function AdminModuleDetails({ moduleData, onBack }: AdminModuleDetailsProps) {
+export default function AdminModuleDetails({ moduleData, onBack, onEdit, onDelete }: AdminModuleDetailsProps) {
   const [lessons, setLessons] = useState<LessonItem[]>([]);
   const [isLoadingLessons, setIsLoadingLessons] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState<LessonItem | null>(null);
@@ -71,9 +73,25 @@ export default function AdminModuleDetails({ moduleData, onBack }: AdminModuleDe
             <p className="text-sm text-slate-500 mt-1">Module Details</p>
           </div>
         </div>
-        <button className="px-5 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-slate-200 transition-colors flex items-center gap-2">
-          <Edit className="w-4 h-4" /> Edit Module
-        </button>
+        <div className="flex items-center gap-2">
+          {onEdit && (
+            <button 
+              onClick={() => onEdit(moduleData)} 
+              className="px-4 py-2.5 rounded-xl bg-sky-50 text-[#0077b6] font-bold hover:bg-[#0077b6] hover:text-white transition-colors flex items-center gap-2 cursor-pointer text-xs sm:text-sm"
+            >
+              <Edit className="w-4 h-4" /> Edit Module
+            </button>
+          )}
+          {onDelete && (
+            <button 
+              onClick={() => onDelete(moduleData)} 
+              className="p-2.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-colors cursor-pointer" 
+              title="Delete Module"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

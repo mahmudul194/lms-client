@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { FolderTree, Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import AdminAddCategoryModal from "./AdminAddCategoryModal";
+import AdminEditCategoryModal from "./AdminEditCategoryModal";
+import AdminDeleteConfirmModal from "./AdminDeleteConfirmModal";
 import { categoryApi, CategoryItem, CreateCategoryPayload } from "@/services/api/categoryApi";
 
 export default function AdminCategoriesTab() {
@@ -10,6 +12,8 @@ export default function AdminCategoriesTab() {
   const [search, setSearch] = useState("");
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(null);
+  const [deletingCategory, setDeletingCategory] = useState<CategoryItem | null>(null);
   
   // Pagination State
   const [page, setPage] = useState(1);
@@ -63,6 +67,17 @@ export default function AdminCategoriesTab() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleUpdateCategory = async (id: string, payload: Partial<CreateCategoryPayload>) => {
+    await categoryApi.updateCategory(id, payload);
+    fetchCategories();
+  };
+
+  const handleDeleteCategory = async () => {
+    if (!deletingCategory) return;
+    await categoryApi.deleteCategory(deletingCategory.id);
+    fetchCategories();
   };
 
   return (
@@ -154,10 +169,18 @@ export default function AdminCategoriesTab() {
                   </td>
                   <td className="p-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button className="p-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white transition-colors" title="Edit">
+                      <button
+                        onClick={() => setEditingCategory(cat)}
+                        className="p-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white transition-colors cursor-pointer"
+                        title="Edit Category"
+                      >
                         <Edit className="w-4 h-4" />
                       </button>
-                      <button className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-500 hover:text-white transition-colors" title="Delete">
+                      <button
+                        onClick={() => setDeletingCategory(cat)}
+                        className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-500 hover:text-white transition-colors cursor-pointer"
+                        title="Delete Category"
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -199,6 +222,22 @@ export default function AdminCategoriesTab() {
         onClose={() => setIsAddingCategory(false)} 
         onCreate={handleCreateCategory}
         isLoading={isSubmitting}
+      />
+
+      <AdminEditCategoryModal
+        isOpen={!!editingCategory}
+        category={editingCategory}
+        onClose={() => setEditingCategory(null)}
+        onUpdate={handleUpdateCategory}
+      />
+
+      <AdminDeleteConfirmModal
+        isOpen={!!deletingCategory}
+        title="Delete Category"
+        itemName={deletingCategory?.name}
+        message="Are you sure you want to delete this course category? Courses linked to this category may become uncategorized."
+        onClose={() => setDeletingCategory(null)}
+        onConfirm={handleDeleteCategory}
       />
     </div>
   );

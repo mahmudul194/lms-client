@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Award, Plus, Search, Eye, Trash2, Calendar, FileCheck } from "lucide-react";
-import { certificatesApi, CertificateItem } from "@/services/api/certificatesApi";
+import { Award, Plus, Search, Edit, Eye, Trash2, Calendar, FileCheck } from "lucide-react";
+import { certificatesApi, CertificateItem, CreateCertificatePayload } from "@/services/api/certificatesApi";
 import AdminAddCertificateView from "./AdminAddCertificateView";
 import AdminCertificateDetails from "./AdminCertificateDetails";
+import AdminEditCertificateModal from "./AdminEditCertificateModal";
+import AdminDeleteConfirmModal from "./AdminDeleteConfirmModal";
 
 export default function AdminCertificatesTab() {
   const [certificates, setCertificates] = useState<CertificateItem[]>([]);
@@ -12,6 +14,8 @@ export default function AdminCertificatesTab() {
   const [isAddingCertificate, setIsAddingCertificate] = useState(false);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [editingCert, setEditingCert] = useState<CertificateItem | null>(null);
+  const [deletingCert, setDeletingCert] = useState<CertificateItem | null>(null);
 
   const fetchCertificates = async () => {
     setLoading(true);
@@ -33,18 +37,46 @@ export default function AdminCertificatesTab() {
     fetchCertificates();
   }, [search]);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to revoke/delete this certificate?")) return;
-    try {
-      await certificatesApi.deleteCertificate(id);
-      fetchCertificates();
-    } catch (e) {
-      alert("Failed to delete certificate.");
+  const handleUpdateCertificate = async (id: string, payload: Partial<CreateCertificatePayload>) => {
+    await certificatesApi.updateCertificate(id, payload);
+    fetchCertificates();
+  };
+
+  const handleDeleteCertificateConfirm = async () => {
+    if (!deletingCert) return;
+    await certificatesApi.deleteCertificate(deletingCert.id);
+    fetchCertificates();
+    if (selectedCertificateId === deletingCert.id) {
+      setSelectedCertificateId(null);
     }
   };
 
   if (selectedCertificateId) {
-    return <AdminCertificateDetails certificateId={selectedCertificateId} onBack={() => setSelectedCertificateId(null)} />;
+    return (
+      <>
+        <AdminCertificateDetails 
+          certificateId={selectedCertificateId} 
+          onBack={() => setSelectedCertificateId(null)} 
+          onEdit={(c) => setEditingCert(c)}
+          onDelete={(c) => setDeletingCert(c)}
+        />
+        <AdminEditCertificateModal
+          isOpen={!!editingCert}
+          certificate={editingCert}
+          onClose={() => setEditingCert(null)}
+          onUpdate={handleUpdateCertificate}
+        />
+        <AdminDeleteConfirmModal
+          isOpen={!!deletingCert}
+          title="Revoke Certificate"
+          itemName={deletingCert ? `${deletingCert.studentName || 'Student'} - ${deletingCert.courseName || 'Course'}` : undefined}
+          message="Are you sure you want to revoke and permanently delete this official completion certificate?"
+          confirmText="Revoke & Delete"
+          onClose={() => setDeletingCert(null)}
+          onConfirm={handleDeleteCertificateConfirm}
+        />
+      </>
+    );
   }
 
   if (isAddingCertificate) {
@@ -143,15 +175,18 @@ export default function AdminCertificatesTab() {
                   </td>
                   <td className="p-4">
                     <div className="flex justify-end gap-2">
-                      <button onClick={() => setSelectedCertificateId(cert.id)} className="p-2 text-slate-400 hover:text-[#0077b6] hover:bg-sky-50 rounded-lg transition-colors" title="View Details">
+                      <button onClick={() => setSelectedCertificateId(cert.id)} className="p-2 text-slate-400 hover:text-[#0077b6] hover:bg-sky-50 rounded-lg transition-colors cursor-pointer" title="View Details">
                         <Eye className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => setEditingCert(cert)} className="p-2 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer" title="Edit Certificate">
+                        <Edit className="w-4 h-4" />
                       </button>
                       {cert.certificateUrl && (
                         <a href={cert.certificateUrl} target="_blank" rel="noreferrer" className="p-2 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-lg transition-colors" title="View PDF">
                           <FileCheck className="w-4 h-4" />
                         </a>
                       )}
-                      <button onClick={() => handleDelete(cert.id)} className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors" title="Revoke Certificate">
+                      <button onClick={() => setDeletingCert(cert)} className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer" title="Revoke Certificate">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -162,6 +197,23 @@ export default function AdminCertificatesTab() {
           </tbody>
         </table>
       </div>
+
+      <AdminEditCertificateModal
+        isOpen={!!editingCert}
+        certificate={editingCert}
+        onClose={() => setEditingCert(null)}
+        onUpdate={handleUpdateCertificate}
+      />
+
+      <AdminDeleteConfirmModal
+        isOpen={!!deletingCert}
+        title="Revoke Certificate"
+        itemName={deletingCert ? `${deletingCert.studentName || 'Student'} - ${deletingCert.courseName || 'Course'}` : undefined}
+        message="Are you sure you want to revoke and permanently delete this official completion certificate?"
+        confirmText="Revoke & Delete"
+        onClose={() => setDeletingCert(null)}
+        onConfirm={handleDeleteCertificateConfirm}
+      />
     </div>
   );
 }

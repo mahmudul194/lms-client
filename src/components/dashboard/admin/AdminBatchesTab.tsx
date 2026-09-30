@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import { Layers, Plus, BookOpen, Search, Edit, Eye, Trash2, Users } from "lucide-react";
 import AdminAddBatchView from "./AdminAddBatchView";
 import AdminBatchDetails from "./AdminBatchDetails";
+import AdminEditBatchModal from "./AdminEditBatchModal";
+import AdminDeleteConfirmModal from "./AdminDeleteConfirmModal";
 import { batchesApi, BatchItem, CreateBatchPayload } from "@/services/api/batchesApi";
 
 export default function AdminBatchesTab() {
@@ -12,6 +14,8 @@ export default function AdminBatchesTab() {
   const [isAddingBatch, setIsAddingBatch] = useState(false);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [editingBatch, setEditingBatch] = useState<BatchItem | null>(null);
+  const [deletingBatch, setDeletingBatch] = useState<BatchItem | null>(null);
 
   const fetchBatches = async () => {
     setLoading(true);
@@ -45,18 +49,45 @@ export default function AdminBatchesTab() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this batch?")) return;
-    try {
-      await batchesApi.deleteBatch(id);
-      fetchBatches();
-    } catch (e) {
-      alert("Failed to delete batch.");
+  const handleUpdateBatch = async (id: string, payload: Partial<CreateBatchPayload>) => {
+    await batchesApi.updateBatch(id, payload);
+    fetchBatches();
+  };
+
+  const handleDeleteBatchConfirm = async () => {
+    if (!deletingBatch) return;
+    await batchesApi.deleteBatch(deletingBatch.id);
+    fetchBatches();
+    if (selectedBatchId === deletingBatch.id) {
+      setSelectedBatchId(null);
     }
   };
 
   if (selectedBatchId) {
-    return <AdminBatchDetails batchId={selectedBatchId} onBack={() => setSelectedBatchId(null)} />;
+    return (
+      <>
+        <AdminBatchDetails 
+          batchId={selectedBatchId} 
+          onBack={() => setSelectedBatchId(null)} 
+          onEdit={(b) => setEditingBatch(b)}
+          onDelete={(b) => setDeletingBatch(b)}
+        />
+        <AdminEditBatchModal
+          isOpen={!!editingBatch}
+          batch={editingBatch}
+          onClose={() => setEditingBatch(null)}
+          onUpdate={handleUpdateBatch}
+        />
+        <AdminDeleteConfirmModal
+          isOpen={!!deletingBatch}
+          title="Delete Batch"
+          itemName={deletingBatch ? `${deletingBatch.name} (${deletingBatch.code})` : undefined}
+          message="Are you sure you want to delete this batch? All enrollments and class records will be affected."
+          onClose={() => setDeletingBatch(null)}
+          onConfirm={handleDeleteBatchConfirm}
+        />
+      </>
+    );
   }
 
   if (isAddingBatch) {
@@ -143,13 +174,13 @@ export default function AdminBatchesTab() {
                   </td>
                   <td className="p-4">
                     <div className="flex justify-end gap-2">
-                      <button onClick={() => setSelectedBatchId(batch.id)} className="p-2 text-slate-400 hover:text-[#0077b6] hover:bg-sky-50 rounded-lg transition-colors" title="View Details">
+                      <button onClick={() => setSelectedBatchId(batch.id)} className="p-2 text-slate-400 hover:text-[#0077b6] hover:bg-sky-50 rounded-lg transition-colors cursor-pointer" title="View Details">
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button className="p-2 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-colors" title="Edit Batch">
+                      <button onClick={() => setEditingBatch(batch)} className="p-2 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer" title="Edit Batch">
                         <Edit className="w-4 h-4" />
                       </button>
-                      <button onClick={() => handleDelete(batch.id)} className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors" title="Delete Batch">
+                      <button onClick={() => setDeletingBatch(batch)} className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer" title="Delete Batch">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -160,6 +191,22 @@ export default function AdminBatchesTab() {
           </tbody>
         </table>
       </div>
+
+      <AdminEditBatchModal
+        isOpen={!!editingBatch}
+        batch={editingBatch}
+        onClose={() => setEditingBatch(null)}
+        onUpdate={handleUpdateBatch}
+      />
+
+      <AdminDeleteConfirmModal
+        isOpen={!!deletingBatch}
+        title="Delete Batch"
+        itemName={deletingBatch ? `${deletingBatch.name} (${deletingBatch.code})` : undefined}
+        message="Are you sure you want to delete this batch? All enrollments and class records will be affected."
+        onClose={() => setDeletingBatch(null)}
+        onConfirm={handleDeleteBatchConfirm}
+      />
     </div>
   );
 }
