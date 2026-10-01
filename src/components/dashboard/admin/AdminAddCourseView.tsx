@@ -268,7 +268,7 @@ export default function AdminAddCourseView({ onBack, onAdd }: AdminAddCourseView
 
         <div className="flex justify-end pt-2 gap-3">
           <button type="button" onClick={onBack} disabled={loading} className="px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-all">Cancel</button>
-          <button type="submit" disabled={loading} className="px-8 py-3 rounded-xl bg-[#0077b6] hover:bg-[#005a8c] text-white font-black shadow-md transition-all">
+          <button type="submit" disabled={loading} className="px-8 py-3 rounded-xl bg-gradient-to-r from-[#002b5b] to-[#0077b6] hover:from-[#001830] hover:to-[#005a8c] text-white font-extrabold shadow-md transition-all cursor-pointer hover:scale-102 disabled:opacity-50">
             {loading ? "Creating..." : "Create Course"}
           </button>
         </div>

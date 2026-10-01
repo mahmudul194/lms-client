@@ -108,7 +108,7 @@ export default function AdminCertificatesTab() {
           </h3>
           <p className="text-sm text-slate-500 mt-1">Issue, manage, and verify course completion certificates.</p>
         </div>
-        <button onClick={() => setIsAddingCertificate(true)} className="px-6 py-3 rounded-xl bg-[#002b5b] hover:bg-[#001830] text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-md cursor-pointer hover:scale-102 transition-all shrink-0">
+        <button onClick={() => setIsAddingCertificate(true)} className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#002b5b] to-[#0077b6] hover:from-[#001830] hover:to-[#005a8c] text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all cursor-pointer hover:scale-102 shrink-0">
           <Plus className="w-4 h-4 text-sky-300" />
           <span>Issue Certificates</span>
         </button>

@@ -102,9 +102,9 @@ export default function AdminSettingsTab() {
         <div className="pt-2 flex justify-end">
           <button
             type="submit"
-            className="px-6 py-2.5 rounded-xl bg-[#002b5b] hover:bg-[#001a38] text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer"
+            className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#002b5b] to-[#0077b6] hover:from-[#001830] hover:to-[#005a8c] text-white font-extrabold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-102"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-4 h-4 text-sky-300" />
             <span>Save Settings</span>
           </button>
         </div>

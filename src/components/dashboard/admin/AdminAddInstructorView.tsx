@@ -172,8 +172,8 @@ export default function AdminAddInstructorView({
           </div>
 
           <div className="flex justify-end pt-2">
-            <button type="submit" disabled={loading} className="px-6 py-3 rounded-xl bg-[#0077b6] hover:bg-[#005a8c] text-white font-bold transition-all flex items-center gap-2">
-              {loading ? "Creating..." : "Next Step"} <ArrowRight className="w-4 h-4" />
+            <button type="submit" disabled={loading} className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#002b5b] to-[#0077b6] hover:from-[#001830] hover:to-[#005a8c] text-white font-extrabold shadow-md transition-all cursor-pointer hover:scale-102 flex items-center gap-2 disabled:opacity-50">
+              {loading ? "Creating..." : "Next Step"} <ArrowRight className="w-4 h-4 text-sky-300" />
             </button>
           </div>
         </form>
@@ -220,7 +220,7 @@ export default function AdminAddInstructorView({
 
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" disabled={loading} onClick={() => setStep(1)} className="px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-all">Back</button>
-            <button type="submit" disabled={loading} className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#002b5b] to-[#0077b6] hover:from-[#001830] hover:to-[#005a8c] text-white font-extrabold shadow-md transition-all">
+            <button type="submit" disabled={loading} className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#002b5b] to-[#0077b6] hover:from-[#001830] hover:to-[#005a8c] text-white font-extrabold shadow-md transition-all cursor-pointer hover:scale-102 disabled:opacity-50">
               {loading ? "Saving..." : "Save Trainer Profile"}
             </button>
           </div>

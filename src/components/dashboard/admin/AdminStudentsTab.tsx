@@ -128,7 +128,7 @@ export default function AdminStudentsTab() {
 
         <button
           onClick={() => setIsAddingStudent(true)}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#002b5b] to-[#0077b6] hover:from-[#001830] hover:to-[#005a8c] text-white font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer hover:scale-102 whitespace-nowrap self-start sm:self-center"
+          className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#002b5b] to-[#0077b6] hover:from-[#001830] hover:to-[#005a8c] text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all cursor-pointer hover:scale-102 shrink-0"
         >
           <Plus className="w-4 h-4 text-sky-300" />
           <span>Add New Student</span>

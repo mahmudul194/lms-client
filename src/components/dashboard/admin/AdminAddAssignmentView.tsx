@@ -215,8 +215,8 @@ export default function AdminAddAssignmentView({ onBack, onAdd }: AdminAddAssign
           <button type="button" onClick={onBack} className="px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer">
             Cancel
           </button>
-          <button type="submit" disabled={isSubmitting} className="px-8 py-3 rounded-xl bg-[#002b5b] hover:bg-[#001830] text-white font-extrabold shadow-md transition-all cursor-pointer flex items-center gap-2 disabled:opacity-50">
-            <Save className="w-5 h-5 text-sky-400" />
+          <button type="submit" disabled={isSubmitting} className="px-8 py-3 rounded-xl bg-gradient-to-r from-[#002b5b] to-[#0077b6] hover:from-[#001830] hover:to-[#005a8c] text-white font-extrabold shadow-md transition-all cursor-pointer hover:scale-102 flex items-center gap-2 disabled:opacity-50">
+            <Save className="w-5 h-5 text-sky-300" />
             <span>{isSubmitting ? "Saving..." : "Create Assignment"}</span>
           </button>
         </div>
