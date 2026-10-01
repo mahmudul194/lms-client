@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { UserCheck, Search, Plus, Phone, Mail, ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
+import { UserCheck, Search, Plus, Phone, Mail, ChevronLeft, ChevronRight, Eye, RotateCcw, X, ShieldCheck, ShieldAlert, Award } from "lucide-react";
 import AdminAddInstructorView from "./AdminAddInstructorView";
 import AdminInstructorDetails from "./AdminInstructorDetails";
 
@@ -19,6 +19,8 @@ export interface InstructorRecord {
 export default function AdminInstructorsTab() {
   const [instructors, setInstructors] = useState<InstructorRecord[]>([]);
   const [search, setSearch] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [selectedSpecialty, setSelectedSpecialty] = useState("all");
   const [isAddingInstructor, setIsAddingInstructor] = useState(false);
   const [selectedInstructor, setSelectedInstructor] = useState<any | null>(null);
   
@@ -34,10 +36,8 @@ export default function AdminInstructorsTab() {
       setIsLoading(true);
       try {
         const { mentorsApi } = await import("@/services/api/mentorsApi");
-        // pass role: 'mentor' to filter if backend supports it
         const res = await mentorsApi.getAllMentors({ page, limit, search, role: 'mentor' });
         if (res.statusCode === 200 && res.data?.items) {
-          // Local filter just in case backend didn't filter it
           const mentorItems = res.data.items.filter(m => m.user?.role === "mentor");
           
           const apiMentors: InstructorRecord[] = mentorItems.map((m) => ({
@@ -63,11 +63,50 @@ export default function AdminInstructorsTab() {
     })();
   }, [page, search]);
 
+  // Compute unique specialties list
+  const specialtiesList = useMemo(() => {
+    const specs = new Set<string>();
+    instructors.forEach((ins) => {
+      if (ins.specialty && ins.specialty !== "N/A") {
+        ins.specialty.split(",").forEach(s => {
+          const trimmed = s.trim();
+          if (trimmed) specs.add(trimmed);
+        });
+      }
+    });
+    return Array.from(specs).sort();
+  }, [instructors]);
+
+  // Client-side filtering for status and specialty
+  const filteredInstructors = useMemo(() => {
+    return instructors.filter((ins) => {
+      if (selectedStatus === "active" && ins.status !== "Active") return false;
+      if (selectedStatus === "on_leave" && ins.status !== "On Leave") return false;
+
+      if (selectedSpecialty !== "all") {
+        if (!ins.specialty.toLowerCase().includes(selectedSpecialty.toLowerCase())) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [instructors, selectedStatus, selectedSpecialty]);
+
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
       setPage(newPage);
     }
   };
+
+  const handleResetFilters = () => {
+    setSearch("");
+    setSelectedStatus("all");
+    setSelectedSpecialty("all");
+    setPage(1);
+  };
+
+  const isFiltered = search !== "" || selectedStatus !== "all" || selectedSpecialty !== "all";
 
   if (selectedInstructor) {
     return (
@@ -105,23 +144,80 @@ export default function AdminInstructorsTab() {
         </button>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="relative max-w-md w-full">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input 
-            type="text" 
-            placeholder="Search by trainer name, email or specialty..." 
-            value={search} 
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1); // Reset to first page on search
-            }} 
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:bg-white focus:border-[#0077b6] focus:outline-none" 
-          />
+      {/* Filter and Search Bar */}
+      <div className="flex flex-col gap-3 bg-slate-50/80 p-3.5 sm:p-4 rounded-2xl border border-slate-200">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {/* Search Box */}
+          <div className="relative">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input 
+              type="text" 
+              placeholder="Search by name, email or specialty..." 
+              value={search} 
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }} 
+              className="w-full pl-10 pr-9 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:border-[#0077b6] focus:outline-none font-medium text-slate-900" 
+            />
+            {search && (
+              <button 
+                onClick={() => { setSearch(""); setPage(1); }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
+                title="Clear Search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Specialty Filter */}
+          <div>
+            <select
+              value={selectedSpecialty}
+              onChange={(e) => setSelectedSpecialty(e.target.value)}
+              className="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:border-[#0077b6] focus:outline-none font-medium text-slate-700 cursor-pointer"
+            >
+              <option value="all">All Specialties</option>
+              {specialtiesList.map((spec) => (
+                <option key={spec} value={spec}>
+                  {spec}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Status Filter */}
+          <div>
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:border-[#0077b6] focus:outline-none font-medium text-slate-700 cursor-pointer"
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active Mentors</option>
+              <option value="on_leave">On Leave / Inactive</option>
+            </select>
+          </div>
         </div>
-        <span className="px-4 py-1.5 rounded-full bg-sky-50 text-[#0077b6] text-xs sm:text-sm font-bold border border-sky-200 shrink-0">
-          {totalMentors} Active Mentors
-        </span>
+
+        {/* Filter Summary & Reset Action */}
+        <div className="flex items-center justify-between pt-1 border-t border-slate-200/60 text-xs">
+          <span className="font-extrabold text-[#0077b6] bg-sky-50 px-3.5 py-1 rounded-full border border-sky-200">
+            {filteredInstructors.length} Mentors Found
+          </span>
+
+          {isFiltered && (
+            <button
+              onClick={handleResetFilters}
+              className="px-3.5 py-1.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Reset all filters"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset All Filters</span>
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="overflow-x-auto border border-slate-200 rounded-2xl">
@@ -145,14 +241,25 @@ export default function AdminInstructorsTab() {
                   </div>
                 </td>
               </tr>
-            ) : instructors.length === 0 ? (
+            ) : filteredInstructors.length === 0 ? (
               <tr>
-                <td colSpan={5} className="p-8 text-center text-slate-500 font-semibold">
-                  No instructors found in database.
+                <td colSpan={5} className="p-10 text-center text-slate-500 font-medium space-y-2">
+                  <p className="text-sm font-bold text-slate-700">
+                    {isFiltered ? "No mentors match the selected filter criteria." : "No instructors found in database."}
+                  </p>
+                  {isFiltered && (
+                    <button
+                      onClick={handleResetFilters}
+                      className="px-4 py-1.5 rounded-xl bg-sky-50 text-[#0077b6] hover:bg-sky-100 font-bold text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Clear All Filters</span>
+                    </button>
+                  )}
                 </td>
               </tr>
             ) : (
-              instructors.map((ins) => (
+              filteredInstructors.map((ins) => (
                 <tr key={ins.id} className="hover:bg-slate-50 transition-colors">
                   <td className="p-4 font-bold text-slate-900">
                     <div className="flex items-center gap-3">
@@ -165,18 +272,29 @@ export default function AdminInstructorsTab() {
                       </div>
                     </div>
                   </td>
-                  <td className="p-4"><span className="px-3 py-1 rounded-xl bg-slate-100 text-slate-800 font-semibold text-xs">{ins.specialty}</span></td>
+                  <td className="p-4">
+                    <span className="px-3 py-1 rounded-xl bg-slate-100 text-slate-800 font-semibold text-xs inline-block max-w-[200px] truncate" title={ins.specialty}>
+                      {ins.specialty}
+                    </span>
+                  </td>
                   <td className="p-4 text-slate-600 text-xs space-y-1">
                     <div className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-[#0077b6]" /> {ins.phone}</div>
                     <div className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-[#0077b6]" /> {ins.email}</div>
                   </td>
                   <td className="p-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${ins.status === "Active" ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-600"}`}>{ins.status}</span>
+                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${
+                      ins.status === "Active" 
+                        ? "bg-emerald-100 text-emerald-800 border border-emerald-200" 
+                        : "bg-slate-100 text-slate-600 border border-slate-200"
+                    }`}>
+                      {ins.status === "Active" ? <ShieldCheck className="w-3.5 h-3.5" /> : <ShieldAlert className="w-3.5 h-3.5" />}
+                      <span>{ins.status}</span>
+                    </span>
                   </td>
                   <td className="p-4 text-right">
                     <button 
                       onClick={() => setSelectedInstructor(ins.rawData)} 
-                      className="p-2 rounded-lg bg-sky-50 text-[#0077b6] hover:bg-[#0077b6] hover:text-white transition-colors"
+                      className="p-2 rounded-lg bg-sky-50 text-[#0077b6] hover:bg-[#0077b6] hover:text-white transition-colors cursor-pointer"
                       title="View Details"
                     >
                       <Eye className="w-4 h-4" />
@@ -217,4 +335,3 @@ export default function AdminInstructorsTab() {
     </div>
   );
 }
-

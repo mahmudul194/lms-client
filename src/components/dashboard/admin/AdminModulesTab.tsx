@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { FolderTree, Search, Plus, Eye, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { FolderTree, Search, Plus, Eye, Edit, Trash2, ChevronLeft, ChevronRight, BookOpen, Filter, X, RotateCcw } from "lucide-react";
 import AdminAddModuleView from "./AdminAddModuleView";
 import AdminModuleDetails from "./AdminModuleDetails";
 import AdminEditModuleModal from "./AdminEditModuleModal";
@@ -11,6 +11,8 @@ import { modulesApi, CourseModuleItem, CreateModulePayload } from "@/services/ap
 export default function AdminModulesTab() {
   const [modules, setModules] = useState<CourseModuleItem[]>([]);
   const [search, setSearch] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState("all");
   const [isAddingModule, setIsAddingModule] = useState(false);
   const [selectedModule, setSelectedModule] = useState<CourseModuleItem | null>(null);
   const [editingModule, setEditingModule] = useState<CourseModuleItem | null>(null);
@@ -23,12 +25,14 @@ export default function AdminModulesTab() {
   const limit = 10;
   const [isLoading, setIsLoading] = useState(false);
 
+  const [coursesList, setCoursesList] = useState<{ id: string; title: string }[]>([]);
   const [coursesMap, setCoursesMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
     import("@/services/api/coursesApi").then(({ coursesApi }) => {
       coursesApi.getAllCourses({ limit: 100 }).then(res => {
         if (res.data?.items) {
+          setCoursesList(res.data.items);
           const map: Record<string, string> = {};
           res.data.items.forEach(c => { map[c.id] = c.title });
           setCoursesMap(map);
@@ -40,7 +44,13 @@ export default function AdminModulesTab() {
   const fetchModules = async () => {
     setIsLoading(true);
     try {
-      const res = await modulesApi.getAllModules({ page, limit, search });
+      const res = await modulesApi.getAllModules({ 
+        page, 
+        limit, 
+        search: search.trim() || undefined,
+        course_id: selectedCourse !== "all" ? selectedCourse : undefined,
+        status: selectedStatus !== "all" ? selectedStatus : undefined,
+      });
       if (res.statusCode === 200 && res.data?.items) {
         setModules(res.data.items);
         setTotalPages(res.data.totalPages || 1);
@@ -58,7 +68,16 @@ export default function AdminModulesTab() {
 
   useEffect(() => {
     fetchModules();
-  }, [page, search]);
+  }, [page, search, selectedCourse, selectedStatus]);
+
+  const handleResetFilters = () => {
+    setSearch("");
+    setSelectedCourse("all");
+    setSelectedStatus("all");
+    setPage(1);
+  };
+
+  const isFiltered = search !== "" || selectedCourse !== "all" || selectedStatus !== "all";
 
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
@@ -136,21 +155,83 @@ export default function AdminModulesTab() {
         </button>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="relative max-w-md w-full">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input 
-            type="text" 
-            placeholder="Search modules by title..." 
-            value={search} 
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }} 
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:bg-white focus:border-[#0077b6] focus:outline-none" 
-          />
+      {/* Filter and Search Controls */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-slate-50/80 p-3.5 sm:p-4 rounded-2xl border border-slate-200">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 flex-1">
+          {/* Search Box */}
+          <div className="relative flex-1 min-w-[220px]">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input 
+              type="text" 
+              placeholder="Search modules by title..." 
+              value={search} 
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }} 
+              className="w-full pl-10 pr-9 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:border-[#0077b6] focus:outline-none font-medium" 
+            />
+            {search && (
+              <button 
+                onClick={() => { setSearch(""); setPage(1); }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
+                title="Clear Search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Course Selector Filter */}
+          <div className="relative min-w-[200px]">
+            <select
+              value={selectedCourse}
+              onChange={(e) => {
+                setSelectedCourse(e.target.value);
+                setPage(1);
+              }}
+              className="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:border-[#0077b6] focus:outline-none font-medium text-slate-700 cursor-pointer"
+            >
+              <option value="all">All Courses</option>
+              {coursesList.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Status Filter */}
+          <div className="relative min-w-[130px]">
+            <select
+              value={selectedStatus}
+              onChange={(e) => {
+                setSelectedStatus(e.target.value);
+                setPage(1);
+              }}
+              className="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:border-[#0077b6] focus:outline-none font-medium text-slate-700 cursor-pointer"
+            >
+              <option value="all">All Status</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+
+          {/* Clear Filters Button */}
+          {isFiltered && (
+            <button
+              onClick={handleResetFilters}
+              className="px-3.5 py-2 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+              title="Reset all filters"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset</span>
+            </button>
+          )}
         </div>
-        <span className="px-4 py-1.5 rounded-full bg-sky-50 text-[#0077b6] text-xs sm:text-sm font-bold border border-sky-200 shrink-0">
+
+        <span className="px-3.5 py-1.5 rounded-full bg-sky-50 text-[#0077b6] text-xs font-extrabold border border-sky-200 shrink-0 self-start lg:self-center">
           {totalModules} Modules Found
         </span>
       </div>
@@ -177,8 +258,19 @@ export default function AdminModulesTab() {
               </tr>
             ) : modules.length === 0 ? (
               <tr>
-                <td colSpan={4} className="p-8 text-center text-slate-500 font-semibold">
-                  No modules found. Create one to get started!
+                <td colSpan={4} className="p-10 text-center text-slate-500 font-medium space-y-2">
+                  <p className="text-sm font-bold text-slate-700">
+                    {isFiltered ? "No modules match the selected filter criteria." : "No modules found in the database."}
+                  </p>
+                  {isFiltered && (
+                    <button
+                      onClick={handleResetFilters}
+                      className="px-4 py-1.5 rounded-xl bg-sky-50 text-[#0077b6] hover:bg-sky-100 font-bold text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Clear All Filters</span>
+                    </button>
+                  )}
                 </td>
               </tr>
             ) : (

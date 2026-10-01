@@ -1,16 +1,21 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { PlayCircle, Search, Plus, Eye, Edit, Trash2, ChevronLeft, ChevronRight, Video, FileText } from "lucide-react";
+import { PlayCircle, Search, Plus, Eye, Edit, Trash2, ChevronLeft, ChevronRight, Video, FileText, RotateCcw, X, Filter, BookOpen, FolderTree } from "lucide-react";
 import AdminAddLessonView from "./AdminAddLessonView";
 import AdminLessonDetails from "./AdminLessonDetails";
 import AdminEditLessonModal from "./AdminEditLessonModal";
 import AdminDeleteConfirmModal from "./AdminDeleteConfirmModal";
 import { lessonsApi, LessonItem, CreateLessonPayload } from "@/services/api/lessonsApi";
+import { CourseModuleItem } from "@/services/api/modulesApi";
 
 export default function AdminLessonsTab() {
   const [lessons, setLessons] = useState<LessonItem[]>([]);
   const [search, setSearch] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("all");
+  const [selectedModule, setSelectedModule] = useState("all");
+  const [selectedType, setSelectedType] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState("all");
   const [isAddingLesson, setIsAddingLesson] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState<LessonItem | null>(null);
   const [editingLesson, setEditingLesson] = useState<LessonItem | null>(null);
@@ -23,14 +28,29 @@ export default function AdminLessonsTab() {
   const limit = 10;
   const [isLoading, setIsLoading] = useState(false);
 
-  const [modulesMap, setModulesMap] = useState<Record<string, string>>({});
+  const [coursesList, setCoursesList] = useState<{ id: string; title: string }[]>([]);
+  const [modulesList, setModulesList] = useState<CourseModuleItem[]>([]);
+  const [modulesMap, setModulesMap] = useState<Record<string, { title: string; course_id?: string }>>({});
 
   useEffect(() => {
-    import("@/services/api/modulesApi").then(({ modulesApi }) => {
-      modulesApi.getAllModules({ limit: 100 }).then(res => {
+    // Load courses for course filter
+    import("@/services/api/coursesApi").then(({ coursesApi }) => {
+      coursesApi.getAllCourses({ limit: 100 }).then(res => {
         if (res.data?.items) {
-          const map: Record<string, string> = {};
-          res.data.items.forEach(m => { map[m.id] = m.title });
+          setCoursesList(res.data.items);
+        }
+      });
+    });
+
+    // Load modules for module filter and title display
+    import("@/services/api/modulesApi").then(({ modulesApi }) => {
+      modulesApi.getAllModules({ limit: 200 }).then(res => {
+        if (res.data?.items) {
+          setModulesList(res.data.items);
+          const map: Record<string, { title: string; course_id?: string }> = {};
+          res.data.items.forEach(m => { 
+            map[m.id] = { title: m.title, course_id: m.course_id };
+          });
           setModulesMap(map);
         }
       });
@@ -40,11 +60,24 @@ export default function AdminLessonsTab() {
   const fetchLessons = async () => {
     setIsLoading(true);
     try {
-      const res = await lessonsApi.getAllLessons({ page, limit, search });
+      const res = await lessonsApi.getAllLessons({ 
+        page, 
+        limit, 
+        search: search.trim() || undefined,
+        module_id: selectedModule !== "all" ? selectedModule : undefined,
+        type: selectedType !== "all" ? selectedType : undefined,
+        status: selectedStatus !== "all" ? selectedStatus : undefined,
+      });
       if (res.statusCode === 200 && res.data?.items) {
-        setLessons(res.data.items);
+        let items = res.data.items;
+        // Client-side cross-filter by course if course is selected but no specific module was chosen
+        if (selectedCourse !== "all" && selectedModule === "all") {
+          const courseModuleIds = new Set(modulesList.filter(m => m.course_id === selectedCourse).map(m => m.id));
+          items = items.filter(l => courseModuleIds.has(l.module_id));
+        }
+        setLessons(items);
         setTotalPages(res.data.totalPages || 1);
-        setTotalLessons(res.data.total || res.data.items.length);
+        setTotalLessons(res.data.total || items.length);
       } else {
         setLessons([]);
       }
@@ -58,7 +91,23 @@ export default function AdminLessonsTab() {
 
   useEffect(() => {
     fetchLessons();
-  }, [page, search]);
+  }, [page, search, selectedCourse, selectedModule, selectedType, selectedStatus]);
+
+  const handleResetFilters = () => {
+    setSearch("");
+    setSelectedCourse("all");
+    setSelectedModule("all");
+    setSelectedType("all");
+    setSelectedStatus("all");
+    setPage(1);
+  };
+
+  const isFiltered = search !== "" || selectedCourse !== "all" || selectedModule !== "all" || selectedType !== "all" || selectedStatus !== "all";
+
+  // Filter modules options based on selected course
+  const availableModules = selectedCourse === "all" 
+    ? modulesList 
+    : modulesList.filter(m => m.course_id === selectedCourse);
 
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
@@ -136,23 +185,127 @@ export default function AdminLessonsTab() {
         </button>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="relative max-w-md w-full">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input 
-            type="text" 
-            placeholder="Search lessons by title..." 
-            value={search} 
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }} 
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:bg-white focus:border-[#0077b6] focus:outline-none" 
-          />
+      {/* Filter and Search Controls */}
+      <div className="flex flex-col gap-3 bg-slate-50/80 p-3.5 sm:p-4 rounded-2xl border border-slate-200">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          {/* Search Box */}
+          <div className="relative sm:col-span-2 lg:col-span-1">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input 
+              type="text" 
+              placeholder="Search lessons..." 
+              value={search} 
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }} 
+              className="w-full pl-10 pr-9 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:border-[#0077b6] focus:outline-none font-medium" 
+            />
+            {search && (
+              <button 
+                onClick={() => { setSearch(""); setPage(1); }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
+                title="Clear Search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Course Selector Filter */}
+          <div>
+            <select
+              value={selectedCourse}
+              onChange={(e) => {
+                const newCourse = e.target.value;
+                setSelectedCourse(newCourse);
+                setSelectedModule("all");
+                setPage(1);
+              }}
+              className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:border-[#0077b6] focus:outline-none font-medium text-slate-700 cursor-pointer"
+            >
+              <option value="all">All Courses</option>
+              {coursesList.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Module Selector Filter */}
+          <div>
+            <select
+              value={selectedModule}
+              onChange={(e) => {
+                setSelectedModule(e.target.value);
+                setPage(1);
+              }}
+              className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:border-[#0077b6] focus:outline-none font-medium text-slate-700 cursor-pointer"
+            >
+              <option value="all">All Modules</option>
+              {availableModules.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Content Type Filter */}
+          <div>
+            <select
+              value={selectedType}
+              onChange={(e) => {
+                setSelectedType(e.target.value);
+                setPage(1);
+              }}
+              className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:border-[#0077b6] focus:outline-none font-medium text-slate-700 cursor-pointer"
+            >
+              <option value="all">All Content Types</option>
+              <option value="video">Video Lecture</option>
+              <option value="document">PDF / Document</option>
+              <option value="quiz">Interactive Quiz</option>
+              <option value="assignment">Assignment</option>
+              <option value="live">Live Class</option>
+            </select>
+          </div>
+
+          {/* Status Filter */}
+          <div>
+            <select
+              value={selectedStatus}
+              onChange={(e) => {
+                setSelectedStatus(e.target.value);
+                setPage(1);
+              }}
+              className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:border-[#0077b6] focus:outline-none font-medium text-slate-700 cursor-pointer"
+            >
+              <option value="all">All Status</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
         </div>
-        <span className="px-4 py-1.5 rounded-full bg-sky-50 text-[#0077b6] text-xs sm:text-sm font-bold border border-sky-200 shrink-0">
-          {totalLessons} Lessons Found
-        </span>
+
+        {/* Filter Summary & Reset Action */}
+        <div className="flex items-center justify-between pt-1 border-t border-slate-200/60 text-xs">
+          <span className="font-extrabold text-[#0077b6] bg-sky-50 px-3 py-1 rounded-full border border-sky-200">
+            {totalLessons} Lessons Found
+          </span>
+
+          {isFiltered && (
+            <button
+              onClick={handleResetFilters}
+              className="px-3.5 py-1.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Reset all filters"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset All Filters</span>
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="overflow-x-auto border border-slate-200 rounded-2xl">
@@ -178,8 +331,19 @@ export default function AdminLessonsTab() {
               </tr>
             ) : lessons.length === 0 ? (
               <tr>
-                <td colSpan={5} className="p-8 text-center text-slate-500 font-semibold">
-                  No lessons found. Create one to get started!
+                <td colSpan={5} className="p-10 text-center text-slate-500 font-medium space-y-2">
+                  <p className="text-sm font-bold text-slate-700">
+                    {isFiltered ? "No lessons match the selected filter criteria." : "No lessons found in the database."}
+                  </p>
+                  {isFiltered && (
+                    <button
+                      onClick={handleResetFilters}
+                      className="px-4 py-1.5 rounded-xl bg-sky-50 text-[#0077b6] hover:bg-sky-100 font-bold text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Clear All Filters</span>
+                    </button>
+                  )}
                 </td>
               </tr>
             ) : (
@@ -195,7 +359,7 @@ export default function AdminLessonsTab() {
                       <div>
                         <div className="font-black text-slate-900 text-sm sm:text-base max-w-xs truncate" title={lesson.title}>{lesson.title}</div>
                         <div className="text-xs text-slate-500 mt-0.5 max-w-xs truncate">
-                          Module: <span className="font-semibold text-[#0077b6]">{modulesMap[lesson.module_id] || "Unknown Module"}</span>
+                          Module: <span className="font-semibold text-[#0077b6]">{modulesMap[lesson.module_id]?.title || "Unknown Module"}</span>
                         </div>
                         {lesson.is_preview && <span className="text-[10px] uppercase font-bold text-[#0077b6] bg-sky-100 px-1.5 py-0.5 rounded ml-1 mt-1 inline-block">Preview</span>}
                       </div>
