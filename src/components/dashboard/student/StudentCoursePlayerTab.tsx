@@ -108,7 +108,17 @@ export default function StudentCoursePlayerTab() {
     }
   };
 
-  const handleOpenPlayer = (lessonId?: string) => {
+  const handleOpenPlayer = (lessonId?: string, targetCourse?: EnrolledCourse) => {
+    if (targetCourse && targetCourse.id !== selectedCourse?.id) {
+      setSelectedCourse(targetCourse);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("bim_active_course_id", targetCourse.id);
+        const sp = new URLSearchParams(window.location.search);
+        sp.set("courseId", targetCourse.id);
+        window.history.replaceState(null, "", `${window.location.pathname}?${sp.toString()}`);
+      }
+    }
+    
     setIsPlayingVideo(true);
     if (typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search);
@@ -168,11 +178,28 @@ export default function StudentCoursePlayerTab() {
   }
 
   if (!selectedCourse) {
-    return <StudentEnrolledCoursesGrid courses={courses} onSelectCourse={handleSelectCourse} />;
+    return (
+      <StudentEnrolledCoursesGrid 
+        courses={courses} 
+        onSelectCourse={handleSelectCourse} 
+        onOpenPlayer={(c) => handleOpenPlayer(undefined, c)} 
+      />
+    );
   }
 
+  const handleUpdateCourse = (updatedCourse: EnrolledCourse) => {
+    setSelectedCourse(updatedCourse);
+    setCourses(prev => prev.map(c => c.id === updatedCourse.id ? updatedCourse : c));
+  };
+
   if (isPlayingVideo) {
-    return <StudentClassroomPlayer course={selectedCourse} onBackToCourses={handleBackToHub} />;
+    return (
+      <StudentClassroomPlayer 
+        course={selectedCourse} 
+        onBackToCourses={handleBackToHub} 
+        onUpdateCourse={handleUpdateCourse}
+      />
+    );
   }
 
   return (

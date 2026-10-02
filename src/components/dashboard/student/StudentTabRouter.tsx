@@ -51,14 +51,11 @@ export default function StudentTabRouter({
         />
       )}
       {studentTab === "courses" && <StudentCoursePlayerTab />}
-      {studentTab === "live" && <StudentLiveScheduleTab liveClasses={liveClasses} />}
+      {studentTab === "live" && <StudentLiveScheduleTab />}
       {studentTab === "assignments" && (
-        <StudentAssignmentsTab
-          assignments={assignments}
-          onOpenUpload={onOpenUpload}
-        />
+        <StudentAssignmentsTab />
       )}
-      {studentTab === "resources" && <StudentResourcesTab resources={resources} />}
+      {studentTab === "resources" && <StudentResourcesTab />}
       {studentTab === "payments" && <StudentPaymentsTab />}
       {studentTab === "certificate" && <StudentCertificateTab currentUser={currentUser} />}
       {studentTab === "profile" && <StudentProfileTab currentUser={currentUser} />}

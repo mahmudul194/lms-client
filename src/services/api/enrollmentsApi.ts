@@ -97,4 +97,10 @@ export const enrollmentsApi = {
   async getMyEnrollments(): Promise<ApiResponse<EnrollmentItem[]>> {
     return apiFetch<EnrollmentItem[]>("/enrollments/my");
   },
+
+  async markLessonCompleted(lessonId: string): Promise<ApiResponse<any>> {
+    return apiFetch<any>(`/enrollments/my/progress/${lessonId}`, {
+      method: "POST",
+    });
+  },
 };

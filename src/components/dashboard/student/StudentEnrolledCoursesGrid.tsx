@@ -7,11 +7,13 @@ import { EnrolledCourse } from "@/types/dashboard";
 interface StudentEnrolledCoursesGridProps {
   courses: EnrolledCourse[];
   onSelectCourse: (course: EnrolledCourse) => void;
+  onOpenPlayer: (course: EnrolledCourse) => void;
 }
 
 export default function StudentEnrolledCoursesGrid({
   courses,
   onSelectCourse,
+  onOpenPlayer,
 }: StudentEnrolledCoursesGridProps) {
   return (
     <div className="space-y-6 font-sans">
@@ -89,6 +91,10 @@ export default function StudentEnrolledCoursesGrid({
             <div className="p-6 pt-0">
               <button
                 type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenPlayer(c);
+                }}
                 className="w-full py-3 px-4 rounded-2xl bg-slate-900 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 group-hover:bg-[#0077b6] transition-all shadow-md cursor-pointer"
               >
                 <PlayCircle className="w-4 h-4 text-sky-400" />

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, ChevronDown, CheckCircle2, PlayCircle, FileText, File as FileIcon, Lock, Download, ArrowLeft, Sparkles, ExternalLink } from "lucide-react";
 import { EnrolledCourse, EnrolledLesson } from "@/types/dashboard";
 import CustomVideoPlayer from "./CustomVideoPlayer";
@@ -9,20 +9,26 @@ import ModuleCookingCard from "./ModuleCookingCard";
 interface StudentClassroomPlayerProps {
   course: EnrolledCourse;
   onBackToCourses: () => void;
+  onUpdateCourse?: (updatedCourse: EnrolledCourse) => void;
 }
 
-export default function StudentClassroomPlayer({ course, onBackToCourses }: StudentClassroomPlayerProps) {
+export default function StudentClassroomPlayer({ course, onBackToCourses, onUpdateCourse }: StudentClassroomPlayerProps) {
   const [courseData, setCourseData] = useState<EnrolledCourse>(course);
   const allLessons = courseData.modules.flatMap((m) => m.lessons);
 
   const [activeLessonId, setActiveLessonId] = useState<string>(() => {
+    return allLessons.find((l) => l.isUnlocked && !l.isCompleted)?.id || allLessons[0]?.id;
+  });
+
+  useEffect(() => {
     if (typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search);
       const lId = sp.get("lessonId") || localStorage.getItem("bim_active_lesson_id");
-      if (lId && allLessons.some((l) => l.id === lId && l.isUnlocked)) return lId;
+      if (lId && allLessons.some((l) => l.id === lId && l.isUnlocked)) {
+        setActiveLessonId(lId);
+      }
     }
-    return allLessons.find((l) => l.isUnlocked && !l.isCompleted)?.id || allLessons[0]?.id;
-  });
+  }, [allLessons]);
 
   const [isCookingState, setIsCookingState] = useState(false);
   const [openModules, setOpenModules] = useState<Record<string, boolean>>(() => {
@@ -60,6 +66,8 @@ export default function StudentClassroomPlayer({ course, onBackToCourses }: Stud
       console.error(e);
     }
 
+    let newCourseData: EnrolledCourse | null = null;
+
     setCourseData((prev) => {
       const updated = prev.modules.map((m) => ({
         ...m,
@@ -71,8 +79,15 @@ export default function StudentClassroomPlayer({ course, onBackToCourses }: Stud
       }));
       const flat = updated.flatMap((m) => m.lessons);
       const done = flat.filter((l) => l.isCompleted).length;
-      return { ...prev, modules: updated, completedLessons: done, progressPercent: Math.round((done / flat.length) * 100) };
+      
+      newCourseData = { ...prev, modules: updated, completedLessons: done, progressPercent: Math.round((done / flat.length) * 100) };
+      
+      return newCourseData;
     });
+
+    if (newCourseData && onUpdateCourse) {
+      onUpdateCourse(newCourseData);
+    }
 
     if (nextLesson) {
       handleSelectLesson(nextLesson);
