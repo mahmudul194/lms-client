@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronLeft, ChevronRight, ChevronDown, CheckCircle2, PlayCircle, Lock, Download, ArrowLeft, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, CheckCircle2, PlayCircle, FileText, File as FileIcon, Lock, Download, ArrowLeft, Sparkles, ExternalLink } from "lucide-react";
 import { EnrolledCourse, EnrolledLesson } from "@/types/dashboard";
 import CustomVideoPlayer from "./CustomVideoPlayer";
 import ModuleCookingCard from "./ModuleCookingCard";
@@ -52,7 +52,14 @@ export default function StudentClassroomPlayer({ course, onBackToCourses }: Stud
     }
   };
 
-  const handleNextAndComplete = () => {
+  const handleNextAndComplete = async () => {
+    try {
+      const { enrollmentsApi } = await import("@/services/api/enrollmentsApi");
+      await enrollmentsApi.markLessonCompleted(activeLesson.id);
+    } catch (e) {
+      console.error(e);
+    }
+
     setCourseData((prev) => {
       const updated = prev.modules.map((m) => ({
         ...m,
@@ -74,6 +81,18 @@ export default function StudentClassroomPlayer({ course, onBackToCourses }: Stud
     } else setIsCookingState(true);
   };
 
+  if (!activeLesson) {
+    return (
+      <div className="space-y-6 font-sans text-center bg-white p-10 rounded-3xl border border-slate-200">
+        <div className="flex justify-start mb-6">
+          <button onClick={onBackToCourses} className="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm flex items-center gap-2 cursor-pointer"><ArrowLeft className="w-4 h-4 text-[#0077b6]" /> Back to Courses</button>
+        </div>
+        <h2 className="text-2xl font-bold text-slate-900">No Lessons Available Yet</h2>
+        <p className="text-slate-500 max-w-md mx-auto">This course doesn't have any published lessons right now. Please check back later.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 font-sans">
       <div className="bg-white/95 p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -91,7 +110,37 @@ export default function StudentClassroomPlayer({ course, onBackToCourses }: Stud
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <div className="lg:col-span-8 space-y-6">
-          {isCookingState ? <ModuleCookingCard completedCount={courseData.completedLessons} totalCount={allLessons.length} onReviewPrevious={() => handleSelectLesson(allLessons[0])} onBackToCourses={onBackToCourses} /> : <CustomVideoPlayer key={activeLesson.id} videoUrl={activeLesson.videoUrl} title={activeLesson.title} onEnded={handleNextAndComplete} />}
+          {isCookingState ? (
+            <ModuleCookingCard completedCount={courseData.completedLessons} totalCount={allLessons.length} onReviewPrevious={() => handleSelectLesson(allLessons[0])} onBackToCourses={onBackToCourses} />
+          ) : activeLesson.type === "video" ? (
+            <CustomVideoPlayer key={activeLesson.id} videoUrl={activeLesson.videoUrl} title={activeLesson.title} onEnded={handleNextAndComplete} />
+          ) : activeLesson.type === "pdf" ? (
+            <div className="w-full aspect-video bg-slate-100 rounded-3xl overflow-hidden shadow-md flex flex-col">
+              <iframe src={activeLesson.pdfUrl} className="w-full flex-1 border-0" title={activeLesson.title} />
+              <div className="bg-slate-800 text-white p-3 flex items-center justify-between">
+                <a href={activeLesson.pdfUrl} target="_blank" rel="noopener noreferrer" className="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-sm font-bold shadow-sm cursor-pointer transition-colors flex items-center gap-2">
+                  <ExternalLink className="w-4 h-4" /> Open in New Tab
+                </a>
+                <button onClick={handleNextAndComplete} className="px-4 py-2 rounded-xl bg-[#0077b6] hover:bg-[#002b5b] text-sm font-bold shadow-sm cursor-pointer transition-colors">Mark as Completed</button>
+              </div>
+            </div>
+          ) : activeLesson.type === "quiz" || activeLesson.type === "assignment" ? (
+            <div className="w-full aspect-video bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex items-center justify-center flex-col text-center space-y-4">
+              <div className="w-16 h-16 rounded-full bg-sky-50 text-[#0077b6] flex items-center justify-center">
+                <FileText className="w-8 h-8" />
+              </div>
+              <h2 className="text-xl font-bold text-slate-800">{activeLesson.title}</h2>
+              <p className="text-slate-500 max-w-sm">This is an interactive {activeLesson.type}. Click below to start.</p>
+              <button onClick={handleNextAndComplete} className="px-6 py-3 rounded-xl bg-[#0077b6] hover:bg-[#002b5b] text-white font-bold cursor-pointer transition-colors mt-2">Start {activeLesson.type}</button>
+            </div>
+          ) : (
+            <div className="w-full min-h-[400px] bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col">
+              <div className="prose max-w-none flex-1 text-slate-700" dangerouslySetInnerHTML={{ __html: activeLesson.textContent || "<p>No content available.</p>" }} />
+              <div className="mt-8 pt-4 border-t border-slate-100 flex justify-end">
+                <button onClick={handleNextAndComplete} className="px-5 py-2.5 rounded-xl bg-[#0077b6] hover:bg-[#002b5b] text-white font-bold shadow-sm cursor-pointer transition-colors">Mark as Completed</button>
+              </div>
+            </div>
+          )}
           <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/80 shadow-2xs space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
               <div><span className="text-xs font-black uppercase text-[#0077b6] tracking-wider">{isCookingState ? "Course Milestone" : "Active Lecture"}</span><h1 className="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">{isCookingState ? "The new module is cooking" : activeLesson.title}</h1><span className="text-sm font-semibold text-slate-500 font-semibold mt-1 block">{isCookingState ? "Weekly batch lectures completed" : `Duration: ${activeLesson.duration}`}</span></div>
@@ -124,7 +173,10 @@ export default function StudentClassroomPlayer({ course, onBackToCourses }: Stud
                   <div className="p-2 space-y-1.5 bg-white border-t border-slate-100">
                     {m.lessons.map((l) => (
                       <div key={l.id} onClick={() => handleSelectLesson(l)} className={`p-3 rounded-xl flex items-center justify-between gap-3 text-sm transition-all cursor-pointer ${!isCookingState && l.id === activeLesson.id ? "bg-sky-50 border-2 border-[#0077b6] shadow-xs" : l.isUnlocked ? "hover:bg-slate-50 border border-transparent" : "opacity-50 hover:bg-slate-50/50 border border-transparent"}`}>
-                        <div className="flex items-center gap-3 truncate">{l.isCompleted ? <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" /> : !isCookingState && l.id === activeLesson.id ? <PlayCircle className="w-5 h-5 text-[#0077b6] shrink-0 animate-pulse" /> : l.isUnlocked ? <PlayCircle className="w-5 h-5 text-slate-400 shrink-0" /> : <Lock className="w-5 h-5 text-slate-400 shrink-0" />}<span className={`truncate ${!isCookingState && l.id === activeLesson.id ? "font-bold text-slate-950" : "font-medium text-slate-700"}`}>{l.title}</span></div>
+                        <div className="flex items-center gap-3 truncate">
+                          {l.isCompleted ? <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" /> : !isCookingState && l.id === activeLesson.id ? (l.type === "pdf" ? <FileIcon className="w-5 h-5 text-[#0077b6] shrink-0 animate-pulse" /> : l.type === "text" ? <FileText className="w-5 h-5 text-[#0077b6] shrink-0 animate-pulse" /> : <PlayCircle className="w-5 h-5 text-[#0077b6] shrink-0 animate-pulse" />) : l.isUnlocked ? (l.type === "pdf" ? <FileIcon className="w-5 h-5 text-slate-400 shrink-0" /> : l.type === "text" ? <FileText className="w-5 h-5 text-slate-400 shrink-0" /> : <PlayCircle className="w-5 h-5 text-slate-400 shrink-0" />) : <Lock className="w-5 h-5 text-slate-400 shrink-0" />}
+                          <span className={`truncate ${!isCookingState && l.id === activeLesson.id ? "font-bold text-slate-950" : "font-medium text-slate-700"}`}>{l.title}</span>
+                        </div>
                         <span className="text-xs font-semibold font-medium text-slate-500 shrink-0">{l.duration}</span>
                       </div>
                     ))}

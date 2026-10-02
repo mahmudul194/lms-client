@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { ArrowLeft, GraduationCap, User, Info, MapPin, Briefcase, Calendar, Monitor, Shield } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ArrowLeft, GraduationCap, User, Info, MapPin, Briefcase, Calendar, Monitor, Shield, BookOpen } from "lucide-react";
 
 interface AdminStudentDetailsProps {
   student: any;
@@ -9,6 +9,25 @@ interface AdminStudentDetailsProps {
 }
 
 export default function AdminStudentDetails({ student, onBack }: AdminStudentDetailsProps) {
+  const [enrollments, setEnrollments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { enrollmentsApi } = await import("@/services/api/enrollmentsApi");
+        const res = await enrollmentsApi.getAllEnrollments({ student_id: student.id, limit: 100 });
+        if (res.statusCode === 200 && res.data?.items) {
+          setEnrollments(res.data.items);
+        }
+      } catch (err) {
+        console.error("Failed to load student enrollments", err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [student.id]);
+
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6 font-sans animate-in fade-in zoom-in-95 duration-200">
       <div className="flex items-center gap-4 border-b border-slate-100 pb-5">
@@ -159,6 +178,62 @@ export default function AdminStudentDetails({ student, onBack }: AdminStudentDet
             </div>
           </div>
         )}
+        {/* Course Progress Section */}
+        <div className="bg-sky-50 p-6 rounded-2xl border border-sky-100 shadow-sm">
+          <h3 className="text-sm font-bold text-sky-800 uppercase tracking-wider mb-5 flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-sky-600" /> Enrolled Courses & Progress
+          </h3>
+          {loading ? (
+            <div className="text-sm text-sky-600 font-medium py-4 text-center">Loading enrollments...</div>
+          ) : enrollments.length === 0 ? (
+            <div className="text-sm text-sky-700/80 font-medium py-4 text-center">No active enrollments found for this student.</div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {enrollments.map((enr: any) => {
+                const course = enr.batch?.course || {};
+                let totalLessons = 0;
+                
+                (course.modules || []).forEach((m: any) => {
+                  totalLessons += (m.lessons || []).length;
+                });
+
+                const completedLessonIds = (enr.lesson_progress || [])
+                  .filter((p: any) => p.is_completed)
+                  .map((p: any) => p.lesson_id);
+                
+                const completedLessonsCount = completedLessonIds.length;
+                const progressPercent = totalLessons > 0 ? Math.round((completedLessonsCount / totalLessons) * 100) : 0;
+
+                return (
+                  <div key={enr.id} className="bg-white p-4 rounded-xl border border-sky-200 shadow-sm flex flex-col gap-3">
+                    <div className="flex justify-between items-start gap-3">
+                      <div>
+                        <h4 className="font-bold text-slate-900 text-sm line-clamp-1">{course.title || "Unknown Course"}</h4>
+                        <p className="text-xs font-semibold text-sky-600 mt-0.5">Batch: {enr.batch?.name || "N/A"}</p>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide shrink-0 ${enr.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                        {enr.status}
+                      </span>
+                    </div>
+                    
+                    <div className="space-y-1.5 mt-auto">
+                      <div className="flex justify-between items-end text-xs">
+                        <span className="font-semibold text-slate-500">Progress</span>
+                        <span className="font-bold text-slate-700">{completedLessonsCount} / {totalLessons} Lessons ({progressPercent}%)</span>
+                      </div>
+                      <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-sky-400 to-sky-600 rounded-full transition-all duration-500" 
+                          style={{ width: `${progressPercent}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

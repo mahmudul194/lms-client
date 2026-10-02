@@ -5,6 +5,8 @@ import { CreditCard, Search, UserPlus, Sparkles, AlertCircle, CheckCircle2 } fro
 import { PendingApproval } from "@/types/dashboard";
 import AdminPaymentQueueTable from "./AdminPaymentQueueTable";
 import AdminManualAdmissionModal from "./AdminManualAdmissionModal";
+import AdminInvoiceModal from "./AdminInvoiceModal";
+import AdminInstallmentsModal from "./AdminInstallmentsModal";
 
 interface AdminAdmissionsTabProps {
   pendingApprovals: PendingApproval[];
@@ -22,7 +24,13 @@ export default function AdminAdmissionsTab({
   const [filter, setFilter] = useState<"All" | "Pending" | "Approved" | "Rejected">("All");
   const [search, setSearch] = useState("");
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [invoiceId, setInvoiceId] = useState<string | null>(null);
+  const [installmentsId, setInstallmentsId] = useState<string | null>(null);
   const [localApprovals, setLocalApprovals] = useState<PendingApproval[]>(pendingApprovals);
+
+  React.useEffect(() => {
+    setLocalApprovals(pendingApprovals);
+  }, [pendingApprovals]);
 
   const handleEnrollStudent = (newApproval: PendingApproval) => {
     setLocalApprovals((prev) => [newApproval, ...prev]);
@@ -110,12 +118,20 @@ export default function AdminAdmissionsTab({
         pendingApprovals={filtered}
         onApprove={handleApproveLocal}
         onReject={handleRejectLocal}
+        onViewInvoice={(id) => setInvoiceId(id)}
+        onViewInstallments={(id) => setInstallmentsId(id)}
       />
 
       <AdminManualAdmissionModal
         isOpen={isManualModalOpen}
         onClose={() => setIsManualModalOpen(false)}
         onEnroll={handleEnrollStudent}
+      />
+
+      <AdminInstallmentsModal
+        isOpen={!!installmentsId}
+        onClose={() => setInstallmentsId(null)}
+        enrollmentId={installmentsId || ""}
       />
     </div>
   );

@@ -10,6 +10,7 @@ import StudentTabRouter from "@/components/dashboard/student/StudentTabRouter";
 import AssignmentUploadModal from "@/components/dashboard/student/AssignmentUploadModal";
 import InstructorDashboardView from "@/components/dashboard/instructor/InstructorDashboardView";
 import AdminDashboardView from "@/components/dashboard/admin/AdminDashboardView";
+import { Lock, LogOut, ShieldAlert } from "lucide-react";
 
 export default function UnifiedDashboardPage() {
   const [mounted, setMounted] = useState(false);
@@ -23,6 +24,7 @@ export default function UnifiedDashboardPage() {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [, setActiveAssignmentId] = useState<number | null>(null);
   const [selectedClassVideo, setSelectedClassVideo] = useState<ClassVideo | null>(null);
+  const [isDeviceLocked, setIsDeviceLocked] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -53,6 +55,7 @@ export default function UnifiedDashboardPage() {
         const res = await authApi.getMe();
         const user = res.data;
         if (res.statusCode === 200 && user) {
+          if (user.isDeviceLocked) setIsDeviceLocked(true);
           if (user.name) localStorage.setItem("bim_user_name", user.name);
           if (user.email) localStorage.setItem("bim_user_email", user.email);
           setCurrentUser((prev) => ({ ...prev, name: user.name || prev.name, nameEn: user.name || prev.nameEn, email: user.email || prev.email }));
@@ -120,6 +123,42 @@ export default function UnifiedDashboardPage() {
       </div>
 
       <AssignmentUploadModal isOpen={uploadModalOpen} onClose={() => setUploadModalOpen(false)} />
+
+      {isDeviceLocked && (
+        <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white max-w-md w-full rounded-3xl p-8 shadow-2xl flex flex-col items-center text-center">
+            <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mb-6">
+              <ShieldAlert className="w-8 h-8 text-rose-600" />
+            </div>
+            <h2 className="text-2xl font-black text-slate-900 mb-2">Device Limit Reached</h2>
+            <p className="text-sm text-slate-500 mb-8 font-medium leading-relaxed">
+              You are logged in from more than 3 devices. Please log out from all devices or this device to regain access to your dashboard.
+            </p>
+            <div className="flex flex-col gap-3 w-full">
+              <button
+                onClick={async () => {
+                  const { authApi } = await import("@/services/api/authApi");
+                  await authApi.logoutAll();
+                  window.location.href = "/";
+                }}
+                className="w-full py-3.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2"
+              >
+                <LogOut className="w-4 h-4" /> Logout All Devices
+              </button>
+              <button
+                onClick={async () => {
+                  const { authApi } = await import("@/services/api/authApi");
+                  await authApi.logout();
+                  window.location.href = "/";
+                }}
+                className="w-full py-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-all flex items-center justify-center gap-2"
+              >
+                <Lock className="w-4 h-4" /> Logout This Device
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

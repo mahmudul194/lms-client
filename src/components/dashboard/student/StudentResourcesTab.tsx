@@ -1,45 +1,47 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { FolderDown, Download, FileSpreadsheet, Layers, FileCode } from "lucide-react";
-import { CourseResource } from "@/types/dashboard";
+import { FolderDown, ArrowRight } from "lucide-react";
+import { enrollmentsApi, EnrollmentItem } from "@/services/api/enrollmentsApi";
+import StudentResourcesView from "./StudentResourcesView";
 
-interface StudentResourcesTabProps {
-  resources: CourseResource[];
-}
-
-export default function StudentResourcesTab({ resources }: StudentResourcesTabProps) {
-  const [filter, setFilter] = useState("all");
-  const [list, setList] = useState<CourseResource[]>(resources);
+export default function StudentResourcesTab() {
+  const [enrollments, setEnrollments] = useState<EnrollmentItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  // State for which batch resources to view
+  const [selectedBatch, setSelectedBatch] = useState<{
+    id: string;
+    name: string;
+    courseTitle: string;
+  } | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
-        const { resourcesApi } = await import("@/services/api");
-        const res = await resourcesApi.getAllResources();
-        if (res.statusCode === 200 && res.data?.items?.length) {
-          const apiItems: CourseResource[] = res.data.items.map((r) => ({
-            name: r.title,
-            size: r.sizeMb ? `${r.sizeMb} MB` : "15 MB",
-            type: r.pdf ? "PDF" : "RVT Model",
-            category: "Templates",
-          }));
-          setList(apiItems);
+        const res = await enrollmentsApi.getMyEnrollments();
+        if (res.statusCode === 200 && res.data) {
+          // Show all enrollments or filter active
+          setEnrollments(res.data);
         }
-      } catch {}
+      } catch (e) {
+        console.error("Failed to fetch enrollments for resources", e);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
-  const filteredResources =
-    filter === "all"
-      ? list
-      : list.filter((r) => r.category.toLowerCase().includes(filter.toLowerCase()));
-
-  const getIcon = (type: string) => {
-    if (type.includes("RVT") || type.includes("RFA")) return <Layers className="w-5 h-5 text-[#0077b6]" />;
-    if (type.includes("DWG") || type.includes("CAD")) return <FileCode className="w-5 h-5 text-emerald-600" />;
-    return <FileSpreadsheet className="w-5 h-5 text-amber-600" />;
-  };
+  if (selectedBatch) {
+    return (
+      <StudentResourcesView
+        courseTitle={selectedBatch.courseTitle}
+        batch={selectedBatch.name}
+        batchId={selectedBatch.id}
+        onBack={() => setSelectedBatch(null)}
+      />
+    );
+  }
 
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6 font-sans">
@@ -47,32 +49,65 @@ export default function StudentResourcesTab({ resources }: StudentResourcesTabPr
         <div>
           <h3 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2.5">
             <FolderDown className="w-6 h-6 text-[#0077b6]" />
-            <span>Course Resource Library</span>
+            <span>My Resources</span>
           </h3>
-          <p className="text-sm text-slate-500 mt-1">Download BIM family packages, project models, and calculation sheets</p>
-        </div>
-        <div className="flex items-center gap-2">
-          {["all", "Families", "Templates", "CAD"].map((cat) => (
-            <button key={cat} onClick={() => setFilter(cat)} className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${filter === cat ? "bg-[#002b5b] text-white shadow-xs" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
-              {cat === "all" ? "All Files" : cat}
-            </button>
-          ))}
+          <p className="text-sm text-slate-500 mt-1">Select a course batch to view and download study materials, PDFs, and links.</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {filteredResources.map((res, i) => (
-          <div key={i} className="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 hover:bg-white hover:shadow-md transition-all flex items-center justify-between gap-4 group">
-            <div className="flex items-center gap-4 min-w-0">
-              <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">{getIcon(res.type)}</div>
-              <div className="min-w-0">
-                <h4 className="font-bold text-slate-900 text-sm truncate">{res.name}</h4>
-                <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5"><span className="font-semibold text-[#0077b6]">{res.type}</span><span>•</span><span>{res.size}</span></div>
-              </div>
-            </div>
-            <button onClick={() => alert(`Downloading resource: ${res.name}`)} className="p-3 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-[#0077b6] hover:text-white hover:border-[#0077b6] transition-all shrink-0 cursor-pointer shadow-2xs"><Download className="w-4 h-4" /></button>
+      <div className="space-y-4">
+        {loading ? (
+          <div className="p-8 text-center text-slate-400 font-semibold bg-slate-50 rounded-2xl border border-slate-100 animate-pulse">
+            Loading your courses...
           </div>
-        ))}
+        ) : enrollments.length === 0 ? (
+          <div className="p-8 text-center text-slate-500 font-medium bg-slate-50 rounded-2xl border border-slate-100">
+            You are not enrolled in any courses yet.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {enrollments.map((enr) => {
+              const courseTitle = enr.batch?.course?.title || "Unknown Course";
+              const batchName = enr.batch?.name || "Unknown Batch";
+              
+              return (
+                <div 
+                  key={enr.id} 
+                  onClick={() => {
+                    if (enr.batch_id) {
+                      setSelectedBatch({
+                        id: enr.batch_id,
+                        name: batchName,
+                        courseTitle: courseTitle,
+                      });
+                    }
+                  }}
+                  className="p-6 rounded-3xl border-2 border-slate-100 bg-white hover:border-purple-500 hover:shadow-lg transition-all cursor-pointer group flex flex-col justify-between"
+                >
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center justify-between">
+                      <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-black">
+                        {batchName}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide shrink-0 ${enr.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                        {enr.status}
+                      </span>
+                    </div>
+                    
+                    <h4 className="font-black text-slate-900 text-lg group-hover:text-purple-700 transition-colors leading-tight">
+                      {courseTitle}
+                    </h4>
+                  </div>
+                  
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm font-bold text-purple-700">
+                    <span>View Materials</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

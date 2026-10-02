@@ -182,7 +182,7 @@ export default function AdminAddLessonView({ onBack, onAdd }: AdminAddLessonView
               <label className="font-bold text-slate-700 block mb-1.5">Type *</label>
               <select value={form.type} onChange={(e) => update("type", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 focus:border-[#0077b6] focus:outline-none">
                 <option value="video">Video</option>
-                <option value="document">Document (PDF)</option>
+                <option value="pdf">Document (PDF)</option>
                 <option value="quiz">Quiz</option>
                 <option value="assignment">Assignment</option>
                 <option value="live">Live Session</option>
@@ -204,7 +204,7 @@ export default function AdminAddLessonView({ onBack, onAdd }: AdminAddLessonView
             </div>
           )}
 
-          {form.type === "document" && (
+          {form.type === "pdf" && (
             <div>
               <label className="font-bold text-slate-700 block mb-1.5">PDF URL</label>
               <input type="url" placeholder="https://..." value={form.pdf_url} onChange={(e) => update("pdf_url", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 focus:border-[#0077b6] focus:outline-none" />

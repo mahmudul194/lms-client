@@ -1,19 +1,23 @@
 "use client";
 
 import React from "react";
-import { CheckCircle2, UserCheck, Check, X } from "lucide-react";
+import { CheckCircle2, UserCheck, Check, X, FileText, Calendar } from "lucide-react";
 import { PendingApproval } from "@/types/dashboard";
 
 interface AdminPaymentQueueTableProps {
   pendingApprovals: PendingApproval[];
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
+  onViewInvoice: (id: string) => void;
+  onViewInstallments: (id: string) => void;
 }
 
 export default function AdminPaymentQueueTable({
   pendingApprovals,
   onApprove,
   onReject,
+  onViewInvoice,
+  onViewInstallments,
 }: AdminPaymentQueueTableProps) {
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-4 font-sans">
@@ -81,29 +85,41 @@ export default function AdminPaymentQueueTable({
                   )}
                 </td>
                 <td className="p-4 text-right">
-                  {item.status === "Approved" ? (
-                    <span className="inline-flex items-center gap-1 text-emerald-700 font-extrabold text-xs">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Approved
-                    </span>
-                  ) : item.status === "Rejected" ? (
-                    <span className="text-rose-600 font-extrabold text-xs">Rejected</span>
-                  ) : (
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => onApprove(item.id)}
-                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs cursor-pointer shadow-xs flex items-center gap-1"
-                      >
-                        <Check className="w-3.5 h-3.5" />
-                        <span>Approve</span>
+                  <div className="flex flex-col items-end gap-2">
+                    {item.status === "Approved" ? (
+                      <span className="inline-flex items-center gap-1 text-emerald-700 font-extrabold text-xs">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Approved
+                      </span>
+                    ) : item.status === "Rejected" ? (
+                      <span className="text-rose-600 font-extrabold text-xs">Rejected</span>
+                    ) : (
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => onApprove(item.id)}
+                          className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs cursor-pointer shadow-xs flex items-center gap-1"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                          <span>Approve</span>
+                        </button>
+                        <button
+                          onClick={() => onReject(item.id)}
+                          className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-700 text-slate-700 font-bold text-xs cursor-pointer"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
+                    
+                    {/* Invoice & Installment Action Buttons */}
+                    <div className="flex items-center justify-end gap-2 mt-1">
+                      <button onClick={() => window.open(`/dashboard/admin/invoice/${item.id}`, "_blank")} className="px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs cursor-pointer flex items-center gap-1">
+                        <FileText className="w-3.5 h-3.5" /> Invoice
                       </button>
-                      <button
-                        onClick={() => onReject(item.id)}
-                        className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-700 text-slate-700 font-bold text-xs cursor-pointer"
-                      >
-                        <X className="w-3.5 h-3.5" />
+                      <button onClick={() => onViewInstallments(item.id)} className="px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs cursor-pointer flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5" /> Installments
                       </button>
                     </div>
-                  )}
+                  </div>
                 </td>
               </tr>
             )))}

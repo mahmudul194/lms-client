@@ -8,6 +8,7 @@ export interface AuthUser {
   email: string;
   phone?: string;
   role: string;
+  isDeviceLocked?: boolean;
 }
 
 export interface AuthSuccessData {

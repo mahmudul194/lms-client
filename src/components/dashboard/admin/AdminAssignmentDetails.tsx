@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { ArrowLeft, Edit, Trash2, Calendar, FileText, CheckCircle, Link as LinkIcon, BookOpen, Clock } from "lucide-react";
 import { assignmentsApi, AssignmentItem, CreateAssignmentPayload } from "@/services/api/assignmentsApi";
 import AdminEditAssignmentModal from "./AdminEditAssignmentModal";
+import AdminAssignmentSubmissionsList from "./AdminAssignmentSubmissionsList";
 
 interface AdminAssignmentDetailsProps {
   assignmentId: string;
@@ -168,6 +169,14 @@ export default function AdminAssignmentDetails({ assignmentId, onBack, onDelete 
         onClose={() => setIsEditing(false)}
         onUpdate={handleUpdate}
       />
+
+      {/* Submissions Section */}
+      <div className="pt-8 border-t border-slate-200 mt-8">
+        <AdminAssignmentSubmissionsList 
+          assignmentId={assignment.id} 
+          totalMarks={assignment.totalMarks} 
+        />
+      </div>
     </div>
   );
 }

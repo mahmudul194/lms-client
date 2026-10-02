@@ -64,6 +64,18 @@ export const studentsApi = {
     return apiFetch<PaginatedStudents>(`/students${qs ? `?${qs}` : ""}`);
   },
 
+  async getMyProfile(): Promise<ApiResponse<StudentRecord>> {
+    return apiFetch<StudentRecord>("/students/profile/my");
+  },
+
+  async updateMyProfile(payload: Partial<CreateStudentPayload> | FormData): Promise<ApiResponse<StudentRecord>> {
+    const isForm = payload instanceof FormData;
+    return apiFetch<StudentRecord>("/students/profile/my", {
+      method: "PATCH",
+      body: isForm ? payload : JSON.stringify(payload),
+    });
+  },
+
   async getStudentById(id: string): Promise<ApiResponse<StudentRecord>> {
     return apiFetch<StudentRecord>(`/students/${id}`);
   },

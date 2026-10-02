@@ -19,19 +19,74 @@ export default function StudentCoursePlayerTab() {
         const { enrollmentsApi } = await import("@/services/api/enrollmentsApi");
         const res = await enrollmentsApi.getMyEnrollments();
         if (res.statusCode === 200 && Array.isArray(res.data) && res.data.length > 0) {
-          const apiCourses: EnrolledCourse[] = res.data.map((enr: any) => ({
-            id: enr.batch?.course?.id || enr.batch_id || enr.id,
-            title: enr.batch?.course?.title || enr.batch?.name || "Enrolled Course",
-            category: "BIM Engineering",
-            batch: enr.batch?.name || "Active Batch",
-            instructor: "Course Instructor",
-            thumbnail: enr.batch?.course?.thumbnail || "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=800&auto=format&fit=crop",
-            totalLessons: 24,
-            completedLessons: 0,
-            progressPercent: 0,
-            modules: [],
-          }));
+          const apiCourses: EnrolledCourse[] = res.data.map((enr: any) => {
+            const course = enr.batch?.course || {};
+            const categoryName = course.category?.name || "Uncategorized";
+            const instructor = course.mentors && course.mentors.length > 0 ? course.mentors.map((m: any) => m.name).join(", ") : "Course Instructor";
+            const thumbnail = course.thumbnail || "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=800&auto=format&fit=crop";
+            
+            const progressArr = enr.lesson_progress || [];
+            const completedLessonIds = progressArr.filter((p: any) => p.is_completed).map((p: any) => p.lesson_id);
+
+            let totalLessonsCount = 0;
+            let completedLessonsCount = 0;
+
+            const mappedModules = (course.modules || []).sort((a: any, b: any) => a.order - b.order).map((mod: any, mIdx: number) => {
+               const mappedLessons = (mod.lessons || []).sort((a: any, b: any) => a.order - b.order).map((l: any, lIdx: number) => {
+                  totalLessonsCount++;
+                  const isCompleted = completedLessonIds.includes(l.id);
+                  if (isCompleted) completedLessonsCount++;
+
+                  return {
+                     id: l.id,
+                     lessonNo: lIdx + 1,
+                     title: l.title || "",
+                     duration: l.duration ? `${l.duration} min` : "0:00",
+                     videoUrl: l.video_url || "",
+                     pdfUrl: l.pdf_url || "",
+                     textContent: l.text_content || "",
+                     type: l.type || "video",
+                     description: l.description || "",
+                     resources: [],
+                     isCompleted: isCompleted,
+                     isUnlocked: true,
+                  };
+               });
+               return {
+                  id: mod.id,
+                  moduleNo: `Module ${mIdx + 1}`,
+                  title: mod.title || "",
+                  lessons: mappedLessons,
+               };
+            });
+
+            return {
+              id: course.id || enr.batch_id || enr.id,
+              batchId: enr.batch_id || (enr.batch ? enr.batch.id : ""),
+              title: course.title || enr.batch?.name || "Enrolled Course",
+              category: categoryName,
+              batch: enr.batch?.name || "Active Batch",
+              instructor: instructor,
+              thumbnail: thumbnail,
+              totalLessons: totalLessonsCount,
+              completedLessons: completedLessonsCount,
+              progressPercent: totalLessonsCount > 0 ? Math.round((completedLessonsCount / totalLessonsCount) * 100) : 0,
+              modules: mappedModules,
+            };
+          });
           setCourses(apiCourses);
+
+          if (typeof window !== "undefined") {
+            const sp = new URLSearchParams(window.location.search);
+            const cId = sp.get("courseId") || localStorage.getItem("bim_active_course_id");
+            if (cId) {
+              const found = apiCourses.find((c) => c.id === cId);
+              if (found) {
+                setSelectedCourse(found);
+                if (sp.get("play") === "true") setIsPlayingVideo(true);
+              }
+            }
+          }
         } else {
           setCourses([]);
         }
@@ -39,17 +94,6 @@ export default function StudentCoursePlayerTab() {
         setCourses([]);
       }
     })();
-
-    if (typeof window === "undefined") return;
-    const sp = new URLSearchParams(window.location.search);
-    const cId = sp.get("courseId") || localStorage.getItem("bim_active_course_id");
-    if (cId) {
-      const found = courses.find((c) => c.id === cId);
-      if (found) {
-        setSelectedCourse(found);
-        if (sp.get("play") === "true") setIsPlayingVideo(true);
-      }
-    }
   }, []);
 
   const handleSelectCourse = (course: EnrolledCourse) => {

@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { ArrowLeft, BookOpen, Video, ArrowRight, Sparkles, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, BookOpen, Video, ArrowRight, ClipboardList, FileText } from "lucide-react";
 import { EnrolledCourse } from "@/types/dashboard";
-import StudentModulesListView from "./StudentModulesListView";
 import StudentLiveRecordingsView from "./StudentLiveRecordingsView";
+import StudentAssignmentsView from "./StudentAssignmentsView";
+import StudentResourcesView from "./StudentResourcesView";
 
 interface StudentCourseHubProps {
   course: EnrolledCourse;
@@ -13,25 +14,38 @@ interface StudentCourseHubProps {
 }
 
 export default function StudentCourseHub({ course, onBackToCourses, onOpenPlayer }: StudentCourseHubProps) {
-  const [subView, setSubView] = useState<"hub" | "modules" | "live_recordings">("hub");
-
-  if (subView === "modules") {
-    return (
-      <StudentModulesListView
-        course={course}
-        onBack={() => setSubView("hub")}
-        onSelectLesson={(lessonId) => onOpenPlayer(lessonId)}
-      />
-    );
-  }
+  const [subView, setSubView] = useState<"hub" | "live_recordings" | "assignments" | "resources">("hub");
 
   if (subView === "live_recordings") {
     return (
       <StudentLiveRecordingsView
         courseTitle={course.title}
         batch={course.batch}
+        batchId={course.batchId}
         onBack={() => setSubView("hub")}
-        onPlayRecording={() => onOpenPlayer()}
+        onPlayRecording={(videoUrl, title) => onOpenPlayer()}
+      />
+    );
+  }
+
+  if (subView === "assignments") {
+    return (
+      <StudentAssignmentsView
+        courseTitle={course.title}
+        batch={course.batch}
+        batchId={course.batchId}
+        onBack={() => setSubView("hub")}
+      />
+    );
+  }
+
+  if (subView === "resources") {
+    return (
+      <StudentResourcesView
+        courseTitle={course.title}
+        batch={course.batch}
+        batchId={course.batchId}
+        onBack={() => setSubView("hub")}
       />
     );
   }
@@ -70,11 +84,11 @@ export default function StudentCourseHub({ course, onBackToCourses, onOpenPlayer
         </div>
       </div>
 
-      {/* Two Core Learning Cards: (1) Course Modules & (2) Live Sessions */}
+      {/* Core Learning Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Card 1: Course Modules */}
         <div
-          onClick={() => setSubView("modules")}
+          onClick={() => onOpenPlayer()}
           className="p-7 sm:p-8 rounded-3xl bg-white border-2 border-slate-200 hover:border-[#0077b6] hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between group space-y-6"
         >
           <div className="space-y-4">
@@ -83,7 +97,7 @@ export default function StudentCourseHub({ course, onBackToCourses, onOpenPlayer
                 <BookOpen className="w-7 h-7" />
               </div>
               <span className="px-3 py-1 rounded-full bg-sky-100 text-[#0077b6] text-xs font-black">
-                {course.modules.length} Modules Available
+                {course.modules.length} Modules
               </span>
             </div>
 
@@ -103,7 +117,7 @@ export default function StudentCourseHub({ course, onBackToCourses, onOpenPlayer
           </div>
         </div>
 
-        {/* Card 2: Live Sessions (Pre-recorded Live Videos) */}
+        {/* Card 2: Live Sessions */}
         <div
           onClick={() => setSubView("live_recordings")}
           className="p-7 sm:p-8 rounded-3xl bg-white border-2 border-slate-200 hover:border-emerald-500 hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between group space-y-6"
@@ -114,7 +128,7 @@ export default function StudentCourseHub({ course, onBackToCourses, onOpenPlayer
                 <Video className="w-7 h-7" />
               </div>
               <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black">
-                Pre-recorded Live Classes
+                Live Classes
               </span>
             </div>
 
@@ -123,13 +137,75 @@ export default function StudentCourseHub({ course, onBackToCourses, onOpenPlayer
                 Live Sessions
               </h3>
               <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1 leading-relaxed">
-                Watch pre-recorded video backups of all live classes conducted in your batch, with instructor notes and practice BIM models.
+                Watch pre-recorded video backups of all live classes conducted in your batch, with instructor notes.
               </p>
             </div>
           </div>
 
           <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm font-bold text-emerald-700">
-            <span>Watch Live Class Recordings</span>
+            <span>Watch Live Classes</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </div>
+
+        {/* Card 3: Assignments */}
+        <div
+          onClick={() => setSubView("assignments")}
+          className="p-7 sm:p-8 rounded-3xl bg-white border-2 border-slate-200 hover:border-amber-500 hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between group space-y-6"
+        >
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 group-hover:scale-110 transition-transform">
+                <ClipboardList className="w-7 h-7" />
+              </div>
+              <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-black">
+                Tasks & Exams
+              </span>
+            </div>
+
+            <div>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-amber-700 transition-colors">
+                Assignments
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1 leading-relaxed">
+                View, download, and complete batch assignments to test your skills and earn your certification.
+              </p>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm font-bold text-amber-700">
+            <span>View Batch Assignments</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </div>
+
+        {/* Card 4: Resources */}
+        <div
+          onClick={() => setSubView("resources")}
+          className="p-7 sm:p-8 rounded-3xl bg-white border-2 border-slate-200 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between group space-y-6"
+        >
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 group-hover:scale-110 transition-transform">
+                <FileText className="w-7 h-7" />
+              </div>
+              <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-800 text-xs font-black">
+                Materials & Links
+              </span>
+            </div>
+
+            <div>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-purple-700 transition-colors">
+                Resources
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1 leading-relaxed">
+                Access class materials, PDF notes, reference links, and other files provided by your instructor.
+              </p>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm font-bold text-purple-700">
+            <span>Browse Materials</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </div>
         </div>
@@ -137,3 +213,4 @@ export default function StudentCourseHub({ course, onBackToCourses, onOpenPlayer
     </div>
   );
 }
+

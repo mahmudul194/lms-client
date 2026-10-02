@@ -30,20 +30,26 @@ export default function AdminDashboardView({ adminTab, setAdminTab }: { adminTab
         const { enrollmentsApi } = await import("@/services/api/enrollmentsApi");
         const res = await enrollmentsApi.getAllEnrollments({ limit: 50 });
         if (res.statusCode === 200 && res.data?.items) {
-          const apiApprovals: PendingApproval[] = res.data.items.map((e) => ({
-            id: e.id,
-            name: e.student?.name || "Student",
-            course: e.batch?.course?.title || e.batch?.name || "BIM Engineering Course",
-            method: e.paid_amount ? `Direct (৳${e.paid_amount})` : "Manual Entry",
-            amount: `৳${(e.paid_amount || e.total_amount).toLocaleString()}`,
-            phone: e.student?.phone || "N/A",
-            status: e.status === "active" ? "Approved" : e.status === "cancelled" ? "Rejected" : "Pending",
-            batch: e.batch?.name,
-            email: e.student?.email,
-            totalFee: `৳${e.total_amount?.toLocaleString()}`,
-            advancePaid: `৳${(e.paid_amount || 0).toLocaleString()}`,
-            dueAmount: `৳${Math.max(0, (e.total_amount || 0) - (e.paid_amount || 0)).toLocaleString()}`,
-          }));
+          const apiApprovals: PendingApproval[] = res.data.items.map((e) => {
+            const total = Number(e.total_amount) || 0;
+            const paid = Number(e.paid_amount) || 0;
+            const due = Math.max(0, total - paid);
+            
+            return {
+              id: e.id,
+              name: e.student?.name || "Student",
+              course: e.batch?.course?.title || e.batch?.name || "BIM Engineering Course",
+              method: e.paid_amount ? `Direct (৳${paid})` : "Manual Entry",
+              amount: `৳${(paid || total).toLocaleString()}`,
+              phone: e.student?.phone || "N/A",
+              status: e.status?.toLowerCase() === "active" ? "Approved" : e.status?.toLowerCase() === "cancelled" ? "Rejected" : "Pending",
+              batch: e.batch?.name,
+              email: e.student?.email,
+              totalFee: `৳${total.toLocaleString()}`,
+              advancePaid: `৳${paid.toLocaleString()}`,
+              dueAmount: `৳${due.toLocaleString()}`,
+            };
+          });
           setPendingApprovals(apiApprovals);
         }
       } catch { }

@@ -33,10 +33,10 @@ export interface NavItem {
 
 export const STUDENT_NAV_ITEMS: NavItem[] = [
   { id: "overview", label: "Overview", icon: Sparkles },
-  { id: "courses", label: "Course & Videos", icon: BookOpen, badge: "28/45" },
+  { id: "courses", label: "My Courses", icon: BookOpen },
   { id: "live", label: "Live Schedule", icon: Video, badge: "Live" },
   { id: "assignments", label: "Assignments", icon: FileCheck, badge: "1 Due" },
-  { id: "resources", label: "Project Files", icon: FolderDown },
+  { id: "resources", label: "Resources", icon: FolderDown },
   { id: "payments", label: "Installments", icon: CreditCard, badge: "৳4k Due" },
   { id: "certificate", label: "Certificate", icon: Award },
   { id: "profile", label: "Settings", icon: User },

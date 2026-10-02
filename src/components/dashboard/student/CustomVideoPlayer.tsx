@@ -109,7 +109,13 @@ export default function CustomVideoPlayer({ videoUrl, title, onEnded }: CustomVi
       {isYouTube ? (
         <div className="absolute inset-0 w-full h-full pointer-events-none scale-100 select-none"><div id={ytElementId} className="w-full h-full" /></div>
       ) : (
-        <video ref={videoRef} key={videoUrl} src={videoUrl} onTimeUpdate={() => videoRef.current && setHtml5Time(videoRef.current.currentTime)} onLoadedMetadata={() => videoRef.current && setHtml5Duration(videoRef.current.duration)} onEnded={() => { setHtml5Playing(false); onEnded?.(); }} onError={() => setHtml5Playing(false)} className="w-full h-full object-contain pointer-events-none" playsInline preload="metadata" />
+        <video ref={videoRef} key={videoUrl} src={videoUrl} onTimeUpdate={() => videoRef.current && setHtml5Time(videoRef.current.currentTime)} onLoadedMetadata={() => videoRef.current && setHtml5Duration(videoRef.current.duration)} onEnded={() => { setHtml5Playing(false); onEnded?.(); }} onError={() => { setHtml5Playing(false); setPosterErr(true); }} className="w-full h-full object-contain pointer-events-none" playsInline preload="metadata" />
+      )}
+      {!isYouTube && posterErr && (
+         <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900 z-10 text-white p-4 text-center">
+            <span className="text-rose-500 font-bold mb-2">Error loading video</span>
+            <span className="text-sm text-slate-300">The provided URL is neither a valid 11-character YouTube ID nor a supported direct video file. Please check the video source.</span>
+         </div>
       )}
       {!isPlaying && currentTime === 0 && isYouTube && (
         <img src={posterErr ? `https://img.youtube.com/vi/${ytVideoId}/hqdefault.jpg` : `https://img.youtube.com/vi/${ytVideoId}/maxresdefault.jpg`} onError={() => setPosterErr(true)} alt={title} className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10 brightness-95 transition-opacity duration-300" />

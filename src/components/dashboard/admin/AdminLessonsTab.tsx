@@ -264,7 +264,7 @@ export default function AdminLessonsTab() {
             >
               <option value="all">All Content Types</option>
               <option value="video">Video Lecture</option>
-              <option value="document">PDF / Document</option>
+              <option value="pdf">PDF / Document</option>
               <option value="quiz">Interactive Quiz</option>
               <option value="assignment">Assignment</option>
               <option value="live">Live Class</option>

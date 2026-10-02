@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, PlayCircle, Clock, Calendar, Download } from "lucide-react";
+import { ArrowLeft, PlayCircle, Clock, Calendar, Download, Video, Radio } from "lucide-react";
 import { LiveScheduleItem } from "@/services/api/liveSchedulesApi";
 
 interface StudentLiveRecordingsViewProps {
   courseTitle: string;
   batch: string;
+  batchId?: string;
   onBack: () => void;
   onPlayRecording: (videoUrl: string, title: string) => void;
 }
@@ -14,6 +15,7 @@ interface StudentLiveRecordingsViewProps {
 export default function StudentLiveRecordingsView({
   courseTitle,
   batch,
+  batchId,
   onBack,
   onPlayRecording,
 }: StudentLiveRecordingsViewProps) {
@@ -21,10 +23,15 @@ export default function StudentLiveRecordingsView({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!batchId) {
+      setLoading(false);
+      return;
+    }
+    
     (async () => {
       try {
         const { liveSchedulesApi } = await import("@/services/api/liveSchedulesApi");
-        const res = await liveSchedulesApi.getAllLiveSchedules();
+        const res = await liveSchedulesApi.getAllLiveSchedules({ batchId });
         if (res.statusCode === 200 && res.data?.items) {
           setRecordings(res.data.items);
         }
@@ -32,7 +39,10 @@ export default function StudentLiveRecordingsView({
         setLoading(false);
       }
     })();
-  }, []);
+  }, [batchId]);
+
+  const upcomingSessions = recordings.filter(r => r.status === 'scheduled' || r.status === 'live');
+  const pastRecordings = recordings.filter(r => r.status === 'completed');
 
   return (
     <div className="space-y-6 font-sans">
@@ -45,38 +55,80 @@ export default function StudentLiveRecordingsView({
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2.5 py-0.5 rounded-md bg-[#002b5b] text-white text-xs font-bold">{batch}</span>
-              <span className="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-xs font-bold">Live Session Recordings</span>
+              <span className="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-xs font-bold">Live Classes</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900">{courseTitle} — Live Class Recordings</h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Watch recorded videos of live classes conducted in your batch</p>
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900">{courseTitle} — Live Sessions</h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">View your upcoming live classes and past recordings</p>
           </div>
-          <span className="px-4 py-1.5 rounded-full bg-sky-50 text-[#0077b6] text-xs font-bold border border-sky-200 w-fit">{recordings.length} Recorded Sessions</span>
+          <span className="px-4 py-1.5 rounded-full bg-sky-50 text-[#0077b6] text-xs font-bold border border-sky-200 w-fit">{recordings.length} Total Sessions</span>
         </div>
       </div>
 
-      <div className="space-y-3.5">
+      <div className="space-y-8">
         {loading ? (
-          <div className="p-8 text-center text-slate-400 bg-white rounded-3xl border border-slate-200">Loading recordings...</div>
+          <div className="p-8 text-center text-slate-400 bg-white rounded-3xl border border-slate-200">Loading sessions...</div>
         ) : recordings.length === 0 ? (
-          <div className="p-8 text-center text-slate-400 bg-white rounded-3xl border border-slate-200">No live class recordings available yet for this batch.</div>
+          <div className="p-8 text-center text-slate-400 bg-white rounded-3xl border border-slate-200">No live sessions have been scheduled for this batch yet.</div>
         ) : (
-          recordings.map((rec, i) => (
-            <div key={rec.id} className="p-5 sm:p-6 rounded-3xl border border-slate-200 bg-white hover:border-[#0077b6] hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-1 rounded-lg bg-[#002b5b] text-white text-xs font-black">Class {i + 1}</span>
-                  <h4 className="text-base font-black text-slate-900 leading-snug">{rec.title}</h4>
-                </div>
-                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 font-medium">
-                  <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-[#0077b6]" /> {new Date(rec.startTime).toLocaleDateString()}</span>
-                  <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-[#0077b6]" /> 1h 30m</span>
+          <>
+            {/* Upcoming Sessions */}
+            {upcomingSessions.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                  <Radio className="w-5 h-5 text-rose-500 animate-pulse" />
+                  Upcoming & Live Sessions
+                </h3>
+                <div className="space-y-3.5">
+                  {upcomingSessions.map((rec) => (
+                    <div key={rec.id} className="p-5 sm:p-6 rounded-3xl border border-rose-100 bg-rose-50/30 hover:border-rose-300 hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2.5 py-1 rounded-lg text-white text-xs font-black ${rec.status === 'live' ? 'bg-rose-500 animate-pulse' : 'bg-[#002b5b]'}`}>
+                            {rec.status === 'live' ? 'LIVE NOW' : 'UPCOMING'}
+                          </span>
+                          <h4 className="text-base font-black text-slate-900 leading-snug">{rec.title}</h4>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 font-medium">
+                          <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-rose-500" /> {new Date(rec.startTime).toLocaleString()}</span>
+                        </div>
+                      </div>
+                      <a href={rec.meetingUrl} target="_blank" rel="noreferrer" className="px-5 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer shrink-0">
+                        <Video className="w-4 h-4" /> <span>Join Session</span>
+                      </a>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <button onClick={() => onPlayRecording(rec.meetingUrl, rec.title)} className="px-5 py-2.5 rounded-xl bg-[#0077b6] hover:bg-[#002b5b] text-white text-xs font-bold flex items-center gap-2 shadow-sm transition-all cursor-pointer shrink-0">
-                <PlayCircle className="w-4 h-4" /> <span>Watch Recording</span>
-              </button>
-            </div>
-          ))
+            )}
+
+            {/* Past Recordings */}
+            {pastRecordings.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                  <PlayCircle className="w-5 h-5 text-[#0077b6]" />
+                  Past Recordings
+                </h3>
+                <div className="space-y-3.5">
+                  {pastRecordings.map((rec, i) => (
+                    <div key={rec.id} className="p-5 sm:p-6 rounded-3xl border border-slate-200 bg-white hover:border-[#0077b6] hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-black">Completed</span>
+                          <h4 className="text-base font-black text-slate-900 leading-snug">{rec.title}</h4>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 font-medium">
+                          <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-slate-400" /> {new Date(rec.startTime).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      <button onClick={() => onPlayRecording(rec.meetingUrl, rec.title)} className="px-5 py-2.5 rounded-xl bg-[#0077b6] hover:bg-[#002b5b] text-white text-xs font-bold flex items-center gap-2 shadow-sm transition-all cursor-pointer shrink-0">
+                        <PlayCircle className="w-4 h-4" /> <span>Watch Recording</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

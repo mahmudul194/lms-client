@@ -1,15 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { UserPlus, X, CheckCircle2, AlertCircle } from "lucide-react";
 import { PendingApproval } from "@/types/dashboard";
 import { useIsMounted } from "@/hooks/useIsMounted";
-
-const INITIAL_FORM = {
-  name: "", phone: "", course: "Revit Combo Pro (Arch + Struct + MEP)", batch: "8th Live Batch",
-  method: "bKash Personal", trxId: "", totalFee: "16000", advancePaid: "5000", note: "",
-};
 
 interface AdminManualAdmissionModalProps {
   isOpen: boolean;
@@ -23,116 +18,213 @@ export default function AdminManualAdmissionModal({
   onEnroll,
 }: AdminManualAdmissionModalProps) {
   const mounted = useIsMounted();
-  const [form, setForm] = useState(INITIAL_FORM);
+  const [students, setStudents] = useState<any[]>([]);
+  const [batches, setBatches] = useState<any[]>([]);
+  
+  const [form, setForm] = useState({
+    student_id: "",
+    batch_id: "",
+    total_amount: "",
+    paid_amount: "",
+    transaction_id: ""
+  });
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchData();
+    }
+  }, [isOpen]);
+
+  const fetchData = async () => {
+    try {
+      const { studentsApi, batchesApi } = await import("@/services/api");
+      const [sRes, bRes] = await Promise.all([
+        studentsApi.getAllStudents({ limit: 100 }),
+        batchesApi.getAllBatches({ limit: 100 })
+      ]);
+      if (sRes.data?.items) setStudents(sRes.data.items);
+      if (bRes.data?.items) setBatches(bRes.data.items);
+    } catch (e) {
+      console.error("Failed to load students/batches", e);
+    }
+  };
 
   if (!mounted || !isOpen) return null;
 
-  const total = Number(form.totalFee) || 0;
-  const advance = Number(form.advancePaid) || 0;
+  const total = Number(form.total_amount) || 0;
+  const advance = Number(form.paid_amount) || 0;
   const due = Math.max(0, total - advance);
+
   const update = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
 
-  const handleSubmit = async (e: React.SubmitEvent) => {
+  const handleBatchChange = (batchId: string) => {
+    const selectedBatch = batches.find((b) => b.id === batchId);
+    let defaultPrice = "";
+    if (selectedBatch) {
+      defaultPrice = (selectedBatch.discount_price || selectedBatch.price || 0).toString();
+    }
+    setForm((prev) => ({ ...prev, batch_id: batchId, total_amount: defaultPrice }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.student_id || !form.batch_id || !form.paid_amount) {
+      alert("Please fill out required fields.");
+      return;
+    }
+    
+    setIsSubmitting(true);
     try {
-      const { usersApi, studentsApi, enrollmentsApi, batchesApi } = await import("@/services/api");
-      const email = `${form.name.trim().toLowerCase().replace(/\s+/g, "")}${form.phone.slice(-4)}@gmail.com`;
-      const uRes = await usersApi.createUser({ name: form.name.trim(), phone: form.phone.trim(), email, password: "password123", role: "student" });
-      const sRes = await studentsApi.createStudent({ name: form.name.trim(), email, phone: form.phone.trim(), userId: uRes.data?.id, technology: form.course });
-      const bRes = await batchesApi.getAllBatches({ limit: 1 });
-      const bId = bRes.data?.items?.[0]?.id;
-      if (bId && (sRes.data?.id || uRes.data?.id)) {
-        await enrollmentsApi.manualEnrollment({ student_id: sRes.data?.id || uRes.data?.id || "", batch_id: bId, total_amount: total, paid_amount: advance, transaction_id: form.trxId.trim() || undefined });
+      const { enrollmentsApi } = await import("@/services/api/enrollmentsApi");
+      const payload = {
+        student_id: form.student_id,
+        batch_id: form.batch_id,
+        total_amount: Number(form.total_amount),
+        paid_amount: Number(form.paid_amount),
+        transaction_id: form.transaction_id || undefined,
+      };
+      
+      const res = await enrollmentsApi.manualEnrollment(payload);
+      
+      if (res.statusCode !== 201) {
+        alert(res.message || "Failed to enroll manually");
+        setIsSubmitting(false);
+        return;
       }
-    } catch {}
-    onEnroll({
-      id: `adm-${Date.now()}`,
-      name: form.name.trim(),
-      phone: form.phone.trim(),
-      course: form.course,
-      batch: form.batch,
-      method: `${form.method} (${form.trxId.trim() || "CASH-DESK"})`,
-      amount: `৳${advance.toLocaleString()}`,
-      totalFee: `৳${total.toLocaleString()}`,
-      advancePaid: `৳${advance.toLocaleString()}`,
-      dueAmount: `৳${due.toLocaleString()}`,
-      trxId: form.trxId.trim(),
-      note: form.note.trim(),
-      status: "Pending",
-    });
-    onClose();
+      
+      const st = students.find((s) => s.id === form.student_id);
+      const ba = batches.find((b) => b.id === form.batch_id);
+      
+      onEnroll({
+        id: res.data?.id || `adm-${Date.now()}`,
+        name: st?.name || "Student",
+        phone: st?.phone || "N/A",
+        course: ba?.course?.title || ba?.name || "Course",
+        batch: ba?.name || "Batch",
+        method: "Manual TrxID",
+        amount: `৳${form.paid_amount}`,
+        totalFee: `৳${form.total_amount || 0}`,
+        advancePaid: `৳${form.paid_amount}`,
+        dueAmount: `৳${Math.max(0, Number(form.total_amount) - Number(form.paid_amount))}`,
+        trxId: form.transaction_id,
+        note: "",
+        status: "Approved",
+      });
+      
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to enroll manually");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 font-sans animate-fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-4 shadow-2xl border border-slate-100 ring-1 ring-black/5 animate-scale-in my-8 text-xs sm:text-sm">
+      <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-4 shadow-2xl border border-slate-100 ring-1 ring-black/5 animate-scale-in my-8 text-xs sm:text-sm">
         <div className="flex items-start justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-sky-50 text-[#0077b6] flex items-center justify-center border border-sky-100 shrink-0"><UserPlus className="w-5 h-5" /></div>
             <div>
-              <h3 className="text-lg font-black text-slate-900">Manual Student Admission & TrxID Entry</h3>
-              <p className="text-xs text-slate-500">Record offline/direct student payments, advance fees & due tracking</p>
+              <h3 className="text-lg font-black text-slate-900">Manual Student Admission</h3>
+              <p className="text-xs text-slate-500">Select student & batch to record offline payment</p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"><X className="w-5 h-5" /></button>
         </div>
 
         {/* Live Due Amount Calculation Banner */}
-        <div className={`p-3.5 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs ${
-          due > 0 ? "bg-amber-50/90 border-amber-200 text-amber-900" : "bg-emerald-50 border-emerald-200 text-emerald-900"
-        }`}>
-          <div className="flex items-center gap-2">
-            {due > 0 ? <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" /> : <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
-            <span><strong>Total Fee: ৳{total.toLocaleString()}</strong> — Advance: <strong>৳{advance.toLocaleString()}</strong></span>
-          </div>
-          <span className={`px-3 py-1 rounded-full font-semibold font-bold text-xs shrink-0 ${
-            due > 0 ? "bg-amber-200/80 text-amber-950" : "bg-emerald-200/80 text-emerald-950"
+        {form.batch_id && (
+          <div className={`p-3.5 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs ${
+            due > 0 ? "bg-amber-50/90 border-amber-200 text-amber-900" : "bg-emerald-50 border-emerald-200 text-emerald-900"
           }`}>
-            {due > 0 ? `Remaining Due (পাবো): ৳${due.toLocaleString()}` : "Fully Paid (100%)"}
-          </span>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input type="text" required placeholder="Student Full Name" value={form.name} onChange={(e) => update("name", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none" />
-            <input type="tel" required placeholder="Phone Number (+880 17XX...)" value={form.phone} onChange={(e) => update("phone", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] font-semibold focus:outline-none" />
+            <div className="flex items-center gap-2">
+              {due > 0 ? <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" /> : <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
+              <span><strong>Total Fee: ৳{total.toLocaleString()}</strong> — Advance: <strong>৳{advance.toLocaleString()}</strong></span>
+            </div>
+            <span className={`px-3 py-1 rounded-full font-semibold font-bold text-xs shrink-0 ${
+              due > 0 ? "bg-amber-200/80 text-amber-950" : "bg-emerald-200/80 text-emerald-950"
+            }`}>
+              {due > 0 ? `Remaining Due (পাবো): ৳${due.toLocaleString()}` : "Fully Paid (100%)"}
+            </span>
           </div>
+        )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <select value={form.course} onChange={(e) => update("course", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none">
-              <option value="Revit Combo Pro (Arch + Struct + MEP)">Revit Combo Pro (Arch + Struct + MEP)</option>
-              <option value="Tekla Steel Detailing Masterclass">Tekla Steel Detailing Masterclass</option>
-              <option value="Revit Dynamo BIM Automation">Revit Dynamo BIM Automation</option>
+        <form onSubmit={handleSubmit} className="space-y-4 text-sm mt-4">
+          <div>
+            <label className="block font-bold text-slate-700 mb-1">Select Student <span className="text-rose-500">*</span></label>
+            <select 
+              required 
+              value={form.student_id} 
+              onChange={(e) => update("student_id", e.target.value)} 
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none"
+            >
+              <option value="">-- Choose Student --</option>
+              {students.map((s) => (
+                <option key={s.id} value={s.id}>{s.name} ({s.phone || s.email})</option>
+              ))}
             </select>
-            <select value={form.batch} onChange={(e) => update("batch", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none">
-              <option value="8th Live Batch">8th Live Batch</option>
-              <option value="9th Live Batch (Upcoming)">9th Live Batch (Upcoming)</option>
-              <option value="3rd Special Weekend Batch">3rd Special Weekend Batch</option>
+          </div>
+
+          <div>
+            <label className="block font-bold text-slate-700 mb-1">Select Batch <span className="text-rose-500">*</span></label>
+            <select 
+              required 
+              value={form.batch_id} 
+              onChange={(e) => handleBatchChange(e.target.value)} 
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none"
+            >
+              <option value="">-- Choose Batch --</option>
+              {batches.map((b) => (
+                <option key={b.id} value={b.id}>{b.name} ({b.course?.title || ""})</option>
+              ))}
             </select>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <select value={form.method} onChange={(e) => update("method", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none">
-              <option value="bKash Personal">bKash (Personal Send Money)</option>
-              <option value="bKash Merchant">bKash (Merchant Payment)</option>
-              <option value="Nagad">Nagad Transfer</option>
-              <option value="Rocket">Rocket Transfer</option>
-              <option value="Bank Transfer">Bank Transfer</option>
-              <option value="Direct Cash / Desk">Direct Office Cash</option>
-            </select>
-            <input type="text" placeholder="TrxID / Money Receipt No" value={form.trxId} onChange={(e) => update("trxId", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] uppercase font-semibold font-bold focus:outline-none" />
+            <div>
+              <label className="block font-bold text-slate-700 mb-1">Total Course Fee (৳) <span className="text-rose-500">*</span></label>
+              <input 
+                type="number" 
+                required 
+                placeholder="e.g. 5000" 
+                value={form.total_amount} 
+                onChange={(e) => update("total_amount", e.target.value)} 
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none font-bold" 
+              />
+            </div>
+            <div>
+              <label className="block font-bold text-slate-700 mb-1">Paid Amount (৳) <span className="text-rose-500">*</span></label>
+              <input 
+                type="number" 
+                required 
+                placeholder="e.g. 1000" 
+                value={form.paid_amount} 
+                onChange={(e) => update("paid_amount", e.target.value)} 
+                className="w-full px-3.5 py-2.5 rounded-xl bg-amber-50 border border-amber-200 focus:bg-white focus:border-[#0077b6] focus:outline-none font-bold text-amber-900" 
+              />
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-semibold">
-            <input type="number" required placeholder="Total Fee" value={form.totalFee} onChange={(e) => update("totalFee", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none" />
-            <input type="number" required placeholder="Advance / Paid" value={form.advancePaid} onChange={(e) => update("advancePaid", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none font-bold text-[#0077b6]" />
+          <div>
+            <label className="block font-bold text-slate-700 mb-1">Transaction ID</label>
+            <input 
+              type="text" 
+              placeholder="e.g. CASH-REC-001" 
+              value={form.transaction_id} 
+              onChange={(e) => update("transaction_id", e.target.value)} 
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] uppercase font-semibold focus:outline-none" 
+            />
           </div>
 
-          <input type="text" placeholder="Office / Admission Remarks (e.g. Due on 2nd class)" value={form.note} onChange={(e) => update("note", e.target.value)} className="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none text-xs" />
-
-          <div className="flex justify-end gap-3 pt-2 border-t border-slate-100">
-            <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer">Cancel</button>
-            <button type="submit" className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#002b5b] to-[#0077b6] hover:from-[#001830] hover:to-[#005a8c] text-white font-extrabold shadow-md transition-all cursor-pointer hover:scale-102">Save & Enroll Student</button>
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+            <button type="button" onClick={onClose} disabled={isSubmitting} className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer">Cancel</button>
+            <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#002b5b] to-[#0077b6] hover:from-[#001830] hover:to-[#005a8c] text-white font-extrabold shadow-md transition-all cursor-pointer hover:scale-102 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2">
+              {isSubmitting ? "Enrolling..." : "Save & Enroll Student"}
+            </button>
           </div>
         </form>
       </div>

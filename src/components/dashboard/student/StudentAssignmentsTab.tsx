@@ -1,42 +1,47 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { FileText, CheckCircle2, Clock, UploadCloud, MessageSquare } from "lucide-react";
-import { Assignment } from "@/types/dashboard";
+import { FileText, ArrowRight, BookOpen, Clock } from "lucide-react";
+import { enrollmentsApi, EnrollmentItem } from "@/services/api/enrollmentsApi";
+import StudentAssignmentsView from "./StudentAssignmentsView";
 
-interface StudentAssignmentsTabProps {
-  assignments: Assignment[];
-  onOpenUpload: (assignmentId: number) => void;
-}
-
-export default function StudentAssignmentsTab({
-  assignments,
-  onOpenUpload,
-}: StudentAssignmentsTabProps) {
-  const [list, setList] = useState<Assignment[]>(assignments);
+export default function StudentAssignmentsTab() {
+  const [enrollments, setEnrollments] = useState<EnrollmentItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  // State for which batch assignments to view
+  const [selectedBatch, setSelectedBatch] = useState<{
+    id: string;
+    name: string;
+    courseTitle: string;
+  } | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
-        const { assignmentsApi } = await import("@/services/api");
-        const res = await assignmentsApi.getAllAssignments();
-        if (res.statusCode === 200 && res.data?.items?.length) {
-          const apiList: Assignment[] = res.data.items.map((item, idx) => ({
-            id: idx + 1,
-            title: item.title,
-            deadline: new Date(item.dueAt).toLocaleDateString(),
-            status: item.status === "closed" ? "Graded" : "Due",
-            totalMarks: item.totalMarks,
-            obtainedMarks: item.status === "closed" ? item.totalMarks : null,
-            feedback: item.description || "Reviewed by mentor",
-          }));
-          setList(apiList);
+        const res = await enrollmentsApi.getMyEnrollments();
+        if (res.statusCode === 200 && res.data) {
+          // Filter out only active enrollments if needed, but for now we'll show all
+          setEnrollments(res.data);
         }
-      } catch {}
+      } catch (e) {
+        console.error("Failed to fetch enrollments for assignments", e);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
-  const gradedCount = list.filter((a) => a.status === "Graded").length;
+  if (selectedBatch) {
+    return (
+      <StudentAssignmentsView
+        courseTitle={selectedBatch.courseTitle}
+        batch={selectedBatch.name}
+        batchId={selectedBatch.id}
+        onBack={() => setSelectedBatch(null)}
+      />
+    );
+  }
 
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6 font-sans">
@@ -44,48 +49,65 @@ export default function StudentAssignmentsTab({
         <div>
           <h3 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2.5">
             <FileText className="w-6 h-6 text-[#0077b6]" />
-            <span>Assignments & Modeling Tasks</span>
+            <span>My Assignments & Tasks</span>
           </h3>
-          <p className="text-sm text-slate-500 mt-1">Submit weekly models, CAD sheets, and receive mentor reviews</p>
-        </div>
-        <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-200 text-xs sm:text-sm">
-          <span className="font-bold text-slate-600">Submissions:</span>
-          <strong className="text-[#0077b6] font-black">{gradedCount}/{list.length} Graded</strong>
+          <p className="text-sm text-slate-500 mt-1">Select a course batch to view assignments, submit work, and check results.</p>
         </div>
       </div>
 
       <div className="space-y-4">
-        {list.map((item) => (
-          <div key={item.id} className="p-6 sm:p-7 rounded-3xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:shadow-md transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="space-y-3 flex-1 min-w-0">
-              <div className="flex items-center gap-3">
-                <span className={`px-3 py-1 rounded-full text-xs font-extrabold flex items-center gap-1.5 ${item.status === "Graded" ? "bg-emerald-100 text-emerald-900 border border-emerald-300" : "bg-amber-100 text-amber-900 border border-amber-300"}`}>
-                  {item.status === "Graded" ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
-                  <span>{item.status}</span>
-                </span>
-                <span className="text-xs sm:text-sm font-semibold text-slate-500">Due: {item.deadline}</span>
-              </div>
-              <h4 className="font-extrabold text-slate-900 text-base sm:text-lg">{item.title}</h4>
-              {item.feedback && (
-                <div className="p-4 rounded-2xl bg-white border border-slate-200 text-xs sm:text-sm text-slate-700 space-y-1">
-                  <div className="flex items-center gap-1.5 font-bold text-[#002b5b]">
-                    <MessageSquare className="w-4 h-4 text-[#0077b6]" /> <span>Mentor Review & Feedback:</span>
-                  </div>
-                  <p className="leading-relaxed pl-5 text-slate-600">{item.feedback}</p>
-                </div>
-              )}
-            </div>
-            <div className="flex items-center gap-4 shrink-0 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-4 md:pt-0 border-slate-200">
-              {item.status === "Graded" ? (
-                <div className="text-right"><span className="text-xs text-slate-400 font-bold block">Score</span><strong className="text-xl font-black text-emerald-600">{item.obtainedMarks}/{item.totalMarks}</strong></div>
-              ) : (
-                <button onClick={() => onOpenUpload(item.id)} className="px-5 py-3 rounded-2xl bg-[#0077b6] hover:bg-[#002b5b] text-white font-extrabold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-102">
-                  <UploadCloud className="w-4 h-4" /> <span>Upload Model</span>
-                </button>
-              )}
-            </div>
+        {loading ? (
+          <div className="p-8 text-center text-slate-400 font-semibold bg-slate-50 rounded-2xl border border-slate-100">
+            Loading your courses...
           </div>
-        ))}
+        ) : enrollments.length === 0 ? (
+          <div className="p-8 text-center text-slate-500 font-medium bg-slate-50 rounded-2xl border border-slate-100">
+            You are not enrolled in any courses yet.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {enrollments.map((enr) => {
+              const courseTitle = enr.batch?.course?.title || "Unknown Course";
+              const batchName = enr.batch?.name || "Unknown Batch";
+              
+              return (
+                <div 
+                  key={enr.id} 
+                  onClick={() => {
+                    if (enr.batch_id) {
+                      setSelectedBatch({
+                        id: enr.batch_id,
+                        name: batchName,
+                        courseTitle: courseTitle,
+                      });
+                    }
+                  }}
+                  className="p-6 rounded-3xl border-2 border-slate-100 bg-white hover:border-[#0077b6] hover:shadow-lg transition-all cursor-pointer group flex flex-col justify-between"
+                >
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center justify-between">
+                      <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-black">
+                        {batchName}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide shrink-0 ${enr.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                        {enr.status}
+                      </span>
+                    </div>
+                    
+                    <h4 className="font-black text-slate-900 text-lg group-hover:text-[#0077b6] transition-colors leading-tight">
+                      {courseTitle}
+                    </h4>
+                  </div>
+                  
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm font-bold text-[#0077b6]">
+                    <span>View Batch Assignments</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

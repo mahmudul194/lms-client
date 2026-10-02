@@ -1,6 +1,7 @@
 export interface ClassVideo {
   no: string;
   title: string;
+  batchId?: string;
   duration: string;
   date: string;
   videoUrl: string;
@@ -12,6 +13,7 @@ export interface ClassVideo {
 export interface LiveClass {
   id: number;
   title: string;
+  batchId?: string;
   date: string;
   time: string;
   instructor: string;
@@ -24,6 +26,7 @@ export interface LiveClass {
 export interface Assignment {
   id: number;
   title: string;
+  batchId?: string;
   deadline: string;
   totalMarks: number;
   obtainedMarks: number | null;
@@ -52,6 +55,7 @@ export interface PendingApproval {
 export interface CourseLessonItem {
   id: string;
   title: string;
+  batchId?: string;
   videoUrl: string;
   duration: string;
   resourcesCount: number;
@@ -84,8 +88,12 @@ export interface EnrolledLesson {
   id: string;
   lessonNo: number;
   title: string;
+  batchId?: string;
   duration: string;
   videoUrl: string;
+  pdfUrl?: string;
+  textContent?: string;
+  type: string;
   description: string;
   resources: { name: string; size: string; type: string }[];
   isCompleted: boolean;
@@ -96,12 +104,14 @@ export interface EnrolledModule {
   id: string;
   moduleNo: string;
   title: string;
+  batchId?: string;
   lessons: EnrolledLesson[];
 }
 
 export interface EnrolledCourse {
   id: string;
   title: string;
+  batchId?: string;
   category: string;
   batch: string;
   instructor: string;

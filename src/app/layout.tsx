@@ -31,11 +31,16 @@ export default function RootLayout({
         <RouteProgressBar />
 
         {/* Dynamic Animated Sticky Header */}
-        <Header />
+        <div className="print:hidden">
+          <Header />
+        </div>
 
-        <main className="flex-1 w-full max-w-full overflow-x-clip">{children}</main>
-        <Footer />
-        <FloatingWhatsApp />
+        <main className="flex-1 w-full max-w-full overflow-x-clip print:overflow-visible print:m-0 print:p-0">{children}</main>
+        
+        <div className="print:hidden">
+          <Footer />
+          <FloatingWhatsApp />
+        </div>
       </body>
     </html>
   );
