@@ -46,7 +46,8 @@ export const INSTRUCTOR_NAV_ITEMS: NavItem[] = [
   { id: "overview", label: "Overview", icon: Sparkles },
   { id: "batches", label: "Batches & Live Studio", icon: Video, badge: "Tonight" },
   { id: "grading", label: "Review Submissions", icon: FileCheck, badge: "3 Due" },
-  { id: "materials", label: "Handover Class Recordings", icon: Upload, badge: "Handover" },
+  { id: "materials", label: "Course Content Builder", icon: Upload },
+  { id: "resources", label: "Resources", icon: FolderDown },
   { id: "profile", label: "Trainer Profile", icon: User },
 ];
 

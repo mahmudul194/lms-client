@@ -8,9 +8,10 @@ import { batchesApi } from "@/services/api/batchesApi";
 interface AdminAddResourceViewProps {
   onBack: () => void;
   onAdd: (resource: CreateResourcePayload) => void;
+  mentorBatches?: any[];
 }
 
-export default function AdminAddResourceView({ onBack, onAdd }: AdminAddResourceViewProps) {
+export default function AdminAddResourceView({ onBack, onAdd, mentorBatches }: AdminAddResourceViewProps) {
   const [courses, setCourses] = useState<any[]>([]);
   const [batches, setBatches] = useState<any[]>([]);
   const [selectedCourseId, setSelectedCourseId] = useState("");
@@ -26,35 +27,48 @@ export default function AdminAddResourceView({ onBack, onAdd }: AdminAddResource
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const { coursesApi } = await import("@/services/api/coursesApi");
-        const res = await coursesApi.getAllCourses({ limit: 100 });
-        if (res.statusCode === 200 && res.data?.items) {
-          setCourses(res.data.items);
+    if (mentorBatches && mentorBatches.length > 0) {
+      const uniqueCourses = Array.from(
+        new Map(
+          mentorBatches.filter(b => b.course).map((b) => [b.course.id, b.course])
+        ).values()
+      );
+      setCourses(uniqueCourses);
+    } else {
+      (async () => {
+        try {
+          const { coursesApi } = await import("@/services/api/coursesApi");
+          const res = await coursesApi.getAllCourses({ limit: 100 });
+          if (res.statusCode === 200 && res.data?.items) {
+            setCourses(res.data.items);
+          }
+        } catch (e) {
+          console.error("Failed to fetch courses", e);
         }
-      } catch (e) {
-        console.error("Failed to fetch courses", e);
-      }
-    })();
-  }, []);
+      })();
+    }
+  }, [mentorBatches]);
 
   useEffect(() => {
     if (selectedCourseId) {
-      (async () => {
-        try {
-          const res = await batchesApi.getAllBatches({ course_id: selectedCourseId, limit: 100 });
-          if (res.statusCode === 200 && res.data?.items) {
-            setBatches(res.data.items);
+      if (mentorBatches && mentorBatches.length > 0) {
+        setBatches(mentorBatches.filter(b => b.course_id === selectedCourseId || b.course?.id === selectedCourseId));
+      } else {
+        (async () => {
+          try {
+            const res = await batchesApi.getAllBatches({ course_id: selectedCourseId, limit: 100 });
+            if (res.statusCode === 200 && res.data?.items) {
+              setBatches(res.data.items);
+            }
+          } catch (e) {
+            console.error("Failed to fetch batches", e);
           }
-        } catch (e) {
-          console.error("Failed to fetch batches", e);
-        }
-      })();
+        })();
+      }
     } else {
       setBatches([]);
     }
-  }, [selectedCourseId]);
+  }, [selectedCourseId, mentorBatches]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

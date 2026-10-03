@@ -3,12 +3,13 @@
 import React from "react";
 import { Sparkles, Video, Clock, FileCheck, Upload, Users, MessageSquare } from "lucide-react";
 import { UserAccount } from "@/data/dummyAccounts";
-import { InstructorBatch, StudentSubmission } from "@/data/instructorMockData";
+import { StudentSubmission } from "@/data/instructorMockData";
+import { BatchItem } from "@/services/api/batchesApi";
 import InstructorMetricsGrid from "./InstructorMetricsGrid";
 
 interface InstructorOverviewTabProps {
   currentUser: UserAccount;
-  batches: InstructorBatch[];
+  batches: BatchItem[];
   submissions: StudentSubmission[];
   onNavigateToLive: () => void;
   onNavigateToGrading: () => void;
@@ -78,9 +79,9 @@ export default function InstructorOverviewTab({
                     <strong className="text-slate-900 font-extrabold text-sm">{b.name}</strong>
                   </div>
                   <span className="text-slate-500 text-xs font-medium block mt-1">
-                    {b.schedule} • <strong className="text-slate-700">{b.studentsCount} Students</strong>
+                    {b.mode || "Online"} • <strong className="text-slate-700">{b.enrolled_count || 0} Students</strong>
                   </span>
-                  <span className="text-xs font-bold text-[#0077b6] block mt-0.5">{b.nextClassTopic}</span>
+                  <span className="text-xs font-bold text-[#0077b6] block mt-0.5 capitalize">Status: {b.status || "Upcoming"}</span>
                 </div>
                 <button
                   onClick={onNavigateToLive}

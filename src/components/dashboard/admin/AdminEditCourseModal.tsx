@@ -7,6 +7,7 @@ import { useIsMounted } from "@/hooks/useIsMounted";
 import { CourseItem, CreateCoursePayload } from "@/services/api/coursesApi";
 import { categoryApi, CategoryItem } from "@/services/api/categoryApi";
 import dynamic from "next/dynamic";
+import Select from "react-select";
 import "react-quill-new/dist/quill.snow.css";
 
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
@@ -37,8 +38,10 @@ export default function AdminEditCourseModal({
   const [duration, setDuration] = useState<number>(0);
   const [durationUnit, setDurationUnit] = useState<"hours" | "days" | "weeks" | "months" | "years">("hours");
   const [status, setStatus] = useState<"draft" | "published" | "archived" | "upcoming">("published");
+  const [mentorIds, setMentorIds] = useState<string[]>([]);
 
   const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [mentorsList, setMentorsList] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,6 +50,11 @@ export default function AdminEditCourseModal({
       categoryApi.getAllCategories({ limit: 100 }).then((res) => {
         if (res.data?.items) setCategories(res.data.items);
       }).catch(console.error);
+      import("@/services/api/mentorsApi").then(({ mentorsApi }) => {
+        mentorsApi.getAllMentors({ limit: 100 }).then((res) => {
+          if (res.data?.items) setMentorsList(res.data.items);
+        }).catch(console.error);
+      });
     }
   }, [isOpen]);
 
@@ -64,6 +72,7 @@ export default function AdminEditCourseModal({
       setDuration(course.duration || 0);
       setDurationUnit(course.duration_unit || "hours");
       setStatus(course.status || "published");
+      setMentorIds(course.mentor_ids || course.mentors?.map(m => m.id) || []);
       setError(null);
     }
   }, [course, isOpen]);
@@ -93,6 +102,7 @@ export default function AdminEditCourseModal({
         duration: Number(duration) || 0,
         duration_unit: durationUnit,
         status,
+        mentor_ids: mentorIds.length > 0 ? mentorIds : undefined,
       });
       onClose();
     } catch (err: any) {
@@ -101,6 +111,11 @@ export default function AdminEditCourseModal({
       setLoading(false);
     }
   };
+
+  const mentorOptions = mentorsList.map((m) => ({
+    value: m.id,
+    label: m.user?.name || "Unknown",
+  }));
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 font-sans animate-fade-in overflow-y-auto">
@@ -134,9 +149,9 @@ export default function AdminEditCourseModal({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5 overflow-visible">
           {/* Basic Details */}
-          <div className="bg-slate-50/70 p-5 rounded-2xl border border-slate-200/80 space-y-4">
+          <div className="bg-slate-50/70 p-5 rounded-2xl border border-slate-200/80 space-y-4 overflow-visible">
             <h4 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-2 border-b border-slate-200/60 pb-2">
               <BookOpen className="w-4 h-4 text-[#0077b6]" /> Course Identity
             </h4>
@@ -164,7 +179,7 @@ export default function AdminEditCourseModal({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 overflow-visible">
               <div>
                 <label className="font-bold text-slate-700 block mb-1.5 text-xs sm:text-sm">Category</label>
                 <select
@@ -179,6 +194,44 @@ export default function AdminEditCourseModal({
                     </option>
                   ))}
                 </select>
+              </div>
+              <div>
+                <label className="font-bold text-slate-700 block mb-1.5 text-xs sm:text-sm">Assign Mentors</label>
+                <Select
+                  isMulti
+                  options={mentorOptions}
+                  value={mentorOptions.filter((o) => mentorIds.includes(o.value))}
+                  onChange={(selected) => setMentorIds(selected ? selected.map((s: any) => s.value) : [])}
+                  placeholder="Select mentors..."
+                  className="text-slate-900 font-medium text-xs sm:text-sm"
+                  styles={{
+                    control: (base) => ({
+                      ...base,
+                      minHeight: '44px',
+                      borderRadius: '0.75rem',
+                      borderColor: '#e2e8f0',
+                      boxShadow: 'none',
+                      '&:hover': {
+                        borderColor: '#0077b6'
+                      }
+                    }),
+                    multiValue: (base) => ({
+                      ...base,
+                      backgroundColor: '#f0f9ff',
+                      borderRadius: '0.5rem',
+                    }),
+                    multiValueLabel: (base) => ({
+                      ...base,
+                      color: '#0077b6',
+                      fontWeight: 'bold',
+                    }),
+                    menuPortal: (base) => ({
+                      ...base,
+                      zIndex: 99999,
+                    })
+                  }}
+                  menuPortalTarget={document.body}
+                />
               </div>
               <div>
                 <label className="font-bold text-slate-700 block mb-1.5 text-xs sm:text-sm">Publishing Status</label>

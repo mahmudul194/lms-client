@@ -2,10 +2,10 @@
 
 import React from "react";
 import { BookOpen, Users, FileCheck, Star } from "lucide-react";
-import { InstructorBatch } from "@/data/instructorMockData";
+import { BatchItem } from "@/services/api/batchesApi";
 
 interface InstructorMetricsGridProps {
-  batches: InstructorBatch[];
+  batches: BatchItem[];
   pendingCount: number;
 }
 

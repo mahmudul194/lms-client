@@ -138,6 +138,7 @@ export type InstructorDashboardTab =
   | "live_host"
   | "grading"
   | "materials"
+  | "resources"
   | "profile";
 
 export type AdminDashboardTab =

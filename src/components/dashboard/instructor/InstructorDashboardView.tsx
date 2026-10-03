@@ -3,12 +3,14 @@
 import React, { useState, useEffect } from "react";
 import { UserAccount } from "@/data/dummyAccounts";
 import { InstructorDashboardTab } from "@/types/dashboard";
-import { InstructorBatch, StudentSubmission } from "@/data/instructorMockData";
+import { StudentSubmission } from "@/data/instructorMockData";
+import { BatchItem } from "@/services/api/batchesApi";
 import InstructorOverviewTab from "./InstructorOverviewTab";
 import InstructorBatchesTab from "./InstructorBatchesTab";
 import InstructorGradingTab from "./InstructorGradingTab";
 import InstructorMaterialsTab from "./InstructorMaterialsTab";
 import InstructorProfileTab from "./InstructorProfileTab";
+import AdminResourcesTab from "../admin/AdminResourcesTab";
 
 interface InstructorDashboardViewProps {
   currentUser: UserAccount;
@@ -21,27 +23,33 @@ export default function InstructorDashboardView({
   instructorTab,
   setInstructorTab,
 }: InstructorDashboardViewProps) {
-  const [batches, setBatches] = useState<InstructorBatch[]>([]);
+  const [batches, setBatches] = useState<BatchItem[]>([]);
   const [submissions, setSubmissions] = useState<StudentSubmission[]>([]);
+  const [assignments, setAssignments] = useState<any[]>([]);
 
   useEffect(() => {
     (async () => {
       try {
         const { batchesApi } = await import("@/services/api/batchesApi");
-        const res = await batchesApi.getAllBatches({ limit: 20 });
+        // We might need to filter by mentor if the backend doesn't, but for now we fetch batches
+        const res = await batchesApi.getAllBatches({ 
+          limit: 50, 
+          mentor_id: (currentUser as any).id,
+          // You could also filter by status: 'ongoing' here if needed
+        });
         if (res.statusCode === 200 && res.data?.items) {
-          const apiBatches: InstructorBatch[] = res.data.items.map((b) => ({
-            id: b.id,
-            name: b.name,
-            code: b.code,
-            studentsCount: b.capacity || 45,
-            schedule: "Mon, Wed, Fri (9:00 PM)",
-            completedClasses: 12,
-            totalClasses: 36,
-            nextClassTopic: "Structural Framework & Coordination",
-            status: "Active",
-          }));
-          setBatches(apiBatches);
+          const activeBatches = res.data.items.filter(
+            (b: BatchItem) => b.status === "ongoing" || b.status === "upcoming"
+          );
+          setBatches(activeBatches);
+        }
+      } catch {}
+
+      try {
+        const { assignmentsApi } = await import("@/services/api/assignmentsApi");
+        const res = await assignmentsApi.getAllAssignments({ limit: 50, mentorId: (currentUser as any).id });
+        if (res.statusCode === 200 && res.data?.items) {
+          setAssignments(res.data.items);
         }
       } catch {}
 
@@ -92,10 +100,17 @@ export default function InstructorDashboardView({
       )}
 
       {instructorTab === "grading" && (
-        <InstructorGradingTab submissions={submissions} />
+        <InstructorGradingTab 
+          submissions={submissions} 
+          batches={batches} 
+          assignments={assignments}
+          onAssignmentCreated={(newA) => setAssignments(prev => [newA, ...prev])}
+        />
       )}
 
-      {instructorTab === "materials" && <InstructorMaterialsTab />}
+      {instructorTab === "materials" && <InstructorMaterialsTab batches={batches} />}
+
+      {instructorTab === "resources" && <AdminResourcesTab batches={batches} />}
 
       {instructorTab === "profile" && <InstructorProfileTab currentUser={currentUser} />}
     </div>

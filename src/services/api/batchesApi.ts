@@ -58,6 +58,7 @@ export const batchesApi = {
     course_id?: string;
     status?: string;
     mode?: string;
+    mentor_id?: string;
   }): Promise<ApiResponse<PaginatedBatches>> {
     const sp = new URLSearchParams();
     if (params?.page) sp.set("page", params.page.toString());
@@ -66,6 +67,7 @@ export const batchesApi = {
     if (params?.course_id) sp.set("course_id", params.course_id);
     if (params?.status) sp.set("status", params.status);
     if (params?.mode) sp.set("mode", params.mode);
+    if (params?.mentor_id) sp.set("mentor_id", params.mentor_id);
     const qs = sp.toString();
     return apiFetch<PaginatedBatches>(`/batches${qs ? `?${qs}` : ""}`);
   },

@@ -8,7 +8,7 @@ import AdminResourceDetails from "./AdminResourceDetails";
 import AdminEditResourceModal from "./AdminEditResourceModal";
 import AdminDeleteConfirmModal from "./AdminDeleteConfirmModal";
 
-export default function AdminResourcesTab() {
+export default function AdminResourcesTab({ batches }: { batches?: any[] }) {
   const [resources, setResources] = useState<ResourceItem[]>([]);
   const [selectedResourceId, setSelectedResourceId] = useState<string | null>(null);
   const [isAddingResource, setIsAddingResource] = useState(false);
@@ -85,7 +85,7 @@ export default function AdminResourcesTab() {
   }
 
   if (isAddingResource) {
-    return <AdminAddResourceView onBack={() => setIsAddingResource(false)} onAdd={handleCreateResource} />;
+    return <AdminAddResourceView onBack={() => setIsAddingResource(false)} onAdd={handleCreateResource} mentorBatches={batches} />;
   }
 
   return (
