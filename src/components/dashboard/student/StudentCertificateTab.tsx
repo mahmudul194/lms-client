@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import { Award, ShieldCheck, Lock, CheckCircle2, QrCode, Download } from "lucide-react";
 import { UserAccount } from "@/data/dummyAccounts";
 import { CertificateItem } from "@/services/api/certificatesApi";
+import html2canvas from "html2canvas-pro";
+import jsPDF from "jspdf";
 
 interface StudentCertificateTabProps {
   currentUser: UserAccount;
@@ -13,6 +15,54 @@ export default function StudentCertificateTab({ currentUser }: StudentCertificat
   const [certs, setCerts] = useState<CertificateItem[]>([]);
   const [enrollments, setEnrollments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [downloadingCertId, setDownloadingCertId] = useState<string | null>(null);
+  
+  const certificateRefs = React.useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  const handleDownloadPDF = async (certId: string, studentName: string) => {
+    const certElement = certificateRefs.current[certId];
+    if (!certElement) return;
+
+    try {
+      setDownloadingCertId(certId);
+      
+      const canvas = await html2canvas(certElement, {
+        scale: 3, // 3x high-res
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        logging: false
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4",
+      });
+
+      // certificate element dimensions
+      const canvasWidth = certElement.clientWidth;
+      const canvasHeight = certElement.clientHeight;
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      const ratio = Math.min(pdfWidth / canvasWidth, pdfHeight / canvasHeight);
+      const imgWidth = canvasWidth * ratio;
+      const imgHeight = canvasHeight * ratio;
+      
+      const marginX = (pdfWidth - imgWidth) / 2;
+      const marginY = (pdfHeight - imgHeight) / 2;
+
+      pdf.addImage(imgData, "PNG", marginX, marginY, imgWidth, imgHeight);
+      pdf.save(`${studentName.replace(/\s+/g, "_")}_Certificate.pdf`);
+    } catch (error) {
+      console.error("Failed to generate PDF", error);
+    } finally {
+      setDownloadingCertId(null);
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -121,47 +171,76 @@ export default function StudentCertificateTab({ currentUser }: StudentCertificat
                     </div>
                   </div>
                 ) : (
-                  <div className="relative p-8 sm:p-12 rounded-3xl border-4 border-double border-slate-300 bg-gradient-to-b from-slate-50 to-white shadow-md text-center space-y-6 overflow-hidden">
-                    <div className="flex items-center justify-between border-b border-slate-200 pb-4 text-xs sm:text-sm text-slate-500 font-bold">
-                      <span>BIM BUILD BD ACADEMY</span>
-                      <span className="text-[#0077b6]">ISO 9001:2015 STANDARD</span>
-                    </div>
-
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#002b5b] to-[#0077b6] text-white flex items-center justify-center mx-auto shadow-lg">
-                      <Award className="w-8 h-8" />
-                    </div>
-
-                    <div className="space-y-1">
-                      <span className="text-xs uppercase font-extrabold tracking-widest text-slate-400">This certifies that</span>
-                      <h2 className="text-2xl sm:text-4xl font-black text-slate-950 underline decoration-[#0077b6] decoration-2 underline-offset-8 leading-relaxed">
-                        {cert.studentName || currentUser.name || currentUser.nameEn}
-                      </h2>
-                      <p className="text-sm text-slate-600 pt-5">
-                        has demonstrated professional competence in <strong className="text-slate-900 block mt-1 text-lg">{cert.courseName || cert.course?.title || courseTitle}</strong>
-                      </p>
-                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest pt-2">
-                        Batch: {cert.batchNumber || batchName}
-                      </p>
-                    </div>
-
-                    <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm">
-                      <div className="text-left space-y-0.5">
-                        <span className="text-slate-400 font-bold block text-xs">VERIFICATION ID</span>
-                        <span className="font-extrabold text-[#002b5b]">{cert.certificateNumber || "VERIFIED-CREDENTIAL"}</span>
+                  <div className="space-y-4">
+                    <div 
+                      ref={(el) => {
+                        if (el) {
+                          certificateRefs.current[cert.id] = el;
+                        }
+                      }}
+                      style={{ aspectRatio: '297/210' }}
+                      className="relative p-8 sm:p-12 border-4 border-double border-slate-300 bg-gradient-to-b from-slate-50 to-white shadow-md text-center flex flex-col justify-center space-y-6 sm:space-y-8"
+                    >
+                      <div className="flex items-center justify-between border-b border-slate-200 pb-4 text-xs sm:text-sm text-slate-500 font-bold">
+                        <span>BIM BUILD BD ACADEMY</span>
+                        <span className="text-[#0077b6]">ISO 9001:2015 STANDARD</span>
                       </div>
-                      <div className="text-left space-y-0.5">
-                        <span className="text-slate-400 font-bold block text-xs">ISSUE DATE</span>
-                        <span className="font-extrabold text-[#002b5b]">{cert.issueDate ? new Date(cert.issueDate).toLocaleDateString() : "N/A"}</span>
+
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#002b5b] to-[#0077b6] text-white flex items-center justify-center mx-auto shadow-lg">
+                        <Award className="w-8 h-8" />
                       </div>
-                      {cert.certificateUrl ? (
-                        <a href={cert.certificateUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#0077b6] hover:bg-[#002b5b] transition-all text-white font-extrabold text-xs shadow-md hover:scale-105">
-                          <Download className="w-4 h-4" /> Download PDF
-                        </a>
-                      ) : (
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs">
-                          <QrCode className="w-4 h-4 text-[#0077b6]" /> <span>Scannable ID</span>
+
+                      <div className="space-y-1">
+                        <span className="text-xs uppercase font-extrabold tracking-widest text-slate-400">This certifies that</span>
+                        <h2 className="text-2xl sm:text-4xl font-black text-slate-950 underline decoration-[#0077b6] decoration-2 underline-offset-8 leading-relaxed">
+                          {cert.studentName || currentUser.name || currentUser.nameEn}
+                        </h2>
+                        <p className="text-sm text-slate-600 pt-5">
+                          has demonstrated professional competence in <strong className="text-slate-900 block mt-1 text-lg">{cert.courseName || cert.course?.title || courseTitle}</strong>
+                        </p>
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest pt-2">
+                          Batch: {cert.batchNumber || batchName}
+                        </p>
+                      </div>
+
+                      <div className="pt-8 pb-4 flex items-end justify-between px-4 sm:px-12">
+                        <div className="text-center space-y-2">
+                          <div className="font-['Brush_Script_MT',cursive,serif] text-3xl text-slate-800">
+                            {cert.signature1Name || "Dr. A. Rahman"}
+                          </div>
+                          <div className="w-40 border-t-2 border-slate-900 mx-auto"></div>
+                          <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider">{cert.signature1Designation || "Course Director"}</span>
                         </div>
-                      )}
+                        <div className="text-center space-y-2">
+                          <div className="font-['Brush_Script_MT',cursive,serif] text-3xl text-slate-800">
+                            {cert.signature2Name || "Engr. M. Hasan"}
+                          </div>
+                          <div className="w-40 border-t-2 border-slate-900 mx-auto"></div>
+                          <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider">{cert.signature2Designation || "Lead Instructor"}</span>
+                        </div>
+                      </div>
+
+                      <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm">
+                        <div className="text-left space-y-0.5">
+                          <span className="text-slate-400 font-bold block text-xs">VERIFICATION ID</span>
+                          <span className="font-extrabold text-[#002b5b]">{cert.certificateNumber || "VERIFIED-CREDENTIAL"}</span>
+                        </div>
+                        <div className="text-left space-y-0.5">
+                          <span className="text-slate-400 font-bold block text-xs">ISSUE DATE</span>
+                          <span className="font-extrabold text-[#002b5b]">{cert.issueDate ? new Date(cert.issueDate).toLocaleDateString() : "N/A"}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-end">
+                      <button 
+                        onClick={() => handleDownloadPDF(cert.id, cert.studentName || currentUser.name || "Student")}
+                        disabled={downloadingCertId === cert.id}
+                        className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#0077b6] hover:bg-[#002b5b] transition-all text-white font-extrabold text-sm shadow-md hover:scale-105 disabled:opacity-70 disabled:hover:scale-100 cursor-pointer"
+                      >
+                        <Download className="w-5 h-5" /> 
+                        {downloadingCertId === cert.id ? "Generating High-Res PDF..." : "Download PDF"}
+                      </button>
                     </div>
                   </div>
                 )}

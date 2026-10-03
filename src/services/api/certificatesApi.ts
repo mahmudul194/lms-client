@@ -15,6 +15,8 @@ export interface CertificateItem {
   certificateUrl?: string;
   signature1Name?: string;
   signature1Designation?: string;
+  signature2Name?: string;
+  signature2Designation?: string;
   status: "issued" | "revoked";
   student?: { id: string; name: string; roll?: string };
   course?: { id: string; title: string };
@@ -41,6 +43,8 @@ export interface CreateCertificatePayload {
   certificateUrl?: string;
   signature1Name?: string;
   signature1Designation?: string;
+  signature2Name?: string;
+  signature2Designation?: string;
   status?: string;
 }
 

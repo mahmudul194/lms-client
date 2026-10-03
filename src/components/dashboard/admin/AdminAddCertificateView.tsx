@@ -25,6 +25,10 @@ export default function AdminAddCertificateView({ onBack, onSuccess }: AdminAddC
     batchId: "",
     courseId: "",
     issueDate: new Date().toISOString().split("T")[0],
+    signature1Name: "",
+    signature1Designation: "",
+    signature2Name: "",
+    signature2Designation: "",
   });
 
   useEffect(() => {
@@ -75,6 +79,10 @@ export default function AdminAddCertificateView({ onBack, onSuccess }: AdminAddC
       courseName: course?.title || "Unknown Course",
       batchNumber: batch?.code || "Unknown Batch",
       issueDate: new Date(form.issueDate).toISOString(),
+      signature1Name: form.signature1Name || undefined,
+      signature1Designation: form.signature1Designation || undefined,
+      signature2Name: form.signature2Name || undefined,
+      signature2Designation: form.signature2Designation || undefined,
       status: "issued"
     };
 
@@ -119,6 +127,10 @@ export default function AdminAddCertificateView({ onBack, onSuccess }: AdminAddC
         courseName: course?.title || "Unknown Course",
         batchNumber: batch?.code || "Unknown Batch",
         issueDate: new Date(form.issueDate).toISOString(),
+        signature1Name: form.signature1Name || undefined,
+        signature1Designation: form.signature1Designation || undefined,
+        signature2Name: form.signature2Name || undefined,
+        signature2Designation: form.signature2Designation || undefined,
         status: "issued"
       }));
 
@@ -224,8 +236,56 @@ export default function AdminAddCertificateView({ onBack, onSuccess }: AdminAddC
             />
           </div>
 
+          <div className="space-y-1.5 sm:col-span-2">
+            <h4 className="text-sm font-bold text-slate-700 border-b border-slate-100 pb-2 mt-2">Signatures</h4>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500">Signature 1 Name</label>
+            <input
+              type="text"
+              placeholder="e.g. Dr. A. Rahman"
+              value={form.signature1Name}
+              onChange={(e) => update("signature1Name", e.target.value)}
+              className="w-full px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none transition-all text-sm font-medium text-slate-900"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500">Signature 1 Designation</label>
+            <input
+              type="text"
+              placeholder="e.g. Course Director"
+              value={form.signature1Designation}
+              onChange={(e) => update("signature1Designation", e.target.value)}
+              className="w-full px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none transition-all text-sm font-medium text-slate-900"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500">Signature 2 Name</label>
+            <input
+              type="text"
+              placeholder="e.g. Engr. M. Hasan"
+              value={form.signature2Name}
+              onChange={(e) => update("signature2Name", e.target.value)}
+              className="w-full px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none transition-all text-sm font-medium text-slate-900"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500">Signature 2 Designation</label>
+            <input
+              type="text"
+              placeholder="e.g. Lead Instructor"
+              value={form.signature2Designation}
+              onChange={(e) => update("signature2Designation", e.target.value)}
+              className="w-full px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none transition-all text-sm font-medium text-slate-900"
+            />
+          </div>
+
           {activeTab === "single" && (
-            <div className="space-y-1.5 sm:col-span-2">
+            <div className="space-y-1.5 sm:col-span-2 mt-4">
               <label className="text-sm font-bold text-slate-700">Select Student *</label>
               <select
                 required
