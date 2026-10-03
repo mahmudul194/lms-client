@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Users, Search, Mail, Phone, Plus, RotateCcw, X, GraduationCap, ShieldCheck, ShieldAlert } from "lucide-react";
+import { Users, Search, Mail, Phone, Plus, RotateCcw, X, GraduationCap, ShieldCheck, ShieldAlert, Eye, Ban, Trash2 } from "lucide-react";
 import AdminStudentDetails from "./AdminStudentDetails";
 import AdminAddStudentView from "./AdminAddStudentView";
-import { StudentRecord } from "@/services/api/studentsApi";
+import AdminUserStatusModal from "./AdminUserStatusModal";
+import AdminDeleteConfirmModal from "./AdminDeleteConfirmModal";
+import { studentsApi, StudentRecord } from "@/services/api/studentsApi";
 
 export default function AdminStudentsTab() {
   const [students, setStudents] = useState<StudentRecord[]>([]);
@@ -15,22 +17,43 @@ export default function AdminStudentsTab() {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedStudent, setSelectedStudent] = useState<StudentRecord | null>(null);
   const [isAddingStudent, setIsAddingStudent] = useState(false);
+  const [banningStudent, setBanningStudent] = useState<StudentRecord | null>(null);
+  const [deletingStudent, setDeletingStudent] = useState<StudentRecord | null>(null);
+
+  const fetchStudents = async () => {
+    try {
+      setLoading(true);
+      const res = await studentsApi.getAllStudents({ limit: 1000 });
+      if (res.statusCode === 200 && res.data?.items) {
+        setStudents(res.data.items);
+      }
+    } catch (err) {
+      console.error("Failed to load students", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    (async () => {
-      try {
-        const { studentsApi } = await import("@/services/api/studentsApi");
-        const res = await studentsApi.getAllStudents({ limit: 1000 });
-        if (res.statusCode === 200 && res.data?.items) {
-          setStudents(res.data.items);
-        }
-      } catch (err) {
-        console.error("Failed to load students", err);
-      } finally {
-        setLoading(false);
-      }
-    })();
+    fetchStudents();
   }, []);
+
+  const handleToggleBanStudent = async () => {
+    if (!banningStudent) return;
+    const isBanned = !!banningStudent.user?.isBanned;
+    if (isBanned) {
+      await studentsApi.unbanStudent(banningStudent.id);
+    } else {
+      await studentsApi.banStudent(banningStudent.id);
+    }
+    await fetchStudents();
+  };
+
+  const handleDeleteStudent = async () => {
+    if (!deletingStudent) return;
+    await studentsApi.deleteStudent(deletingStudent.id);
+    await fetchStudents();
+  };
 
   // Compute unique departments from loaded student records
   const departmentsList = useMemo(() => {
@@ -111,7 +134,15 @@ export default function AdminStudentsTab() {
   }
 
   if (selectedStudent) {
-    return <AdminStudentDetails student={selectedStudent} onBack={() => setSelectedStudent(null)} />;
+    return (
+      <AdminStudentDetails
+        student={selectedStudent}
+        onBack={() => {
+          setSelectedStudent(null);
+          fetchStudents();
+        }}
+      />
+    );
   }
 
   return (
@@ -328,12 +359,33 @@ export default function AdminStudentsTab() {
                       </span>
                     </td>
                     <td className="p-4 text-right">
-                      <button
-                        onClick={() => setSelectedStudent(s)}
-                        className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-[#0077b6] hover:text-white text-slate-700 font-bold text-xs transition-colors cursor-pointer"
-                      >
-                        Details
-                      </button>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => setSelectedStudent(s)}
+                          className="p-2 text-slate-400 hover:text-[#0077b6] hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
+                          title="View Student Details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setBanningStudent(s)}
+                          className={`p-2 rounded-lg transition-colors cursor-pointer ${
+                            isBanned
+                              ? "text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                              : "text-slate-400 hover:text-amber-600 hover:bg-amber-50"
+                          }`}
+                          title={isBanned ? "Reactivate Student" : "Ban Student"}
+                        >
+                          {isBanned ? <ShieldCheck className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
+                        </button>
+                        <button
+                          onClick={() => setDeletingStudent(s)}
+                          className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                          title="Delete Student Record"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -342,6 +394,27 @@ export default function AdminStudentsTab() {
           </tbody>
         </table>
       </div>
+
+      {/* Ban / Unban Modal */}
+      <AdminUserStatusModal
+        isOpen={!!banningStudent}
+        userName={banningStudent?.name}
+        userRole="Student"
+        isCurrentlyBanned={!!banningStudent?.user?.isBanned}
+        onClose={() => setBanningStudent(null)}
+        onConfirm={handleToggleBanStudent}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <AdminDeleteConfirmModal
+        isOpen={!!deletingStudent}
+        title="Delete Student Record"
+        itemName={deletingStudent?.name}
+        message="Are you sure you want to permanently delete this student record? All related admissions, payments, and submissions will be removed."
+        confirmText="Delete Student"
+        onClose={() => setDeletingStudent(null)}
+        onConfirm={handleDeleteStudent}
+      />
     </div>
   );
 }

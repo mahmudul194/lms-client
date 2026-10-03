@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { UserCheck, Search, Plus, Phone, Mail, ChevronLeft, ChevronRight, Eye, RotateCcw, X, ShieldCheck, ShieldAlert, Award } from "lucide-react";
+import { UserCheck, Search, Plus, Phone, Mail, ChevronLeft, ChevronRight, Eye, RotateCcw, X, ShieldCheck, ShieldAlert, Award, Ban, Trash2 } from "lucide-react";
 import AdminAddInstructorView from "./AdminAddInstructorView";
 import AdminInstructorDetails from "./AdminInstructorDetails";
+import AdminUserStatusModal from "./AdminUserStatusModal";
+import AdminDeleteConfirmModal from "./AdminDeleteConfirmModal";
+import { mentorsApi, MentorItem } from "@/services/api/mentorsApi";
 
 export interface InstructorRecord {
   id: string;
@@ -12,7 +15,7 @@ export interface InstructorRecord {
   specialty: string;
   phone: string;
   email: string;
-  status: "Active" | "On Leave";
+  status: "Active" | "Banned";
   rawData?: any;
 }
 
@@ -23,6 +26,8 @@ export default function AdminInstructorsTab() {
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");
   const [isAddingInstructor, setIsAddingInstructor] = useState(false);
   const [selectedInstructor, setSelectedInstructor] = useState<any | null>(null);
+  const [banningInstructor, setBanningInstructor] = useState<MentorItem | null>(null);
+  const [deletingInstructor, setDeletingInstructor] = useState<MentorItem | null>(null);
   
   // Pagination State
   const [page, setPage] = useState(1);
@@ -31,37 +36,55 @@ export default function AdminInstructorsTab() {
   const limit = 10;
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      setIsLoading(true);
-      try {
-        const { mentorsApi } = await import("@/services/api/mentorsApi");
-        const res = await mentorsApi.getAllMentors({ page, limit, search, role: 'mentor' });
-        if (res.statusCode === 200 && res.data?.items) {
-          const mentorItems = res.data.items.filter(m => m.user?.role === "mentor");
-          
-          const apiMentors: InstructorRecord[] = mentorItems.map((m) => ({
-            id: m.id,
-            name: m.user?.name || "Unknown",
-            role: m.designation || "N/A",
-            specialty: m.subject || m.skills?.join(", ") || "N/A",
-            phone: m.user?.phone || "N/A",
-            email: m.user?.email || "N/A",
-            status: m.user?.isBanned ? "On Leave" : "Active",
-            rawData: m
-          }));
+  const loadMentors = async (currentPage = page) => {
+    setIsLoading(true);
+    try {
+      const res = await mentorsApi.getAllMentors({ page: currentPage, limit, search, role: 'mentor' });
+      if (res.statusCode === 200 && res.data?.items) {
+        const mentorItems = res.data.items.filter(m => m.user?.role === "mentor");
+        
+        const apiMentors: InstructorRecord[] = mentorItems.map((m) => ({
+          id: m.id,
+          name: m.user?.name || "Unknown",
+          role: m.designation || "N/A",
+          specialty: m.subject || m.skills?.join(", ") || "N/A",
+          phone: m.user?.phone || "N/A",
+          email: m.user?.email || "N/A",
+          status: m.user?.isBanned ? "Banned" : "Active",
+          rawData: m
+        }));
 
-          setInstructors(apiMentors);
-          setTotalPages(res.data.totalPages || 1);
-          setTotalMentors(res.data.total || mentorItems.length);
-        }
-      } catch (error) {
-        console.error("Failed to fetch mentors", error);
-      } finally {
-        setIsLoading(false);
+        setInstructors(apiMentors);
+        setTotalPages(res.data.totalPages || 1);
+        setTotalMentors(res.data.total || mentorItems.length);
       }
-    })();
+    } catch (error) {
+      console.error("Failed to fetch mentors", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadMentors(page);
   }, [page, search]);
+
+  const handleToggleBanInstructor = async () => {
+    if (!banningInstructor) return;
+    const isBanned = !!banningInstructor.user?.isBanned;
+    if (isBanned) {
+      await mentorsApi.unbanMentor(banningInstructor.id);
+    } else {
+      await mentorsApi.banMentor(banningInstructor.id);
+    }
+    await loadMentors(page);
+  };
+
+  const handleDeleteInstructor = async () => {
+    if (!deletingInstructor) return;
+    await mentorsApi.deleteMentor(deletingInstructor.id);
+    await loadMentors(page);
+  };
 
   // Compute unique specialties list
   const specialtiesList = useMemo(() => {
@@ -81,7 +104,7 @@ export default function AdminInstructorsTab() {
   const filteredInstructors = useMemo(() => {
     return instructors.filter((ins) => {
       if (selectedStatus === "active" && ins.status !== "Active") return false;
-      if (selectedStatus === "on_leave" && ins.status !== "On Leave") return false;
+      if (selectedStatus === "banned" && ins.status !== "Banned") return false;
 
       if (selectedSpecialty !== "all") {
         if (!ins.specialty.toLowerCase().includes(selectedSpecialty.toLowerCase())) {
@@ -112,7 +135,10 @@ export default function AdminInstructorsTab() {
     return (
       <AdminInstructorDetails 
         instructor={selectedInstructor} 
-        onBack={() => setSelectedInstructor(null)} 
+        onBack={() => {
+          setSelectedInstructor(null);
+          loadMentors(page);
+        }} 
       />
     );
   }
@@ -196,7 +222,7 @@ export default function AdminInstructorsTab() {
             >
               <option value="all">All Status</option>
               <option value="active">Active Mentors</option>
-              <option value="on_leave">On Leave / Inactive</option>
+              <option value="banned">Banned Mentors</option>
             </select>
           </div>
         </div>
@@ -285,20 +311,40 @@ export default function AdminInstructorsTab() {
                     <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${
                       ins.status === "Active" 
                         ? "bg-emerald-100 text-emerald-800 border border-emerald-200" 
-                        : "bg-slate-100 text-slate-600 border border-slate-200"
+                        : "bg-rose-100 text-rose-800 border border-rose-200"
                     }`}>
                       {ins.status === "Active" ? <ShieldCheck className="w-3.5 h-3.5" /> : <ShieldAlert className="w-3.5 h-3.5" />}
                       <span>{ins.status}</span>
                     </span>
                   </td>
                   <td className="p-4 text-right">
-                    <button 
-                      onClick={() => setSelectedInstructor(ins.rawData)} 
-                      className="p-2 rounded-lg bg-sky-50 text-[#0077b6] hover:bg-[#0077b6] hover:text-white transition-colors cursor-pointer"
-                      title="View Details"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center justify-end gap-1.5">
+                      <button 
+                        onClick={() => setSelectedInstructor(ins.rawData)} 
+                        className="p-2 text-slate-400 hover:text-[#0077b6] hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
+                        title="View Trainer Details"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => setBanningInstructor(ins.rawData)}
+                        className={`p-2 rounded-lg transition-colors cursor-pointer ${
+                          ins.rawData?.user?.isBanned
+                            ? "text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                            : "text-slate-400 hover:text-amber-600 hover:bg-amber-50"
+                        }`}
+                        title={ins.rawData?.user?.isBanned ? "Reactivate Trainer" : "Ban Trainer"}
+                      >
+                        {ins.rawData?.user?.isBanned ? <ShieldCheck className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
+                      </button>
+                      <button
+                        onClick={() => setDeletingInstructor(ins.rawData)}
+                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                        title="Delete Trainer Record"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -332,6 +378,26 @@ export default function AdminInstructorsTab() {
         </div>
       )}
 
+      {/* Ban / Unban Modal */}
+      <AdminUserStatusModal
+        isOpen={!!banningInstructor}
+        userName={banningInstructor?.user?.name || banningInstructor?.designation}
+        userRole="Trainer"
+        isCurrentlyBanned={!!banningInstructor?.user?.isBanned}
+        onClose={() => setBanningInstructor(null)}
+        onConfirm={handleToggleBanInstructor}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <AdminDeleteConfirmModal
+        isOpen={!!deletingInstructor}
+        title="Delete Trainer Record"
+        itemName={deletingInstructor?.user?.name || deletingInstructor?.designation}
+        message="Are you sure you want to permanently delete this trainer record? This will remove their assigned courses and profile."
+        confirmText="Delete Trainer"
+        onClose={() => setDeletingInstructor(null)}
+        onConfirm={handleDeleteInstructor}
+      />
     </div>
   );
 }
