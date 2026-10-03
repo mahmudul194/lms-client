@@ -93,7 +93,7 @@ export interface EnrolledLesson {
   videoUrl: string;
   pdfUrl?: string;
   textContent?: string;
-  type: string;
+  type?: string;
   description: string;
   resources: { name: string; size: string; type: string }[];
   isCompleted: boolean;

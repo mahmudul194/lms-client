@@ -6,6 +6,10 @@ import { X, BookOpen, Loader2, Sparkles, Video, Image, FileText } from "lucide-r
 import { useIsMounted } from "@/hooks/useIsMounted";
 import { CourseItem, CreateCoursePayload } from "@/services/api/coursesApi";
 import { categoryApi, CategoryItem } from "@/services/api/categoryApi";
+import dynamic from "next/dynamic";
+import "react-quill-new/dist/quill.snow.css";
+
+const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
 interface AdminEditCourseModalProps {
   isOpen: boolean;
@@ -291,13 +295,14 @@ export default function AdminEditCourseModal({
             </div>
             <div>
               <label className="font-bold text-slate-700 block mb-1.5 text-xs sm:text-sm">Detailed Description</label>
-              <textarea
-                rows={4}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-4 py-2.5 sm:py-3 rounded-xl bg-white border border-slate-200 focus:bg-white focus:border-[#0077b6] focus:outline-none text-slate-900 font-medium text-xs sm:text-sm resize-none"
-                placeholder="Full curriculum description and requirements..."
-              />
+              <div className="bg-white rounded-xl overflow-hidden border border-slate-200 focus-within:border-[#0077b6]">
+                <ReactQuill
+                  theme="snow"
+                  value={description}
+                  onChange={(val) => setDescription(val)}
+                  className="min-h-[160px] border-0"
+                />
+              </div>
             </div>
           </div>
 

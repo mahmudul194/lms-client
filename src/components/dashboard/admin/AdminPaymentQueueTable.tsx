@@ -8,8 +8,8 @@ interface AdminPaymentQueueTableProps {
   pendingApprovals: PendingApproval[];
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
-  onViewInvoice: (id: string) => void;
-  onViewInstallments: (id: string) => void;
+  onViewInvoice?: (id: string) => void;
+  onViewInstallments?: (id: string) => void;
 }
 
 export default function AdminPaymentQueueTable({
@@ -115,7 +115,7 @@ export default function AdminPaymentQueueTable({
                       <button onClick={() => window.open(`/dashboard/admin/invoice/${item.id}`, "_blank")} className="px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs cursor-pointer flex items-center gap-1">
                         <FileText className="w-3.5 h-3.5" /> Invoice
                       </button>
-                      <button onClick={() => onViewInstallments(item.id)} className="px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs cursor-pointer flex items-center gap-1">
+                      <button onClick={() => onViewInstallments?.(item.id)} className="px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs cursor-pointer flex items-center gap-1">
                         <Calendar className="w-3.5 h-3.5" /> Installments
                       </button>
                     </div>

@@ -27,9 +27,12 @@ export default function CourseHeroHeader({ course }: CourseHeroHeaderProps) {
         {course.title}
       </h1>
 
-      <p className="text-sm sm:text-base text-slate-200 leading-relaxed max-w-2xl font-medium">
-        {course.description}
-      </p>
+      {course.description ? (
+        <div
+          className="text-sm sm:text-base text-slate-200 leading-relaxed max-w-2xl font-medium prose prose-invert prose-p:my-1.5 prose-headings:text-white prose-ul:my-1 prose-li:my-0.5"
+          dangerouslySetInnerHTML={{ __html: course.description }}
+        />
+      ) : null}
 
       <div className="flex flex-wrap items-center gap-6 pt-2 text-xs sm:text-sm text-slate-200 font-semibold">
         <div className="flex items-center gap-1.5">
