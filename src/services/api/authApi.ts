@@ -12,7 +12,8 @@ export interface AuthUser {
 }
 
 export interface AuthSuccessData {
-  accessToken: string;
+  accessToken?: string;
+  access_token?: string;
   user: AuthUser;
 }
 

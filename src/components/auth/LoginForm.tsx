@@ -132,9 +132,28 @@ export default function LoginForm({ loading: parentLoading, onLoginSubmit }: Log
     setLoading(true);
     try {
       const res = await authApi.verifyOtp(phone.trim(), otpCode.trim());
-      if (res.statusCode === 200 && res.data?.accessToken) {
+      const token = (res.data as any)?.access_token || res.data?.accessToken;
+      if ((res.statusCode === 200 || res.statusCode === 201) && (token || res.data?.user)) {
+        if (res.data?.user) {
+          const apiRole = (res.data.user.role || "").toLowerCase();
+          const mappedRole: "student" | "instructor" | "admin" = 
+            apiRole === "admin" || apiRole === "developer" || apiRole === "manager" || apiRole === "moderator"
+              ? "admin"
+              : apiRole === "instructor" || apiRole === "mentor"
+              ? "instructor"
+              : "student";
+          if (typeof window !== "undefined") {
+            localStorage.setItem("bim_user_role", mappedRole);
+            localStorage.setItem("bim_user_id", res.data.user.id || "");
+            localStorage.setItem("bim_user_name", res.data.user.name || "");
+            localStorage.setItem("bim_user_email", res.data.user.email || "");
+          }
+        }
         await syncMeProfile();
-        router.push("/dashboard");
+        setInfoMsg("Login successful! Redirecting to dashboard...");
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 300);
       } else {
         setErrorMsg(res.message || "Invalid or expired OTP code.");
       }
