@@ -6,7 +6,7 @@ import { CouponItem } from "@/types/dashboard";
 
 export interface ValidateCouponPayload {
   code: string;
-  batchId?: string;
+  courseId?: string;
 }
 
 export interface ValidatedCouponData {

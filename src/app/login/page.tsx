@@ -1,14 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import LoginForm from "@/components/auth/LoginForm";
 
-export default function LoginPage() {
+function LoginContent() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect") || "/dashboard";
 
   const performLogin = (role: "student" | "instructor" | "admin") => {
     setLoading(true);
@@ -18,7 +20,7 @@ export default function LoginPage() {
     }
     setTimeout(() => {
       setLoading(false);
-      window.location.href = "/dashboard";
+      window.location.href = redirectUrl;
     }, 400);
   };
 
@@ -93,5 +95,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-[#0077b6]"></div></div>}>
+      <LoginContent />
+    </Suspense>
   );
 }

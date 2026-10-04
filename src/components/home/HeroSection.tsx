@@ -99,7 +99,7 @@ export default function HeroSection() {
 
               <div>
                 <Link
-                  href="/admission"
+                  href="/courses"
                   className="inline-block px-9 py-3 rounded-xl bg-[#002b5b] hover:bg-[#001a38] text-white font-bold text-xs sm:text-sm lg:text-base transition-all shadow-md hover:scale-105 active:scale-95"
                 >
                   Admission

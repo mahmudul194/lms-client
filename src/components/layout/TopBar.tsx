@@ -1,9 +1,16 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { getAuthToken } from "@/services/api/apiClient";
 
 export default function TopBar() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsLoggedIn(!!getAuthToken());
+  }, []);
+
   return (
     <div className="bg-[#002b5b] text-white text-xs sm:text-[13px] font-medium border-b border-[#0f4c81]/40">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12">
@@ -21,18 +28,27 @@ export default function TopBar() {
           {/* Right: Admission, Log in, Social Icons */}
           <div className="flex items-center gap-5 sm:gap-8 text-xs sm:text-[13px]">
             <Link
-              href="/admission"
+              href="/courses"
               className="text-slate-200 hover:text-sky-300 font-semibold transition-colors"
             >
-              Admission
+              All Courses
             </Link>
 
-            <Link
-              href="/login"
-              className="text-slate-200 hover:text-sky-300 font-semibold transition-colors"
-            >
-              Log in
-            </Link>
+            {isLoggedIn ? (
+              <Link
+                href="/dashboard"
+                className="text-slate-200 hover:text-sky-300 font-semibold transition-colors"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="text-slate-200 hover:text-sky-300 font-semibold transition-colors"
+              >
+                Log in
+              </Link>
+            )}
 
             {/* Social Icons */}
             <div className="flex items-center gap-3.5 text-slate-300 border-l border-[#0f4c81] pl-5">

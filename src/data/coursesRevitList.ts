@@ -8,6 +8,7 @@ export interface Course {
   duration: string;
   totalClasses: number;
   batchNo: string;
+  batchId?: string;
   price: number;
   originalPrice: number;
   installmentAvailable: boolean;

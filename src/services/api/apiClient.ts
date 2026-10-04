@@ -46,6 +46,7 @@ export async function apiFetch<T>(
 
   try {
     const res = await fetch(url, {
+      cache: "no-store",
       ...options,
       headers,
     });

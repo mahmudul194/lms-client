@@ -14,7 +14,8 @@ export default function StudentPaymentsTab() {
       try {
         const res = await enrollmentsApi.getMyEnrollments();
         if (res.statusCode === 200 && res.data) {
-          setEnrollmentsData(res.data);
+          const activeEnrollments = res.data.filter((enr: any) => enr.status !== 'PENDING');
+          setEnrollmentsData(activeEnrollments);
         }
       } catch (e) {
         console.error("Failed to load installments:", e);

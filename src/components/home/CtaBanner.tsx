@@ -22,7 +22,7 @@ export default function CtaBanner() {
 
           <div className="flex flex-wrap items-center justify-center gap-3.5">
             <Link
-              href="/admission"
+              href="/courses"
               className="px-7 py-3.5 rounded-xl bg-white text-[#002b5b] font-black text-sm sm:text-base hover:bg-sky-50 transition-all shadow-lg hover:scale-105 active:scale-95 flex items-center gap-2"
             >
               <span>Apply for Admission</span>

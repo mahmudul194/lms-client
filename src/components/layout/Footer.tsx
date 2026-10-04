@@ -1,13 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { getAuthToken } from "@/services/api/apiClient";
 import { usePathname } from "next/navigation";
 import FooterSocialShare from "./FooterSocialShare";
 import FooterPaymentPills from "./FooterPaymentPills";
 
 export default function Footer() {
   const pathname = usePathname();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsLoggedIn(!!getAuthToken());
+  }, []);
 
   // Hide public footer inside dashboard
   if (pathname && pathname.startsWith("/dashboard")) {
@@ -37,11 +43,7 @@ export default function Footer() {
                   About Us
                 </Link>
               </li>
-              <li>
-                <Link href="/admission" className="hover:text-[#0077b6] transition-colors">
-                  Admission
-                </Link>
-              </li>
+
             </ul>
           </div>
 
@@ -92,9 +94,15 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="hover:text-[#0077b6] transition-colors font-bold text-[#0077b6]">
-                  Portal Login (/dashboard)
-                </Link>
+                {isLoggedIn ? (
+                  <Link href="/dashboard" className="hover:text-[#0077b6] transition-colors font-bold text-[#0077b6]">
+                    Go to Dashboard
+                  </Link>
+                ) : (
+                  <Link href="/login" className="hover:text-[#0077b6] transition-colors font-bold text-[#0077b6]">
+                    Portal Login (/dashboard)
+                  </Link>
+                )}
               </li>
             </ul>
           </div>

@@ -6,7 +6,6 @@ import { authApi } from "@/services/api/authApi";
 
 export default function DashboardSidebarFooter() {
   const [loggingOut, setLoggingOut] = useState(false);
-  const [loggingOutAll, setLoggingOutAll] = useState(false);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -23,17 +22,7 @@ export default function DashboardSidebarFooter() {
     }
   };
 
-  const handleLogoutAll = async () => {
-    if (!confirm("Are you sure you want to log out from ALL active devices?")) return;
-    setLoggingOutAll(true);
-    try {
-      await authApi.logoutAll();
-    } catch {}
-    if (typeof window !== "undefined") {
-      localStorage.clear();
-      window.location.href = "/login";
-    }
-  };
+
 
   return (
     <div className="p-4 border-t border-white/10 bg-[#001830] space-y-3 font-sans">
@@ -59,29 +48,17 @@ export default function DashboardSidebarFooter() {
       </div>
 
       {/* Logout Controls */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="flex w-full">
         {/* Log Out Current Device */}
         <button
           type="button"
           onClick={handleLogout}
-          disabled={loggingOut || loggingOutAll}
-          className="py-2.5 px-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-300 hover:text-rose-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+          disabled={loggingOut}
+          className="w-full py-2.5 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-300 hover:text-rose-200 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
           title="Log out from this device"
         >
-          <LogOut className="w-3.5 h-3.5" />
-          <span>{loggingOut ? "Leaving..." : "Log Out"}</span>
-        </button>
-
-        {/* Log Out All Devices */}
-        <button
-          type="button"
-          onClick={handleLogoutAll}
-          disabled={loggingOut || loggingOutAll}
-          className="py-2.5 px-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-300 hover:text-amber-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
-          title="Log out from all devices"
-        >
-          <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
-          <span>{loggingOutAll ? "Resetting..." : "Logout All"}</span>
+          <LogOut className="w-4 h-4" />
+          <span>{loggingOut ? "Logging out..." : "Log Out"}</span>
         </button>
       </div>
     </div>

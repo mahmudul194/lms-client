@@ -34,11 +34,16 @@ export default function StudentOverviewTab({
         const { enrollmentsApi } = await import("@/services/api/enrollmentsApi");
         const res = await enrollmentsApi.getMyEnrollments();
         if (res.statusCode === 200 && Array.isArray(res.data) && res.data.length > 0) {
-          const first = res.data[0];
-          setEnrolledCourse({
+          const activeEnrollments = res.data.filter((enr: any) => enr.status !== 'PENDING');
+          if (activeEnrollments.length > 0) {
+            const first = activeEnrollments[0];
+            setEnrolledCourse({
             title: first.batch?.course?.title || first.batch?.name || "Active BIM Course",
             batch: first.batch?.name || "Active Batch",
           });
+          } else {
+            setEnrolledCourse(null);
+          }
         } else {
           setEnrolledCourse(null);
         }

@@ -27,7 +27,7 @@ export default function TeklaAndStats() {
               </p>
               <div className="pt-3">
                 <Link
-                  href="/admission"
+                  href="/courses"
                   className="inline-block px-7 py-3 rounded-xl bg-[#0077b6] hover:bg-[#005a8c] text-white font-extrabold text-sm shadow-lg transition-all hover:scale-105"
                 >
                   Enroll Tekla Course

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, ArrowRight, Phone, Mail, FileText, CheckCircle, AlertTriangle, ShieldCheck, UserPlus, KeyRound, ArrowLeft } from "lucide-react";
 import { authApi } from "@/services/api/authApi";
 import { studentsApi } from "@/services/api/studentsApi";
@@ -14,6 +14,7 @@ interface LoginFormProps {
 
 export default function LoginForm({ loading: parentLoading, onLoginSubmit }: LoginFormProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<"email" | "phone" | "academic" | "forgot">("email");
 
   // Email state
@@ -333,6 +334,7 @@ export default function LoginForm({ loading: parentLoading, onLoginSubmit }: Log
                   ...(notRegistered.phone ? { phone: notRegistered.phone } : {}),
                   ...(notRegistered.roll ? { roll: notRegistered.roll } : {}),
                   ...(notRegistered.registrationNumber ? { reg: notRegistered.registrationNumber } : {}),
+                  ...(searchParams.get("redirect") ? { redirect: searchParams.get("redirect") as string } : {}),
                 }).toString()}`}
                 className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#0077b6] to-[#002b5b] hover:from-[#005a8c] hover:to-[#001f42] text-white text-xs font-black text-center shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
@@ -677,7 +679,7 @@ export default function LoginForm({ loading: parentLoading, onLoginSubmit }: Log
       <div className="pt-2 text-center border-t border-slate-100">
         <p className="text-xs text-slate-500">
           New student?{" "}
-          <Link href="/register" className="text-[#0077b6] font-extrabold hover:underline">
+          <Link href={searchParams.get("redirect") ? `/register?redirect=${encodeURIComponent(searchParams.get("redirect") as string)}` : "/register"} className="text-[#0077b6] font-extrabold hover:underline">
             Create an Account / Register Here →
           </Link>
         </p>

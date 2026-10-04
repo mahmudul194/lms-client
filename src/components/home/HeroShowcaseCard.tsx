@@ -42,7 +42,7 @@ export default function HeroShowcaseCard() {
             </div>
 
             <Link
-              href="/admission"
+              href="/courses"
               className="px-4 py-2 rounded-xl bg-[#0077b6] hover:bg-[#005a8c] text-white text-xs font-bold shadow-md transition-all shrink-0 hover:scale-105 active:scale-95"
             >
               Enroll Now

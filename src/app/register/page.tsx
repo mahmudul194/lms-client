@@ -60,7 +60,15 @@ function RegisterFormContent() {
           localStorage.setItem("bim_user_name", formData.name);
           localStorage.setItem("bim_user_email", formData.email);
         }
-        setTimeout(() => router.push("/login?registered=true"), 1500);
+        
+        setTimeout(() => {
+          const redirectParam = searchParams.get("redirect");
+          if (redirectParam) {
+            router.push(`/login?registered=true&redirect=${encodeURIComponent(redirectParam)}`);
+          } else {
+            router.push("/login?registered=true");
+          }
+        }, 1500);
       } else {
         setErrorMsg(res.message || "Registration failed. Please check your information.");
       }
@@ -77,7 +85,7 @@ function RegisterFormContent() {
         <div className="text-xs sm:text-sm text-slate-400 font-medium mb-8">
           <Link href="/" className="hover:text-slate-600 transition-colors">Home</Link>
           <span className="mx-2">/</span>
-          <Link href="/login" className="hover:text-slate-600 transition-colors">Login</Link>
+          <Link href={searchParams.get("redirect") ? `/login?redirect=${encodeURIComponent(searchParams.get("redirect") as string)}` : "/login"} className="hover:text-slate-600 transition-colors">Login</Link>
           <span className="mx-2">/</span>
           <span className="text-slate-700 font-semibold">Student Account Registration</span>
         </div>
@@ -130,7 +138,7 @@ function RegisterFormContent() {
 
             <div className="text-center pt-2">
               <p className="text-xs text-slate-500">
-                Already registered? <Link href="/login" className="text-[#0077b6] font-bold hover:underline">Back to LMS Login →</Link>
+                Already registered? <Link href={searchParams.get("redirect") ? `/login?redirect=${encodeURIComponent(searchParams.get("redirect") as string)}` : "/login"} className="text-[#0077b6] font-bold hover:underline">Back to LMS Login →</Link>
               </p>
             </div>
           </div>

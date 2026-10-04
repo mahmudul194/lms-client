@@ -69,7 +69,7 @@ export default function NotFound() {
 
         {/* Quick Links Footer */}
         <div className="pt-8 border-t border-slate-200/90 text-xs sm:text-sm text-slate-500 font-semibold flex flex-wrap items-center justify-center gap-5 sm:gap-7">
-          <Link href="/admission" className="hover:text-[#0077b6] transition-colors">
+          <Link href="/courses" className="hover:text-[#0077b6] transition-colors">
             Admission & Installments
           </Link>
           <span className="text-slate-300">•</span>

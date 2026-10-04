@@ -76,13 +76,7 @@ export default function NavMobileMenu({ isOpen, onClose, searchQuery, setSearchQ
           </Link>
         </div>
 
-        <Link
-          href="/admission"
-          onClick={onClose}
-          className="block px-4 py-2.5 rounded-xl text-[#002b5b] bg-sky-100 font-bold"
-        >
-          Admission
-        </Link>
+
       </div>
     </div>
   );

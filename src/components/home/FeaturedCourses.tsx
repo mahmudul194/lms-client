@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import CourseCard, { CourseCardItem } from "@/components/courses/CourseCard";
+import CourseCard, { CourseCardItem } from "../courses/CourseCard";
+
 
 export default function FeaturedCourses() {
   const [courses, setCourses] = useState<CourseCardItem[]>([]);
@@ -12,18 +13,26 @@ export default function FeaturedCourses() {
     let isMounted = true;
     (async () => {
       try {
-        const { coursesApi } = await import("@/services/api");
-        const res = await coursesApi.getAllCourses({ limit: 12 });
+        const { batchesApi } = await import("@/services/api");
+        const res = await batchesApi.getAllBatches({ limit: 12 });
         if (!isMounted) return;
 
         if (res.statusCode === 200 && res.data?.items?.length) {
-          const apiCourses = res.data.items.map((c) => {
-            const batch = c.batches?.[0];
-            const price = batch?.price || 16000;
-            const discountPrice = batch?.discount_price || 12000;
+          const apiBatches = res.data.items
+            .filter((b: any) => {
+              if (b.status === 'cancelled' || b.status === 'completed') return false;
+              if (b.registration_end) {
+                return new Date(b.registration_end).getTime() > Date.now();
+              }
+              return true;
+            })
+            .map((b: any) => {
+              const c = b.course || {};
+            const price = b.price || 16000;
+            const discountPrice = b.discount_price || 12000;
             return {
-              id: c.slug || c.id,
-              title: c.title,
+              id: c.slug || b.code || b.id, // Navigate using course slug or batch code
+              title: b.name || c.title,
               tag: c.level?.toUpperCase() || "WEB",
               discount: `৳${price - discountPrice} OFF`,
               badge: c.level || "Professional",
@@ -31,9 +40,10 @@ export default function FeaturedCourses() {
               price: discountPrice.toLocaleString(),
               originalPrice: price.toLocaleString(),
               image: c.thumbnail || "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
+              registrationEnd: b.registration_end,
             };
           });
-          setCourses(apiCourses);
+          setCourses(apiBatches);
         }
       } catch {
         // Fallback
@@ -53,7 +63,7 @@ export default function FeaturedCourses() {
         <div className="text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#002b5b] tracking-tight">
             Explore All Courses (Installment Details Available on{" "}
-            <Link href="/admission" className="text-[#0077b6] relative inline-block underline decoration-2 decoration-[#0077b6] underline-offset-4 font-black hover:text-[#0f4c81]">
+            <Link href="/courses" className="text-[#0077b6] relative inline-block underline decoration-2 decoration-[#0077b6] underline-offset-4 font-black hover:text-[#0f4c81]">
               Admission
             </Link>{" "}
             Page)

@@ -19,7 +19,8 @@ export default function StudentCoursePlayerTab() {
         const { enrollmentsApi } = await import("@/services/api/enrollmentsApi");
         const res = await enrollmentsApi.getMyEnrollments();
         if (res.statusCode === 200 && Array.isArray(res.data) && res.data.length > 0) {
-          const apiCourses: EnrolledCourse[] = res.data.map((enr: any) => {
+          const activeEnrollments = res.data.filter((enr: any) => enr.status !== 'PENDING');
+          const apiCourses: EnrolledCourse[] = activeEnrollments.map((enr: any) => {
             const course = enr.batch?.course || {};
             const categoryName = course.category?.name || "Uncategorized";
             const instructor = course.mentors && course.mentors.length > 0 ? course.mentors.map((m: any) => m.name).join(", ") : "Course Instructor";
