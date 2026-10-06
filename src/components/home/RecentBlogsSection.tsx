@@ -32,23 +32,11 @@ export default function RecentBlogsSection() {
   return (
     <section className="py-16 sm:py-20 bg-white font-sans">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 space-y-10">
-        {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-100 pb-6">
-          <div>
-            <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#0077b6]">
-              NEWS & ARTICLES
-            </span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#002b5b] mt-1 tracking-tight">
-              Recent Engineering & BIM Blogs
-            </h2>
-          </div>
-          <Link
-            href="/blog"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-50 text-[#0077b6] hover:bg-[#0077b6] hover:text-white font-extrabold text-xs sm:text-sm transition-all shadow-xs group shrink-0 self-start sm:self-auto cursor-pointer"
-          >
-            <span>View All Articles</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
+        {/* Section Header - Clean & Centered */}
+        <div className="text-center pb-2">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#002b5b] tracking-tight">
+            Recent Engineering & BIM Blogs
+          </h2>
         </div>
 
         {/* 3-Column Recent Blog Cards */}
