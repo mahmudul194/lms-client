@@ -23,7 +23,7 @@ export default function HomePage() {
       {/* 4. 3x3 Course Grid with Discount Badges */}
       <FeaturedCourses />
 
-      {/* 5. Tekla Course & What We Offer */}
+      {/* 5. Tekla Course */}
       <TeklaBanner />
 
       {/* 6. Start to Success Stats Bar */}

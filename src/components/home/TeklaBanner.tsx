@@ -2,11 +2,10 @@
 
 import React from "react";
 import Link from "next/link";
-import { Zap } from "lucide-react";
 
 export default function TeklaBanner() {
   return (
-    <section className="py-20 bg-white space-y-20">
+    <section className="py-20 bg-white">
       {/* 1. Professional Tekla Course Banner */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#002b5b]">
@@ -44,25 +43,6 @@ export default function TeklaBanner() {
             </div>
           </div>
           <div className="absolute inset-0 bg-gradient-to-r from-[#002b5b] via-[#0f4c81] to-slate-900 opacity-95" />
-        </div>
-      </div>
-
-      {/* 2. Middle Offer Box with Lightning Bolt Icon */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative bg-[#f0f4f8] rounded-3xl p-10 sm:p-12 text-center border border-slate-200 shadow-xs">
-          {/* Top Circular Lightning Bolt Badge */}
-          <div className="absolute -top-7 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-[#002b5b] text-white flex items-center justify-center shadow-xl">
-            <Zap className="w-7 h-7 fill-white text-white" />
-          </div>
-
-          <div className="pt-3 space-y-2.5">
-            <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#0077b6]">
-              What We Offer
-            </span>
-            <p className="text-base sm:text-lg lg:text-xl font-bold text-[#002b5b] max-w-3xl mx-auto leading-relaxed">
-              Professional BIM training, live project experience, and mentorship to build your career in smart construction.
-            </p>
-          </div>
         </div>
       </div>
     </section>
