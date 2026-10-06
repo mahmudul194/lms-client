@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import LearnAndCertifySection from "./LearnAndCertifySection";
 
 export default function TestimonialsSection() {
   const testimonials = [
@@ -32,9 +31,9 @@ export default function TestimonialsSection() {
   ];
 
   return (
-    <section className="py-24 bg-white space-y-28 font-sans">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 space-y-24">
-        {/* Top Part: What Students Say About Us */}
+    <section className="py-24 bg-white font-sans">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12">
+        {/* What Students Say About Us */}
         <div className="space-y-14">
           <div className="text-center space-y-2.5">
             <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#0077b6]">
@@ -75,9 +74,6 @@ export default function TestimonialsSection() {
             <span className="w-3 h-3 rounded-full bg-slate-300" />
           </div>
         </div>
-
-        {/* Bottom Part: What You’ll Learn & Get Certified */}
-        <LearnAndCertifySection />
       </div>
     </section>
   );

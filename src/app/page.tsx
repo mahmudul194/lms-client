@@ -25,7 +25,7 @@ export default function HomePage() {
       {/* 5. Start to Success Stats Bar */}
       <StartToSuccess />
 
-      {/* 6. Testimonials & What You'll Learn / Certified */}
+      {/* 6. Testimonials */}
       <TestimonialsSection />
 
       {/* 7. Social Community Cards (Facebook, YouTube, LinkedIn) */}
