@@ -1,7 +1,7 @@
 import React from "react";
 import HeroSection from "@/components/home/HeroSection";
 import RecentBlogsSection from "@/components/home/RecentBlogsSection";
-import VideoShowcase from "@/components/home/VideoShowcase";
+import RecentPortfolioSection from "@/components/home/RecentPortfolioSection";
 import FeaturedCourses from "@/components/home/FeaturedCourses";
 import TeklaBanner from "@/components/home/TeklaBanner";
 import StartToSuccess from "@/components/home/StartToSuccess";
@@ -17,8 +17,8 @@ export default function HomePage() {
       {/* 2. Recent Engineering & BIM Blogs */}
       <RecentBlogsSection />
 
-      {/* 3. Free Class Videos Showcase */}
-      <VideoShowcase />
+      {/* 3. Recent Projects & Portfolio */}
+      <RecentPortfolioSection />
 
       {/* 4. 3x3 Course Grid with Discount Badges */}
       <FeaturedCourses />
