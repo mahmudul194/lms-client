@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, Quote } from "lucide-react";
 
 export default function TestimonialsSection() {
   const testimonials = [
@@ -81,12 +81,12 @@ export default function TestimonialsSection() {
     }
   }, [maxIndex, currentIndex]);
 
-  // Auto-play sliding effect with pause on hover
+  // Auto-play sliding effect with pause on hover (halka speed barano holo)
   useEffect(() => {
     if (isPaused) return;
     const timer = setInterval(() => {
       handleNext();
-    }, 4500);
+    }, 3200);
     return () => clearInterval(timer);
   }, [isPaused, handleNext]);
 
@@ -110,36 +110,14 @@ export default function TestimonialsSection() {
   return (
     <section className="py-20 sm:py-24 bg-white font-sans overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 space-y-10 sm:space-y-12">
-        {/* Header with Title and Sliding Arrow Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-100 pb-5">
-          <div>
-            <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#0077b6]">
-              TESTIMONIALS
-            </span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-[#002b5b] mt-1 tracking-tight">
-              What Students Say About Us
-            </h2>
-          </div>
-
-          {/* Navigation Buttons */}
-          <div className="flex items-center gap-2 self-start sm:self-auto">
-            <button
-              onClick={handlePrev}
-              className="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-[#0077b6] hover:text-white hover:border-[#0077b6] text-slate-700 transition-all shadow-xs cursor-pointer active:scale-95"
-              aria-label="Previous Testimonial"
-              title="Previous"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={handleNext}
-              className="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-[#0077b6] hover:text-white hover:border-[#0077b6] text-slate-700 transition-all shadow-xs cursor-pointer active:scale-95"
-              aria-label="Next Testimonial"
-              title="Next"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
+        {/* Clean Centered Header without Arrow Buttons */}
+        <div className="text-center space-y-2.5">
+          <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#0077b6]">
+            TESTIMONIALS
+          </span>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-[#002b5b] tracking-tight">
+            What Students Say About Us
+          </h2>
         </div>
 
         {/* Sliding Cards Track */}
@@ -152,7 +130,7 @@ export default function TestimonialsSection() {
           onTouchEnd={handleTouchEnd}
         >
           <div
-            className="flex transition-transform duration-500 ease-out"
+            className="flex transition-transform duration-350 ease-out"
             style={{
               transform: `translateX(-${currentIndex * (100 / visibleCount)}%)`,
             }}
