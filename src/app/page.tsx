@@ -1,5 +1,6 @@
 import React from "react";
 import HeroSection from "@/components/home/HeroSection";
+import RecentBlogsSection from "@/components/home/RecentBlogsSection";
 import VideoShowcase from "@/components/home/VideoShowcase";
 import FeaturedCourses from "@/components/home/FeaturedCourses";
 import TeklaBanner from "@/components/home/TeklaBanner";
@@ -13,22 +14,25 @@ export default function HomePage() {
       {/* 1. Hero Section */}
       <HeroSection />
 
-      {/* 2. Free Class Videos & About Showcase */}
+      {/* 2. Recent Engineering & BIM Blogs */}
+      <RecentBlogsSection />
+
+      {/* 3. Free Class Videos Showcase */}
       <VideoShowcase />
 
-      {/* 3. 3x3 Course Grid with Discount Badges */}
+      {/* 4. 3x3 Course Grid with Discount Badges */}
       <FeaturedCourses />
 
-      {/* 4. Tekla Course & What We Offer */}
+      {/* 5. Tekla Course & What We Offer */}
       <TeklaBanner />
 
-      {/* 5. Start to Success Stats Bar */}
+      {/* 6. Start to Success Stats Bar */}
       <StartToSuccess />
 
-      {/* 6. Testimonials */}
+      {/* 7. Testimonials */}
       <TestimonialsSection />
 
-      {/* 7. Social Community Cards (Facebook, YouTube, LinkedIn) */}
+      {/* 8. Social Community Cards (Facebook, YouTube, LinkedIn) */}
       <CommunityCards />
     </div>
   );

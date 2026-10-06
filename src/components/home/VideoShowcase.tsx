@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import AboutVideoTriad from "./AboutVideoTriad";
 import CourseFreeVideoGrid from "./CourseFreeVideoGrid";
 import VideoModal from "@/components/common/VideoModal";
 
@@ -108,11 +107,8 @@ export default function VideoShowcase() {
   ];
 
   return (
-    <section className="py-16 bg-white space-y-12">
+    <section className="py-16 bg-white">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 space-y-12">
-        {/* Top 3-Video About Triad */}
-        <AboutVideoTriad onPlayVideo={(url) => setActiveVideo(url)} />
-
         {/* Free Course Preview Video Cards */}
         <CourseFreeVideoGrid
           videoGroups={videoGroups}
