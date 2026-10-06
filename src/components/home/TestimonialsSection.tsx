@@ -44,11 +44,17 @@ export default function TestimonialsSection() {
   ];
 
   const N = testimonials.length;
-  // Duplicate array 3 times for seamless infinite bidirectional loop without rollbacks
-  const extendedList = [...testimonials, ...testimonials, ...testimonials];
+  // 5x duplicates to ensure the buffer never runs dry under any transition delay
+  const extendedList = [
+    ...testimonials,
+    ...testimonials,
+    ...testimonials,
+    ...testimonials,
+    ...testimonials,
+  ];
 
-  // Start in the middle copy (index N)
-  const [currentIndex, setCurrentIndex] = useState(N);
+  // Base index in the middle copy (copy 2: index 2 * N)
+  const [currentIndex, setCurrentIndex] = useState(2 * N);
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [visibleCount, setVisibleCount] = useState(3);
   const [isPaused, setIsPaused] = useState(false);
@@ -56,6 +62,7 @@ export default function TestimonialsSection() {
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
+  // Responsive visible count
   useEffect(() => {
     const updateCount = () => {
       if (window.innerWidth < 640) {
@@ -71,6 +78,19 @@ export default function TestimonialsSection() {
     return () => window.removeEventListener("resize", updateCount);
   }, []);
 
+  // Pause carousel when tab is in background so timer doesn't run away
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden) {
+        setIsPaused(true);
+      } else {
+        setIsPaused(false);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, []);
+
   const handleNext = useCallback(() => {
     setIsTransitioning(true);
     setCurrentIndex((prev) => prev + 1);
@@ -81,23 +101,51 @@ export default function TestimonialsSection() {
     setCurrentIndex((prev) => prev - 1);
   }, []);
 
-  // Seamless snap when sliding past boundaries so it never rolls back
-  const handleTransitionEnd = () => {
-    if (currentIndex >= 2 * N) {
+  // When transition is disabled for instantaneous reset, re-enable it on next animation frame
+  useEffect(() => {
+    if (!isTransitioning) {
+      const raf = requestAnimationFrame(() => {
+        setIsTransitioning(true);
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [isTransitioning]);
+
+  // Guaranteed bounds reset: runs unconditionally after slide finishes (300ms)
+  // Ensures cards never slide past buffer even if browser drops transitionend
+  useEffect(() => {
+    if (currentIndex >= 3 * N || currentIndex < 2 * N) {
+      const timer = setTimeout(() => {
+        setIsTransitioning(false);
+        setCurrentIndex((prev) => {
+          if (prev >= 3 * N) return 2 * N + ((prev - 3 * N) % N);
+          if (prev < 2 * N) return 2 * N + ((prev - 2 * N + N * 10) % N);
+          return prev;
+        });
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [currentIndex, N]);
+
+  // Event-based snap for instant response (filtered to only parent transform event)
+  const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget || e.propertyName !== "transform") return;
+
+    if (currentIndex >= 3 * N) {
       setIsTransitioning(false);
-      setCurrentIndex(currentIndex - N);
-    } else if (currentIndex < N) {
+      setCurrentIndex((prev) => 2 * N + ((prev - 3 * N) % N));
+    } else if (currentIndex < 2 * N) {
       setIsTransitioning(false);
-      setCurrentIndex(currentIndex + N);
+      setCurrentIndex((prev) => 2 * N + ((prev - 2 * N + N * 10) % N));
     }
   };
 
-  // Auto-slide every 2.2s with pause on hover (speed barano holo)
+  // Auto-slide every 2.2s with pause on hover
   useEffect(() => {
     if (isPaused) return;
     const timer = setInterval(() => {
       handleNext();
-    }, 2800);
+    }, 2200);
     return () => clearInterval(timer);
   }, [isPaused, handleNext]);
 
