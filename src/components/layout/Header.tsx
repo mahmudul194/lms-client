@@ -29,7 +29,7 @@ export default function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full max-w-full transition-all duration-300 ease-in-out ${
+      className={`sticky top-0 z-50 w-full max-w-full print:hidden transition-all duration-300 ease-in-out ${
         isScrolled
           ? "shadow-xl shadow-slate-900/15 border-b border-slate-200"
           : "shadow-xs border-b border-slate-100"
