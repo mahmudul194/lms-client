@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Star, Quote } from "lucide-react";
 
 export default function TestimonialsSection() {
   const testimonials = [
@@ -31,48 +32,60 @@ export default function TestimonialsSection() {
   ];
 
   return (
-    <section className="py-24 bg-white font-sans">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12">
-        {/* What Students Say About Us */}
-        <div className="space-y-14">
-          <div className="text-center space-y-2.5">
-            <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#0077b6]">
-              TESTIMONIALS
-            </span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-[#002b5b]">
-              What Students Say About Us
-            </h2>
-          </div>
+    <section className="py-20 sm:py-24 bg-white font-sans">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 space-y-12 sm:space-y-14">
+        {/* Header */}
+        <div className="text-center space-y-2.5">
+          <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#0077b6]">
+            TESTIMONIALS
+          </span>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-[#002b5b] tracking-tight">
+            What Students Say About Us
+          </h2>
+        </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
-            {testimonials.map((item, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded-3xl border border-slate-200/90 p-8 sm:p-9 flex flex-col items-center text-center justify-between shadow-xs hover:shadow-2xl transition-all hover:-translate-y-1.5"
-              >
-                <div className="flex flex-col items-center space-y-5">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-20 h-20 rounded-full object-cover border-4 border-slate-50 shadow-md"
-                  />
-                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
-                    &ldquo;{item.text}&rdquo;
+        {/* 4 Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+          {testimonials.map((item, idx) => (
+            <div
+              key={idx}
+              className="relative bg-gradient-to-b from-white to-slate-50/60 rounded-3xl border border-slate-200/90 p-7 sm:p-8 flex flex-col justify-between shadow-xs hover:shadow-xl hover:border-sky-300 transition-all duration-300 group hover:-translate-y-1.5 overflow-hidden"
+            >
+              {/* Subtle Decorative Quote Icon */}
+              <Quote className="w-8 h-8 text-sky-100 group-hover:text-sky-200 absolute top-6 right-6 transition-colors pointer-events-none" />
+
+              <div className="space-y-4 relative z-10">
+                {/* 5-Star Rating */}
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+
+                {/* Quote Text */}
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
+                  &ldquo;{item.text}&rdquo;
+                </p>
+              </div>
+
+              {/* Student Profile Info */}
+              <div className="flex items-center gap-3.5 pt-6 mt-6 border-t border-slate-200/60 relative z-10">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-12 h-12 rounded-full object-cover ring-2 ring-sky-100 shadow-sm shrink-0"
+                />
+                <div className="min-w-0">
+                  <h4 className="text-sm font-extrabold text-[#002b5b] truncate group-hover:text-[#0077b6] transition-colors">
+                    {item.name}
+                  </h4>
+                  <p className="text-xs font-semibold text-slate-500 truncate mt-0.5">
+                    {item.role}
                   </p>
                 </div>
-
-                <div className="pt-6 mt-6 border-t border-slate-100 w-full text-center">
-                  <h4 className="text-sm sm:text-base font-bold text-[#002b5b]">{item.name}</h4>
-                  <p className="text-xs font-semibold text-slate-400 mt-0.5">{item.role}</p>
-                </div>
               </div>
-            ))}
-          </div>
-
-          <div className="flex justify-center items-center gap-2.5 pt-2">
-            <span className="w-3 h-3 rounded-full bg-[#002b5b]" />
-            <span className="w-3 h-3 rounded-full bg-slate-300" />
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
