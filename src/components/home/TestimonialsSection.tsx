@@ -43,7 +43,13 @@ export default function TestimonialsSection() {
     },
   ];
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const N = testimonials.length;
+  // Duplicate array 3 times for seamless infinite bidirectional loop without rollbacks
+  const extendedList = [...testimonials, ...testimonials, ...testimonials];
+
+  // Start in the middle copy (index N)
+  const [currentIndex, setCurrentIndex] = useState(N);
+  const [isTransitioning, setIsTransitioning] = useState(true);
   const [visibleCount, setVisibleCount] = useState(3);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -65,23 +71,28 @@ export default function TestimonialsSection() {
     return () => window.removeEventListener("resize", updateCount);
   }, []);
 
-  const maxIndex = Math.max(0, testimonials.length - visibleCount);
-
   const handleNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
-  }, [maxIndex]);
+    setIsTransitioning(true);
+    setCurrentIndex((prev) => prev + 1);
+  }, []);
 
   const handlePrev = useCallback(() => {
-    setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
-  }, [maxIndex]);
+    setIsTransitioning(true);
+    setCurrentIndex((prev) => prev - 1);
+  }, []);
 
-  useEffect(() => {
-    if (currentIndex > maxIndex) {
-      setCurrentIndex(maxIndex);
+  // Seamless snap when sliding past boundaries so it never rolls back
+  const handleTransitionEnd = () => {
+    if (currentIndex >= 2 * N) {
+      setIsTransitioning(false);
+      setCurrentIndex(currentIndex - N);
+    } else if (currentIndex < N) {
+      setIsTransitioning(false);
+      setCurrentIndex(currentIndex + N);
     }
-  }, [maxIndex, currentIndex]);
+  };
 
-  // Auto-play sliding effect with pause on hover (halka speed barano holo)
+  // Auto-slide every 3.2s with pause on hover
   useEffect(() => {
     if (isPaused) return;
     const timer = setInterval(() => {
@@ -110,7 +121,7 @@ export default function TestimonialsSection() {
   return (
     <section className="py-20 sm:py-24 bg-white font-sans overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 space-y-10 sm:space-y-12">
-        {/* Clean Centered Header without Arrow Buttons */}
+        {/* Clean Centered Header */}
         <div className="text-center space-y-2.5">
           <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#0077b6]">
             TESTIMONIALS
@@ -120,7 +131,7 @@ export default function TestimonialsSection() {
           </h2>
         </div>
 
-        {/* Sliding Cards Track */}
+        {/* Seamless Infinite Sliding Track */}
         <div
           className="relative overflow-hidden py-3 -my-3"
           onMouseEnter={() => setIsPaused(true)}
@@ -130,12 +141,16 @@ export default function TestimonialsSection() {
           onTouchEnd={handleTouchEnd}
         >
           <div
-            className="flex transition-transform duration-350 ease-out"
+            onTransitionEnd={handleTransitionEnd}
+            className="flex"
             style={{
               transform: `translateX(-${currentIndex * (100 / visibleCount)}%)`,
+              transition: isTransitioning
+                ? "transform 400ms cubic-bezier(0.25, 1, 0.5, 1)"
+                : "none",
             }}
           >
-            {testimonials.map((item, idx) => (
+            {extendedList.map((item, idx) => (
               <div
                 key={idx}
                 className="shrink-0 px-3 sm:px-3.5"
@@ -185,12 +200,15 @@ export default function TestimonialsSection() {
 
         {/* Sliding Dot Indicators */}
         <div className="flex justify-center items-center gap-2 pt-2">
-          {Array.from({ length: maxIndex + 1 }).map((_, idx) => (
+          {testimonials.map((_, idx) => (
             <button
               key={idx}
-              onClick={() => setCurrentIndex(idx)}
+              onClick={() => {
+                setIsTransitioning(true);
+                setCurrentIndex(N + idx);
+              }}
               className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
-                currentIndex === idx
+                currentIndex % N === idx
                   ? "w-8 bg-[#0077b6]"
                   : "w-2.5 bg-slate-300 hover:bg-slate-400"
               }`}
