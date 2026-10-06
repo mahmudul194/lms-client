@@ -197,26 +197,6 @@ export default function TestimonialsSection() {
             ))}
           </div>
         </div>
-
-        {/* Sliding Dot Indicators */}
-        <div className="flex justify-center items-center gap-2 pt-2">
-          {testimonials.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => {
-                setIsTransitioning(true);
-                setCurrentIndex(N + idx);
-              }}
-              className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
-                currentIndex % N === idx
-                  ? "w-8 bg-[#0077b6]"
-                  : "w-2.5 bg-slate-300 hover:bg-slate-400"
-              }`}
-              aria-label={`Go to slide ${idx + 1}`}
-              title={`Slide ${idx + 1}`}
-            />
-          ))}
-        </div>
       </div>
     </section>
   );
