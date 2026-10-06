@@ -92,12 +92,12 @@ export default function TestimonialsSection() {
     }
   };
 
-  // Auto-slide every 3.2s with pause on hover
+  // Auto-slide every 2.2s with pause on hover (speed barano holo)
   useEffect(() => {
     if (isPaused) return;
     const timer = setInterval(() => {
       handleNext();
-    }, 3200);
+    }, 2200);
     return () => clearInterval(timer);
   }, [isPaused, handleNext]);
 
@@ -146,7 +146,7 @@ export default function TestimonialsSection() {
             style={{
               transform: `translateX(-${currentIndex * (100 / visibleCount)}%)`,
               transition: isTransitioning
-                ? "transform 400ms cubic-bezier(0.25, 1, 0.5, 1)"
+                ? "transform 280ms ease-out"
                 : "none",
             }}
           >
