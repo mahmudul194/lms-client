@@ -97,7 +97,7 @@ export default function TestimonialsSection() {
     if (isPaused) return;
     const timer = setInterval(() => {
       handleNext();
-    }, 2200);
+    }, 2800);
     return () => clearInterval(timer);
   }, [isPaused, handleNext]);
 
