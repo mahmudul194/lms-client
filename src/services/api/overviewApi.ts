@@ -14,6 +14,15 @@ export interface StudentOverviewReport {
   paymentHistory: any[];
 }
 
+export interface PublicStatsReport {
+  expertTrainers: number;
+  programs: number;
+  students: number;
+  courseVideos: number;
+  liveClasses: number;
+  yearsOfExperience: number;
+}
+
 export const overviewApi = {
   getAdminOverview: async (params?: { startDate?: string; endDate?: string }): Promise<AdminOverviewReport> => {
     const sp = new URLSearchParams();
@@ -27,5 +36,10 @@ export const overviewApi = {
   getStudentOverview: async (): Promise<StudentOverviewReport> => {
     const response = await apiFetch<StudentOverviewReport>("/overview/student");
     return response.data as StudentOverviewReport;
+  },
+
+  getPublicStats: async (): Promise<PublicStatsReport> => {
+    const response = await apiFetch<PublicStatsReport>("/overview/public-stats");
+    return response.data as PublicStatsReport;
   },
 };

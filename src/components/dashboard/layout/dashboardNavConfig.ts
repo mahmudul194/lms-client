@@ -15,6 +15,8 @@ import {
   User,
   PlayCircle,
   LucideIcon,
+  Star,
+  Bell,
 } from "lucide-react";
 
 export interface NavSubItem {
@@ -39,6 +41,7 @@ export const STUDENT_NAV_ITEMS: NavItem[] = [
   { id: "resources", label: "Resources", icon: FolderDown },
   { id: "payments", label: "Installments", icon: CreditCard, badge: "৳4k Due" },
   { id: "certificate", label: "Certificate", icon: Award },
+  { id: "reviews", label: "My Reviews", icon: Star },
   { id: "profile", label: "Settings", icon: User },
 ];
 
@@ -64,15 +67,42 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
       { id: "instructors", label: "Trainer & Mentors", badge: "3 Active" },
     ],
   },
-  { id: "categories", label: "Course Categories", icon: FolderTree },
-  { id: "courses", label: "Course Manager", icon: BookOpen },
-  { id: "batches", label: "Batch Manager", icon: Layers },
-  { id: "modules", label: "Module Uploader", icon: FolderTree, badge: "New" },
-  { id: "lessons", label: "Lessons Manager", icon: PlayCircle },
-  { id: "assignments", label: "Assignments", icon: FileCheck },
-  { id: "resources", label: "Resources", icon: FolderDown },
+  {
+    id: "batch_management",
+    label: "Batch Manager",
+    icon: Layers,
+    children: [
+      { id: "categories", label: "Course Categories" },
+      { id: "courses", label: "Course " },
+      { id: "batches", label: "Batch " },
+    ],
+  },
+  {
+    id: "course_contents",
+    label: "Course Contents",
+    icon: BookOpen,
+    children: [
+      { id: "modules", label: "Module ", badge: "New" },
+      { id: "lessons", label: "Lessons " },
+      { id: "assignments", label: "Assignments" },
+      { id: "resources", label: "Resources" },
+    ],
+  },
   { id: "certificates", label: "Certificates", icon: Award },
   { id: "coupons", label: "Coupon Engine", icon: TicketPercent, badge: "Active" },
   { id: "revenue", label: "Financial Reports", icon: BarChart3 },
+  {
+    id: "cms",
+    label: "CMS Management",
+    icon: FolderTree,
+    children: [
+      { id: "blogs", label: "Blogs" },
+      { id: "galleries", label: "Galleries" },
+      { id: "portfolios", label: "Portfolios" },
+      { id: "reviews", label: "Reviews" },
+      { id: "notices", label: "Notices" },
+      { id: "contacts", label: "Contact Messages" },
+    ],
+  },
   { id: "settings", label: "Settings", icon: User },
 ];

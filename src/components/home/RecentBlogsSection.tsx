@@ -1,33 +1,27 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { blogsApi } from "@/services/api/blogsApi";
 
 export default function RecentBlogsSection() {
-  const recentBlogs = [
-    {
-      id: "bim-lod-complete-guide",
-      category: "BIM LOD",
-      title: "BIM LOD (Level of Development) — Complete Guide (LOD 100–500)",
-      image:
-        "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      id: "bim-dimensions-1d-7d",
-      category: "BIM DIMENSIONS",
-      title: "BIM Dimensions (1D-7D) Explained: How 7D BIM Transforms Construction",
-      image:
-        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      id: "clash-detection-bim",
-      category: "CLASH DETECTION",
-      title: "Clash Detection in BIM: Comprehensive Guide (What, Why & How)",
-      image:
-        "https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=800&q=80",
-    },
-  ];
+  const [recentBlogs, setRecentBlogs] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const res = await blogsApi.getAllBlogs();
+        if ((res.statusCode === 200 || res.statusCode === 201) && res.data) {
+          // Take top 3 for the landing page
+          setRecentBlogs(res.data.slice(0, 3));
+        }
+      } catch (err) {
+        console.error("Failed to fetch blogs", err);
+      }
+    };
+    fetchBlogs();
+  }, []);
 
   return (
     <section className="py-16 sm:py-20 bg-white font-sans">
@@ -50,7 +44,7 @@ export default function RecentBlogsSection() {
               {/* Inset Framed Image */}
               <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-slate-100">
                 <img
-                  src={blog.image}
+                  src={blog.image || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80"}
                   alt={blog.title}
                   loading="lazy"
                   onError={(e) => {
@@ -61,7 +55,7 @@ export default function RecentBlogsSection() {
                 />
                 <div className="absolute top-3 left-3">
                   <span className="px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-[#0077b6] font-black text-[11px] tracking-wider uppercase shadow-xs">
-                    {blog.category}
+                    {blog.category || "Blog"}
                   </span>
                 </div>
               </div>

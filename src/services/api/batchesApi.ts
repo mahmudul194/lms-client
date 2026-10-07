@@ -20,7 +20,7 @@ export interface BatchItem {
   price?: number;
   discount_price?: number;
   fb_group_link?: string;
-  course?: { id: string; title: string };
+  course?: any;
   createdAt?: string;
 }
 

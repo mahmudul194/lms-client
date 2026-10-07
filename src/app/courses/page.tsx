@@ -17,13 +17,7 @@ export default function AllCoursesPage() {
 
         if (res.statusCode === 200 && res.data?.items?.length) {
           const apiBatches = res.data.items
-            .filter((b: any) => {
-              if (b.status === 'cancelled' || b.status === 'completed') return false;
-              if (b.registration_end) {
-                return new Date(b.registration_end).getTime() > Date.now();
-              }
-              return true;
-            })
+            .filter((b: any) => b.status === "ongoing")
             .map((b: any) => {
               const c = b.course || {};
             const price = b.price || 16000;

@@ -130,7 +130,8 @@ export type StudentDashboardTab =
   | "resources"
   | "payments"
   | "certificate"
-  | "profile";
+  | "profile"
+  | "reviews";
 
 export type InstructorDashboardTab =
   | "overview"
@@ -156,5 +157,11 @@ export type AdminDashboardTab =
   | "certificates"
   | "coupons"
   | "revenue"
-  | "settings";
+  | "settings"
+  | "blogs"
+  | "galleries"
+  | "portfolios"
+  | "reviews"
+  | "notices"
+  | "contacts";
 

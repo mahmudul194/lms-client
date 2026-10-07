@@ -121,8 +121,8 @@ export default function DashboardSidebar({
                       </div>
                     </button>
 
-                    {isExpanded && (
-                      <div className="ml-5 pl-3 border-l-2 border-slate-700/60 space-y-1 py-1">
+                    <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"}`}>
+                      <div className="ml-5 pl-3 border-l-2 border-slate-700/60 space-y-1 py-1 mt-1">
                         {item.children?.map((sub) => (
                           <button key={sub.id} type="button" onClick={() => handleNavClick(sub.id)} className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${activeTabId === sub.id ? "bg-[#0077b6] text-white font-bold shadow-xs" : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]"}`}>
                             <span>{sub.label}</span>
@@ -130,7 +130,7 @@ export default function DashboardSidebar({
                           </button>
                         ))}
                       </div>
-                    )}
+                    </div>
                   </div>
                 );
               }

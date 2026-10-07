@@ -11,6 +11,7 @@ import StudentResourcesTab from "./StudentResourcesTab";
 import StudentPaymentsTab from "./StudentPaymentsTab";
 import StudentCertificateTab from "./StudentCertificateTab";
 import StudentProfileTab from "./StudentProfileTab";
+import StudentReviewsTab from "./StudentReviewsTab";
 
 interface StudentTabRouterProps {
   studentTab: StudentDashboardTab;
@@ -58,6 +59,7 @@ export default function StudentTabRouter({
       {studentTab === "resources" && <StudentResourcesTab />}
       {studentTab === "payments" && <StudentPaymentsTab />}
       {studentTab === "certificate" && <StudentCertificateTab currentUser={currentUser} />}
+      {studentTab === "reviews" && <StudentReviewsTab />}
       {studentTab === "profile" && <StudentProfileTab currentUser={currentUser} />}
     </div>
   );

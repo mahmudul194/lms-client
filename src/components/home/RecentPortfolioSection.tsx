@@ -1,36 +1,27 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { portfoliosApi } from "@/services/api/portfoliosApi";
 
 export default function RecentPortfolioSection() {
-  const recentProjects = [
-    {
-      id: "commercial-bim-modeling",
-      title: "Multi-Storey Residential & Commercial BIM Model",
-      category: "Architectural & Structural BIM",
-      tools: "Revit • Navisworks",
-      image:
-        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      id: "pile-cap-structural-detailing",
-      title: "Students Project: Pile, Pile Cap & Substructure",
-      category: "Structural Detailing",
-      tools: "Revit Structure • AutoCAD",
-      image:
-        "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      id: "mep-clash-coordination",
-      title: "Comprehensive MEP Services & Clash Detection",
-      category: "MEP & Coordination",
-      tools: "Revit MEP • Navisworks Manage",
-      image:
-        "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80",
-    },
-  ];
+  const [recentProjects, setRecentProjects] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchPortfolios = async () => {
+      try {
+        const res = await portfoliosApi.getAllPortfolios();
+        if ((res.statusCode === 200 || res.statusCode === 201) && res.data) {
+          // Take top 3 for the landing page
+          setRecentProjects(res.data.slice(0, 3));
+        }
+      } catch (err) {
+        console.error("Failed to fetch portfolios", err);
+      }
+    };
+    fetchPortfolios();
+  }, []);
 
   return (
     <section className="py-16 sm:py-20 bg-[#f8fafc] font-sans border-y border-slate-100">
@@ -53,7 +44,7 @@ export default function RecentPortfolioSection() {
               {/* Inset Framed Image with Category & Software Tool Tags */}
               <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-slate-900">
                 <img
-                  src={project.image}
+                  src={project.image || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"}
                   alt={project.title}
                   loading="lazy"
                   onError={(e) => {
@@ -66,16 +57,18 @@ export default function RecentPortfolioSection() {
                 {/* Floating Category Pill */}
                 <div className="absolute top-3 left-3">
                   <span className="px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-[#0077b6] font-black text-[11px] tracking-wider uppercase shadow-xs">
-                    {project.category}
+                    {project.category || "Project"}
                   </span>
                 </div>
 
                 {/* Software Tool Badge */}
-                <div className="absolute bottom-3 left-3">
-                  <span className="px-2.5 py-1 rounded-lg bg-slate-950/75 backdrop-blur-md text-white/90 text-[11px] font-semibold border border-white/10 shadow-xs">
-                    {project.tools}
-                  </span>
-                </div>
+                {project.tools && (
+                  <div className="absolute bottom-3 left-3">
+                    <span className="px-2.5 py-1 rounded-lg bg-slate-950/75 backdrop-blur-md text-white/90 text-[11px] font-semibold border border-white/10 shadow-xs">
+                      {project.tools}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Card Body & CTA */}

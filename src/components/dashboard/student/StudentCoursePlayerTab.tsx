@@ -12,6 +12,7 @@ export default function StudentCoursePlayerTab() {
   const [courses, setCourses] = useState<EnrolledCourse[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<EnrolledCourse | null>(null);
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -93,6 +94,8 @@ export default function StudentCoursePlayerTab() {
         }
       } catch {
         setCourses([]);
+      } finally {
+        setLoading(false);
       }
     })();
   }, []);
@@ -154,6 +157,29 @@ export default function StudentCoursePlayerTab() {
       window.history.replaceState(null, "", `${window.location.pathname}?${sp.toString()}`);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 font-sans animate-pulse">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs h-[380px] flex flex-col">
+            <div className="h-44 bg-slate-200 w-full" />
+            <div className="p-5 flex-1 flex flex-col gap-4">
+              <div className="h-6 bg-slate-200 rounded-xl w-3/4" />
+              <div className="h-4 bg-slate-200 rounded w-1/2" />
+              <div className="mt-auto space-y-3 pt-2">
+                <div className="flex justify-between items-center">
+                  <div className="h-3 bg-slate-200 rounded w-1/4" />
+                  <div className="h-3 bg-slate-200 rounded w-1/4" />
+                </div>
+                <div className="h-2 bg-slate-200 rounded-full w-full" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   if (courses.length === 0) {
     return (

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import AnimatedCounter from "@/components/common/AnimatedCounter";
+import { overviewApi, PublicStatsReport } from "@/services/api/overviewApi";
 
 export default function StartToSuccess() {
   const [isInView, setIsInView] = useState(false);
@@ -26,9 +27,19 @@ export default function StartToSuccess() {
     return () => observer.disconnect();
   }, []);
 
+  const [statsData, setStatsData] = useState<PublicStatsReport | null>(null);
+
+  useEffect(() => {
+    overviewApi.getPublicStats()
+      .then((data) => {
+        if (data) setStatsData(data);
+      })
+      .catch(console.error);
+  }, []);
+
   const stats = [
     {
-      targetNumber: 15,
+      targetNumber: statsData?.expertTrainers || 15,
       suffix: "",
       label: "Expert Trainer",
       icon: (
@@ -41,7 +52,7 @@ export default function StartToSuccess() {
       ),
     },
     {
-      targetNumber: 12,
+      targetNumber: statsData?.programs || 12,
       suffix: "",
       label: "Programs",
       icon: (
@@ -54,7 +65,7 @@ export default function StartToSuccess() {
       ),
     },
     {
-      targetNumber: 200,
+      targetNumber: statsData?.students || 200,
       suffix: "+",
       label: "Students",
       icon: (
@@ -65,7 +76,7 @@ export default function StartToSuccess() {
       ),
     },
     {
-      targetNumber: 312,
+      targetNumber: statsData?.courseVideos || 312,
       suffix: "",
       label: "Course Videos",
       icon: (
@@ -77,7 +88,7 @@ export default function StartToSuccess() {
       ),
     },
     {
-      targetNumber: 45,
+      targetNumber: statsData?.liveClasses || 45,
       suffix: "",
       label: "Live Classes",
       icon: (
@@ -90,7 +101,7 @@ export default function StartToSuccess() {
       ),
     },
     {
-      targetNumber: 10,
+      targetNumber: statsData?.yearsOfExperience || 10,
       suffix: "+",
       label: "Years of Experience",
       icon: (

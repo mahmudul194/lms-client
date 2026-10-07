@@ -20,13 +20,7 @@ export default function FeaturedCourses() {
 
         if (res.statusCode === 200 && res.data?.items?.length) {
           items = res.data.items
-            .filter((b: any) => {
-              if (b.status === "cancelled" || b.status === "completed") return false;
-              if (b.registration_end) {
-                return new Date(b.registration_end).getTime() > Date.now();
-              }
-              return true;
-            })
+            .filter((b: any) => b.status === "ongoing")
             .map((b: any) => {
               const c = b.course || {};
               const price = b.price || 16000;
@@ -84,21 +78,13 @@ export default function FeaturedCourses() {
 
   return (
     <section
-      className={`bg-white transition-all ${
-        courses.length > 0 ? "pt-14 sm:pt-18 pb-12 sm:pb-16" : "pt-12 sm:pt-14 pb-2 sm:pb-3"
-      }`}
+      className={`bg-white transition-all ${courses.length > 0 ? "pt-14 sm:pt-18 pb-12 sm:pb-16" : "pt-12 sm:pt-14 pb-2 sm:pb-3"
+        }`}
     >
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12">
         <div className="text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#002b5b] tracking-tight">
-            Explore All Courses (Installment Details Available on{" "}
-            <Link
-              href="/courses"
-              className="text-[#0077b6] relative inline-block underline decoration-2 decoration-[#0077b6] underline-offset-4 font-black hover:text-[#0f4c81]"
-            >
-              Admission
-            </Link>{" "}
-            Page)
+            Explore All Batches
           </h2>
         </div>
 

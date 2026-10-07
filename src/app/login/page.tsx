@@ -20,7 +20,7 @@ function LoginContent() {
     }
     setTimeout(() => {
       setLoading(false);
-      window.location.href = redirectUrl;
+      window.location.href = redirectUrl === "/dashboard" ? `/dashboard?role=${role}&tab=overview` : redirectUrl;
     }, 400);
   };
 

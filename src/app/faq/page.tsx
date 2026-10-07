@@ -2,7 +2,20 @@
 
 import React, { useState } from "react";
 import { ChevronDown, HelpCircle } from "lucide-react";
-import { FAQS } from "@/data/mockData";
+const FAQS = [
+  {
+    question: "What is BIM and why is it important?",
+    answer: "Building Information Modeling (BIM) is a digital representation of physical and functional characteristics of a facility. It is critical for modern AEC projects as it reduces errors, improves collaboration, and optimizes costs.",
+  },
+  {
+    question: "Do I need prior experience in Revit to join?",
+    answer: "No, our comprehensive courses start from the absolute basics. However, basic knowledge of civil/architectural engineering and standard CAD concepts is highly recommended.",
+  },
+  {
+    question: "Are the classes live or pre-recorded?",
+    answer: "All our main batch classes are conducted LIVE via Zoom by industry experts. You also get access to the recorded videos of each class within 24 hours.",
+  },
+];
 
 export default function FaqPage() {
   const [openIdx, setOpenIdx] = useState<number | null>(0);

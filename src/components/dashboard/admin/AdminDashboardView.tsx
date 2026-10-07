@@ -20,6 +20,13 @@ import AdminCoursesTab from "./AdminCoursesTab";
 import AdminCreateBatchModal from "./AdminCreateBatchModal";
 import { CreateBatchPayload } from "@/services/api/batchesApi";
 
+import AdminBlogsTab from "./AdminBlogsTab";
+import AdminGalleriesTab from "./AdminGalleriesTab";
+import AdminPortfoliosTab from "./AdminPortfoliosTab";
+import AdminReviewsTab from "./AdminReviewsTab";
+import AdminNoticesTab from "./AdminNoticesTab";
+import AdminContactsTab from "./AdminContactsTab";
+
 export default function AdminDashboardView({ adminTab, setAdminTab }: { adminTab: AdminDashboardTab; setAdminTab: (tab: AdminDashboardTab) => void }) {
   const [isCreateBatchModalOpen, setIsCreateBatchModalOpen] = useState(false);
   const [pendingApprovals, setPendingApprovals] = useState<PendingApproval[]>([]);
@@ -112,6 +119,12 @@ export default function AdminDashboardView({ adminTab, setAdminTab }: { adminTab
       {adminTab === "coupons" && <AdminCouponsTab />}
       {adminTab === "revenue" && <AdminRevenueTab />}
       {adminTab === "settings" && <AdminSettingsTab />}
+      {adminTab === "blogs" && <AdminBlogsTab />}
+      {adminTab === "galleries" && <AdminGalleriesTab />}
+      {adminTab === "portfolios" && <AdminPortfoliosTab />}
+      {adminTab === "reviews" && <AdminReviewsTab />}
+      {adminTab === "notices" && <AdminNoticesTab />}
+      {adminTab === "contacts" && <AdminContactsTab />}
       <AdminCreateBatchModal isOpen={isCreateBatchModalOpen} onClose={() => setIsCreateBatchModalOpen(false)} onCreate={handleLaunchBatch} />
     </div>
   );

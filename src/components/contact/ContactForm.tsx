@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { contactApi } from "@/services/api/contactApi";
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -11,13 +12,19 @@ export default function ContactForm() {
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.SubmitEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitted(true);
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({ name: "", email: "", phone: "", message: "" });
-    }, 4000);
+    try {
+      await contactApi.create(formData);
+      setIsSubmitted(true);
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setFormData({ name: "", email: "", phone: "", message: "" });
+      }, 4000);
+    } catch (error) {
+      console.error("Failed to send message", error);
+      alert("Failed to send message. Please try again later.");
+    }
   };
 
   return (

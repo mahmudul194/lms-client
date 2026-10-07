@@ -19,3 +19,8 @@ export * from "./certificatesApi";
 export * from "./resourcesApi";
 export * from "./overviewApi";
 export * from "./uploadApi";
+export * from "./reviewsApi";
+export * from "./blogsApi";
+export * from "./portfoliosApi";
+export * from "./galleriesApi";
+export * from "./noticesApi";

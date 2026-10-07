@@ -37,17 +37,10 @@ export default function AdminMetricsGrid() {
       icon: Layers,
       sub: "From installments",
     },
-    {
-      label: "Issued Certificates",
-      value: "3,820",
-      trend: "100% QR Verified",
-      icon: Award,
-      sub: "Industry Recognized",
-    },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 font-sans">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 font-sans">
       {metrics.map((m, idx) => {
         const Icon = m.icon;
         return (

@@ -54,6 +54,37 @@ export default function LoginForm({ loading: parentLoading, onLoginSubmit }: Log
     setNotRegistered(null);
   };
 
+  // Timer state for OTP
+  const [timer, setTimer] = React.useState(0);
+  React.useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (timer > 0) {
+      interval = setInterval(() => setTimer((t) => t - 1), 1000);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    let newOtp = (otpCode || "").split("");
+    // Ensure array has 6 empty strings if it was shorter
+    while (newOtp.length < 6) newOtp.push("");
+    
+    newOtp[index] = value.slice(-1);
+    const newOtpString = newOtp.join("");
+    setOtpCode(newOtpString);
+    
+    if (value && index < 5) {
+      document.getElementById(`otp-${index + 1}`)?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !otpCode[index] && index > 0) {
+      document.getElementById(`otp-${index - 1}`)?.focus();
+    }
+  };
+
   // Helper to fetch user via /auth/me and store session
   const syncMeProfile = async () => {
     try {
@@ -110,6 +141,8 @@ export default function LoginForm({ loading: parentLoading, onLoginSubmit }: Log
       const otpRes = await authApi.sendOtp(phone.trim());
       if (otpRes.statusCode === 200) {
         setOtpSent(true);
+        setOtpCode(""); // Reset previous OTP if any
+        setTimer(60); // Start 60s timer
         setInfoMsg(`OTP code sent to ${phone.trim()}. Please enter the 6-digit code below.`);
       } else {
         setErrorMsg(otpRes.message || "Failed to send OTP code. Please try again.");
@@ -135,9 +168,10 @@ export default function LoginForm({ loading: parentLoading, onLoginSubmit }: Log
       const res = await authApi.verifyOtp(phone.trim(), otpCode.trim());
       const token = (res.data as any)?.access_token || res.data?.accessToken;
       if ((res.statusCode === 200 || res.statusCode === 201) && (token || res.data?.user)) {
+        let mappedRole = "student";
         if (res.data?.user) {
           const apiRole = (res.data.user.role || "").toLowerCase();
-          const mappedRole: "student" | "instructor" | "admin" = 
+          mappedRole = 
             apiRole === "admin" || apiRole === "developer" || apiRole === "manager" || apiRole === "moderator"
               ? "admin"
               : apiRole === "instructor" || apiRole === "mentor"
@@ -152,8 +186,12 @@ export default function LoginForm({ loading: parentLoading, onLoginSubmit }: Log
         }
         await syncMeProfile();
         setInfoMsg("Login successful! Redirecting to dashboard...");
+        
+        const redirectParam = searchParams.get("redirect");
+        const redirectUrl = redirectParam || "/dashboard";
+        
         setTimeout(() => {
-          window.location.href = "/dashboard";
+          window.location.href = redirectUrl === "/dashboard" ? `/dashboard?role=${mappedRole}&tab=overview` : redirectUrl;
         }, 300);
       } else {
         setErrorMsg(res.message || "Invalid or expired OTP code.");
@@ -470,36 +508,48 @@ export default function LoginForm({ loading: parentLoading, onLoginSubmit }: Log
             </form>
           ) : (
             <form onSubmit={handleVerifyOtp} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="block text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-500">
+              <div className="space-y-3">
+                <label className="block text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-500 text-center">
                   ENTER 6-DIGIT OTP CODE
                 </label>
-                <input
-                  type="text"
-                  maxLength={6}
-                  required
-                  placeholder="123456"
-                  value={otpCode}
-                  onChange={(e) => setOtpCode(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-[#f8fafc] border border-slate-200 text-center tracking-[0.4em] font-mono text-lg text-slate-900 focus:outline-none focus:bg-white focus:border-[#0077b6] focus:ring-1 focus:ring-sky-400 transition-all"
-                />
+                <div className="flex items-center justify-center gap-2 sm:gap-3">
+                  {Array.from({ length: 6 }).map((_, idx) => (
+                    <input
+                      key={idx}
+                      id={`otp-${idx}`}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={otpCode[idx] || ""}
+                      onChange={(e) => handleOtpChange(idx, e.target.value)}
+                      onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                      className="w-10 h-12 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-black text-slate-900 bg-[#f8fafc] border border-slate-200 rounded-xl focus:outline-none focus:border-[#0077b6] focus:ring-2 focus:ring-[#0077b6]/20 transition-all"
+                    />
+                  ))}
+                </div>
               </div>
 
-              <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center justify-between text-xs mt-4">
                 <button
                   type="button"
-                  onClick={() => setOtpSent(false)}
-                  className="text-slate-500 hover:text-[#0077b6] transition-colors"
+                  onClick={() => { setOtpSent(false); setTimer(0); setOtpCode(""); }}
+                  className="text-slate-500 hover:text-[#0077b6] font-semibold transition-colors"
                 >
                   ← Change Mobile Number
                 </button>
-                <button
-                  type="button"
-                  onClick={handleSendOtp}
-                  className="text-[#0077b6] font-bold hover:underline"
-                >
-                  Resend OTP
-                </button>
+                {timer > 0 ? (
+                  <span className="text-slate-400 font-bold">
+                    Resend OTP in {timer}s
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    className="text-[#0077b6] font-bold hover:underline"
+                  >
+                    Resend OTP Code
+                  </button>
+                )}
               </div>
 
               <button

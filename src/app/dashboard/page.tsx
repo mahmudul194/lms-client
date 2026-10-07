@@ -3,7 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { DUMMY_ACCOUNTS, UserAccount } from "@/data/dummyAccounts";
 import { ClassVideo, StudentDashboardTab, InstructorDashboardTab, AdminDashboardTab } from "@/types/dashboard";
-import { MOCK_DASHBOARD_CLASSES, MOCK_LIVE_CLASSES, MOCK_ASSIGNMENTS, MOCK_RESOURCES } from "@/data/dashboardMockData";
+const MOCK_DASHBOARD_CLASSES: any[] = [];
+const MOCK_LIVE_CLASSES: any[] = [];
+const MOCK_ASSIGNMENTS: any[] = [];
+const MOCK_RESOURCES: any[] = [];
 import DashboardSidebar from "@/components/dashboard/layout/DashboardSidebar";
 import DashboardHeader from "@/components/dashboard/layout/DashboardHeader";
 import StudentTabRouter from "@/components/dashboard/student/StudentTabRouter";
@@ -77,7 +80,7 @@ export default function UnifiedDashboardPage() {
   const handleSetStudentTab = (t: StudentDashboardTab) => { setStudentTabState(t); syncUrl("student", t); };
   const handleSetInstructorTab = (t: InstructorDashboardTab) => { setInstructorTabState(t); syncUrl("instructor", t); };
   const handleSetAdminTab = (t: AdminDashboardTab) => { setAdminTabState(t); syncUrl("admin", t); };
-  const activeVideo = selectedClassVideo || MOCK_DASHBOARD_CLASSES[0];
+  const activeVideo = selectedClassVideo || MOCK_DASHBOARD_CLASSES[0] || null;
 
   if (!mounted) {
     return (

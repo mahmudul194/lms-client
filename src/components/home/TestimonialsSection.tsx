@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Star, Quote } from "lucide-react";
+import { reviewsApi } from "@/services/api";
 
 export default function TestimonialsSection() {
   const testimonials = [
@@ -43,14 +44,38 @@ export default function TestimonialsSection() {
     },
   ];
 
-  const N = testimonials.length;
+  const [apiReviews, setApiReviews] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const res = await reviewsApi.getAllReviews();
+        if (res.statusCode === 200 && res.data && res.data.length > 0) {
+          const formattedReviews = res.data.map((r: any) => ({
+            name: r.student?.name || "Student",
+            role: r.batch?.name || "BIM Student",
+            image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80",
+            text: r.comment,
+            rating: r.rating
+          }));
+          setApiReviews(formattedReviews);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchReviews();
+  }, []);
+
+  const displayTestimonials = apiReviews.length > 0 ? apiReviews : testimonials;
+  const N = displayTestimonials.length;
   // 5x duplicates to ensure the buffer never runs dry under any transition delay
   const extendedList = [
-    ...testimonials,
-    ...testimonials,
-    ...testimonials,
-    ...testimonials,
-    ...testimonials,
+    ...displayTestimonials,
+    ...displayTestimonials,
+    ...displayTestimonials,
+    ...displayTestimonials,
+    ...displayTestimonials,
   ];
 
   // Base index in the middle copy (copy 2: index 2 * N)
@@ -214,7 +239,7 @@ export default function TestimonialsSection() {
                     {/* 5-Star Rating */}
                     <div className="flex items-center gap-1">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                        <Star key={i} className={`w-3.5 h-3.5 ${i < (item.rating || 5) ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200"}`} />
                       ))}
                     </div>
 

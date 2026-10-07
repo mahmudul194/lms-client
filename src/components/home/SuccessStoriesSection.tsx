@@ -1,9 +1,26 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Star, Quote, ArrowRight } from "lucide-react";
-import { TESTIMONIALS } from "@/data/mockData";
+import { reviewsApi } from "@/services/api";
 
 export default function SuccessStoriesSection() {
+  const [reviews, setReviews] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const res = await reviewsApi.getAllReviews();
+        if ((res.statusCode === 200 || res.statusCode === 201) && res.data) {
+          // Take top 3 for the landing page
+          setReviews(res.data.slice(0, 3));
+        }
+      } catch (err) {
+        console.error("Failed to fetch reviews", err);
+      }
+    };
+    fetchReviews();
+  }, []);
+
   return (
     <section className="py-16 lg:py-24 bg-slate-100/70 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -41,7 +58,7 @@ export default function SuccessStoriesSection() {
 
         {/* Testimonial Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {TESTIMONIALS.map((review) => (
+          {reviews.map((review) => (
             <div
               key={review.id}
               className="bg-white rounded-3xl border border-slate-200/80 p-7 flex flex-col justify-between shadow-xs hover:shadow-md transition-shadow relative"
@@ -51,7 +68,7 @@ export default function SuccessStoriesSection() {
               <div>
                 {/* Rating Stars */}
                 <div className="flex items-center gap-1 text-amber-400 mb-4">
-                  {[...Array(review.rating)].map((_, i) => (
+                  {[...Array(review.rating || 5)].map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-current" />
                   ))}
                 </div>
@@ -63,14 +80,13 @@ export default function SuccessStoriesSection() {
 
               <div className="pt-4 border-t border-slate-100 flex items-center gap-3">
                 <img
-                  src={review.avatar}
-                  alt={review.name}
+                  src={review.student?.image || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80"}
+                  alt={review.student?.name || "Student"}
                   className="w-12 h-12 rounded-full object-cover border-2 border-sky-100"
                 />
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 leading-tight">{review.name}</h4>
-                  <p className="text-xs text-[#0077b6] font-semibold">{review.role} • {review.company}</p>
-                  <span className="text-[11px] text-slate-400 block mt-0.5">{review.course}</span>
+                  <h4 className="text-sm font-bold text-slate-900 leading-tight">{review.student?.name || "Anonymous"}</h4>
+                  <p className="text-xs text-[#0077b6] font-semibold">{review.batch?.name || "Student"}</p>
                 </div>
               </div>
             </div>

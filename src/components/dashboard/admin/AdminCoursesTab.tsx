@@ -207,14 +207,20 @@ export default function AdminCoursesTab() {
                   <td className="p-4 text-right">
                     <div className="flex items-center justify-end gap-1.5">
                       <button 
-                        onClick={() => setSelectedCourse(course)}
+                        onClick={async () => {
+                          const res = await coursesApi.getCourseById(course.id);
+                          if (res.data) setSelectedCourse(res.data);
+                        }}
                         className="p-2 rounded-lg bg-sky-50 text-[#0077b6] hover:bg-[#0077b6] hover:text-white transition-colors cursor-pointer"
                         title="View Details"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button 
-                        onClick={() => setEditingCourse(course)}
+                        onClick={async () => {
+                          const res = await coursesApi.getCourseById(course.id);
+                          if (res.data) setEditingCourse(res.data);
+                        }}
                         className="p-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white transition-colors cursor-pointer"
                         title="Edit Course"
                       >
