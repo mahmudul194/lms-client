@@ -78,7 +78,8 @@ export default function PortfolioPage() {
         {/* Page Header */}
         <motion.div
           initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white px-5 py-12 text-center shadow-sm sm:px-10 sm:py-16"
         >
@@ -135,7 +136,7 @@ export default function PortfolioPage() {
         <motion.section
           initial={{ opacity: 0, y: 35 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.08 }}
+          viewport={{ once: false, amount: 0.08 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
           <DrawingProjectsSection projects={drawingProjects} />
@@ -145,7 +146,7 @@ export default function PortfolioPage() {
         <motion.section
           initial={{ opacity: 0, y: 35 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.08 }}
+          viewport={{ once: false, amount: 0.08 }}
           transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
         >
           <VideoProjectsSection

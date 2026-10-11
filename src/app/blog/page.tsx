@@ -63,7 +63,13 @@ export default function BlogsPage() {
         </div>
 
         {/* Page Header */}
-        <div className="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white px-5 py-10 text-center shadow-sm sm:px-10 sm:py-14">
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white px-5 py-10 text-center shadow-sm sm:px-10 sm:py-14"
+        >
           <div className="pointer-events-none absolute -left-16 -top-20 h-48 w-48 rounded-full bg-sky-100/60 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-20 -right-16 h-48 w-48 rounded-full bg-blue-100/50 blur-3xl" />
 
@@ -90,7 +96,7 @@ export default function BlogsPage() {
               insights to stay informed about the future of digital construction.
             </p>
           </div>
-        </div>
+        </motion.div>
 
         {/* Blog Cards Grid */}
         <motion.div
@@ -104,7 +110,7 @@ export default function BlogsPage() {
           }}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
+          viewport={{ once: false, amount: 0.1 }}
           className="grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3 lg:gap-8"
         >
           {blogs.map((blog) => (

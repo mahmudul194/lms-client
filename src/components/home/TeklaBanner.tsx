@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowUpRight, Layers3 } from "lucide-react";
+import { motion } from "motion/react";
 
 export default function TeklaBanner() {
   return (
@@ -9,7 +10,13 @@ export default function TeklaBanner() {
       <div className="mx-auto max-w-5xl space-y-6 px-4 text-center sm:px-6 lg:px-8">
         {/* Section Heading */}
 
-        <div className="text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          className="text-center"
+        >
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#0077b6]">
             Learn & Build
           </p>
@@ -17,9 +24,19 @@ export default function TeklaBanner() {
             Tekla Structures <span className="text-[#0077b6]">Professional Course</span>
           </h2>
           <div className="mx-auto mt-3 h-1 w-12 rounded-full bg-[#0077b6]/70" />
-        </div>
+        </motion.div>
 
-        <div className="tekla-banner group relative isolate overflow-hidden rounded-3xl border border-[#174c78] bg-[#06172c] shadow-xl shadow-[#002b5b]/15 transition-shadow duration-500 hover:shadow-2xl hover:shadow-[#0077b6]/20">
+        <motion.div
+          initial={{ opacity: 0, y: 30, scale: 0.98 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: false, amount: 0.15 }}
+          transition={{
+            duration: 1,
+            delay: 0.35,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          className="tekla-banner group relative isolate overflow-hidden rounded-3xl border border-[#174c78] bg-[#06172c] shadow-xl shadow-[#002b5b]/15 transition-shadow duration-500 hover:shadow-2xl hover:shadow-[#0077b6]/20"
+        >
           {/* Deep navy background */}
           <div className="absolute inset-0 -z-20 bg-[#06172c]" />
 
@@ -111,7 +128,7 @@ export default function TeklaBanner() {
 
           {/* Subtle animated bottom line */}
           <div className="tekla-line absolute inset-x-0 bottom-0 h-px" />
-        </div>
+        </motion.div>
       </div>
 
       <style jsx>{`
@@ -164,6 +181,6 @@ export default function TeklaBanner() {
       }
       `}
       </style>
-    </section>
+    </section >
   );
 }

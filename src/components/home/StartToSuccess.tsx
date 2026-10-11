@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import AnimatedCounter from "@/components/common/AnimatedCounter";
 import { overviewApi, PublicStatsReport } from "@/services/api/overviewApi";
+import { motion } from "motion/react";
 
 export default function StartToSuccess() {
   const [isInView, setIsInView] = useState(false);
@@ -123,7 +124,13 @@ export default function StartToSuccess() {
 
       <div className="relative mx-auto max-w-[1440px] space-y-12 px-4 sm:space-y-14 sm:px-8 lg:space-y-16 lg:px-12">
         {/* Section Heading — matching Tekla section */}
-        <div className="text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="text-center"
+        >
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#0077b6]">
             Our Achievements
           </p>
@@ -137,15 +144,35 @@ export default function StartToSuccess() {
           <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-500 sm:text-base">
             Key milestones that reflect our learning community and experience.
           </p>
-        </div>
+        </motion.div>
 
         {/* Statistics — Open Layout, No Cards */}
-        <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-8 md:grid-cols-3 lg:grid-cols-6 lg:gap-x-6">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.15 }}
+          variants={{
+            hidden: {},
+            visible: {
+              transition: {
+                staggerChildren: 0.12,
+              },
+            },
+          }}
+          className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-8 md:grid-cols-3 lg:grid-cols-6 lg:gap-x-6"
+        >
           {stats.map((item, idx) => (
-            <div
+            <motion.div
               key={idx}
+              variants={{
+                hidden: { opacity: 0, y: 25 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.6, ease: "easeOut" },
+                },
+              }}
               className="stats-item group flex flex-col items-center text-center"
-              style={{ animationDelay: `${idx * 100}ms` }}
             >
               {/* Icon with Soft Blue Background */}
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#e5f3fb] transition-all duration-300 group-hover:scale-110 group-hover:bg-[#d6edfa] sm:h-20 sm:w-20">
@@ -171,10 +198,10 @@ export default function StartToSuccess() {
 
               {/* Small accent */}
               <div className="mt-3 h-0.5 w-0 rounded-full bg-[#0077b6] transition-all duration-300 group-hover:w-8" />
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </section >
   );
 }

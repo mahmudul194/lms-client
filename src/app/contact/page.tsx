@@ -12,7 +12,8 @@ export default function ContactPage() {
         {/* Breadcrumb */}
         <motion.div
           initial={{ opacity: 0, x: -15 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="text-xs font-medium text-slate-400 sm:text-sm"
         >
@@ -29,7 +30,8 @@ export default function ContactPage() {
         {/* Page Header */}
         <motion.div
           initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white px-5 py-10 text-center shadow-sm sm:px-10 sm:py-14"
         >
@@ -38,9 +40,10 @@ export default function ContactPage() {
 
           <div className="relative">
             <motion.div
-              initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.15 }}
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.5 }}
+              transition={{ duration: 0.65, delay: 0.2, ease: "easeOut" }}
               className="mx-auto mb-5 flex w-fit items-center gap-2 rounded-full border border-sky-100 bg-sky-50 px-4 py-2"
             >
               <span className="h-2 w-2 rounded-full bg-[#0077b6]" />
@@ -85,7 +88,7 @@ export default function ContactPage() {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
+          viewport={{ once: false, amount: 0.1 }}
           variants={{
             hidden: {},
             visible: {

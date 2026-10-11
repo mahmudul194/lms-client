@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
 import { ArrowUpRight, Sparkles, Users } from "lucide-react";
+import { motion } from "motion/react";
 
 export default function CommunityCards() {
   const cards = [
@@ -58,7 +58,13 @@ export default function CommunityCards() {
 
       <div className="relative mx-auto max-w-[1440px] space-y-10 px-4 sm:px-8 lg:space-y-12 lg:px-12">
         {/* Section Header */}
-        <div className="text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="text-center"
+        >
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#0077b6]">
             Stay Connected
           </p>
@@ -74,15 +80,38 @@ export default function CommunityCards() {
             Connect with our community, learn from experts, and stay updated
             with the latest tutorials and opportunities.
           </p>
-        </div>
+        </motion.div>
 
         {/* Community Cards */}
-        <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-3 lg:gap-7">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.15 }}
+          variants={{
+            hidden: {},
+            visible: {
+              transition: {
+                staggerChildren: 0.15,
+              },
+            },
+          }}
+          className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-3 lg:gap-7"
+        >
           {cards.map((card, index) => (
-            <article
+            <motion.article
               key={card.title}
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    duration: 0.6,
+                    ease: "easeOut",
+                  },
+                },
+              }}
               className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-slate-900/[0.07] ${card.accentBorder}`}
-              style={{ transitionDelay: `${index * 60}ms` }}
             >
               {/* Brand Header */}
               <div className="relative flex h-28 items-center justify-between overflow-hidden bg-slate-50 px-7 sm:px-8">
@@ -131,12 +160,18 @@ export default function CommunityCards() {
                   </a>
                 </div>
               </div>
-            </article>
+            </motion.article>
           ))}
-        </div>
+        </motion.div>
 
         {/* Community Note */}
-        <div className="flex flex-col items-center justify-center gap-2 pt-1 text-center sm:flex-row sm:gap-3">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex flex-col items-center justify-center gap-2 pt-1 text-center sm:flex-row sm:gap-3"
+        >
           <div className="flex items-center gap-2 text-[#0077b6]">
             <Users className="h-4 w-4" />
             <Sparkles className="h-3.5 w-3.5" />
@@ -145,8 +180,8 @@ export default function CommunityCards() {
           <p className="text-xs leading-5 text-slate-500 sm:text-sm">
             Learn together, share knowledge, and grow with the community.
           </p>
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </section >
   );
 }

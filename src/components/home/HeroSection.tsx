@@ -4,6 +4,7 @@ import Link from "next/link";
 import { GraduationCap, CheckSquare, ArrowUpRight } from "lucide-react";
 import HeroSoftwareLogos from "./HeroSoftwareLogos";
 import HeroShowcaseCard from "./HeroShowcaseCard";
+import { motion } from "motion/react";
 
 export default function HeroSection() {
   return (
@@ -74,10 +75,32 @@ export default function HeroSection() {
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-[1440px] px-4 sm:px-8 lg:px-12">
-        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-8">
-
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: {},
+            visible: {
+              transition: {
+                staggerChildren: 0.25,
+                delayChildren: 0.35,
+              },
+            },
+          }}
+          className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-8"
+        >
           {/* LEFT SIDE */}
-          <div className="space-y-6 sm:space-y-7 lg:col-span-6">
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 28 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: 1, ease: [0.22, 1, 0.36, 1] },
+              },
+            }}
+            className="space-y-6 sm:space-y-7 lg:col-span-6"
+          >
             {/* Main Headline */}
             <div className="space-y-1">
               <div className="flex items-center gap-3">
@@ -161,14 +184,28 @@ export default function HeroSection() {
 
             {/* Existing Software Logos */}
             <HeroSoftwareLogos />
-          </div>
+          </motion.div>
 
 
           {/* RIGHT SIDE — original component and dimensions */}
-          <div className="lg:col-span-6 motion-safe:animate-[heroReveal_1s_ease-out_0.12s_both]">
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 35, scale: 0.97 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                transition: {
+                  duration: 1.1,
+                  ease: [0.22, 1, 0.36, 1],
+                },
+              },
+            }}
+            className="lg:col-span-6"
+          >
             <HeroShowcaseCard />
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
 
       {/* Entrance animation; respects reduced-motion preferences */}
@@ -193,6 +230,6 @@ export default function HeroSection() {
           }
         }
       `}</style>
-    </section>
+    </section >
   );
 }

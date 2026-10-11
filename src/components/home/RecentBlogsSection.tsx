@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { blogsApi } from "@/services/api/blogsApi";
+import { motion } from "motion/react";
 
 export default function RecentBlogsSection() {
   const [recentBlogs, setRecentBlogs] = useState<any[]>([]);
@@ -27,7 +28,13 @@ export default function RecentBlogsSection() {
     <section className="py-16 sm:py-20 bg-white font-sans">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 space-y-10">
         {/* Section Heading */}
-        <div className="text-center pb-2">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          className="text-center pb-2"
+        >
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#0077b6]">
             Insights & Updates
           </p>
@@ -41,54 +48,83 @@ export default function RecentBlogsSection() {
           <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-500 sm:text-base">
             Explore the latest insights, industry trends, and practical knowledge in engineering and BIM.
           </p>
-        </div>
+        </motion.div>
 
         {/* 3-Column Recent Blog Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.15 }}
+          variants={{
+            hidden: {},
+            visible: {
+              transition: {
+                delayChildren: 0.35,
+                staggerChildren: 0.18,
+              },
+            },
+          }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+        >
           {recentBlogs.map((blog) => (
-            <Link
+            <motion.div
               key={blog.id}
-              href="/blog"
-              className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-xs hover:shadow-2xl hover:border-sky-300 transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1.5 cursor-pointer"
+              variants={{
+                hidden: { opacity: 0, y: 25 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    duration: 0.7,
+                    ease: [0.22, 1, 0.36, 1],
+                  },
+                },
+              }}
             >
-              {/* Inset Framed Image */}
-              <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-slate-100">
-                <img
-                  src={blog.image || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80"}
-                  alt={blog.title}
-                  loading="lazy"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src =
-                      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80";
-                  }}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute top-3 left-3">
-                  <span className="px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-[#0077b6] font-black text-[11px] tracking-wider uppercase shadow-xs">
-                    {blog.category || "Blog"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Card Body & CTA */}
-              <div className="pt-5 px-1.5 flex flex-col justify-between flex-1">
-                <h3 className="text-base sm:text-lg font-black text-[#002b5b] group-hover:text-[#0077b6] transition-colors line-clamp-2 leading-snug">
-                  {blog.title}
-                </h3>
-
-                <div className="pt-4 mt-5 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-xs sm:text-sm font-extrabold text-slate-700 group-hover:text-[#0077b6] transition-colors">
-                    Read Article
-                  </span>
-                  <div className="w-8 h-8 rounded-full bg-sky-50 text-[#0077b6] group-hover:bg-[#0077b6] group-hover:text-white flex items-center justify-center transition-all duration-200">
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+              <Link
+                key={blog.id}
+                href="/blog"
+                className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-xs hover:shadow-2xl hover:border-sky-300 transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1.5 cursor-pointer"
+              >
+                {/* Inset Framed Image */}
+                <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-slate-100">
+                  <img
+                    src={blog.image || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80"}
+                    alt={blog.title}
+                    loading="lazy"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src =
+                        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80";
+                    }}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute top-3 left-3">
+                    <span className="px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-[#0077b6] font-black text-[11px] tracking-wider uppercase shadow-xs">
+                      {blog.category || "Blog"}
+                    </span>
                   </div>
                 </div>
-              </div>
-            </Link>
+
+                {/* Card Body & CTA */}
+                <div className="pt-5 px-1.5 flex flex-col justify-between flex-1">
+                  <h3 className="text-base sm:text-lg font-black text-[#002b5b] group-hover:text-[#0077b6] transition-colors line-clamp-2 leading-snug">
+                    {blog.title}
+                  </h3>
+
+                  <div className="pt-4 mt-5 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-xs sm:text-sm font-extrabold text-slate-700 group-hover:text-[#0077b6] transition-colors">
+                      Read Article
+                    </span>
+                    <div className="w-8 h-8 rounded-full bg-sky-50 text-[#0077b6] group-hover:bg-[#0077b6] group-hover:text-white flex items-center justify-center transition-all duration-200">
+                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </section >
   );
 }

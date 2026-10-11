@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import BatchGallerySection from "@/components/gallery/BatchGallerySection";
 import VideoReviewsSection from "@/components/gallery/VideoReviewsSection";
 import VideoModal from "@/components/common/VideoModal";
+import { motion } from "motion/react";
 
 export default function StudentsGalleryPage() {
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
@@ -119,7 +120,13 @@ export default function StudentsGalleryPage() {
           </div>
 
           {/* Page Header */}
-          <div className="relative overflow-hidden rounded-3xl border border-slate-100 bg-gradient-to-br from-slate-50 via-white to-sky-50/70 px-5 py-10 text-center shadow-sm sm:px-10 sm:py-14 md:py-16">
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="relative overflow-hidden rounded-3xl border border-slate-100 bg-gradient-to-br from-slate-50 via-white to-sky-50/70 px-5 py-10 text-center shadow-sm sm:px-10 sm:py-14 md:py-16"
+          >
             <div className="pointer-events-none absolute -left-16 -top-16 h-40 w-40 rounded-full bg-sky-100/60 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-16 -right-16 h-40 w-40 rounded-full bg-blue-100/60 blur-3xl" />
 
@@ -146,20 +153,32 @@ export default function StudentsGalleryPage() {
                 and real experiences from the BIM Build BD community.
               </p>
             </div>
-          </div>
+          </motion.div>
 
           {/* Section 1: Batch Photo Gallery — component and content unchanged */}
-          <section className="relative">
+          <motion.section
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="relative"
+          >
             <BatchGallerySection batches={batchList} />
-          </section>
+          </motion.section>
 
           {/* Section 2: Video Reviews — component and content unchanged */}
-          <section className="relative">
+          <motion.section
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="relative"
+          >
             <VideoReviewsSection
               videos={studentVideos}
               onPlayVideo={(url) => setActiveVideo(url)}
             />
-          </section>
+          </motion.section>
 
           {/* Reusable Video Modal */}
           <VideoModal
@@ -168,6 +187,6 @@ export default function StudentsGalleryPage() {
           />
         </div>
       </div>
-    </div>
+    </div >
   );
 }

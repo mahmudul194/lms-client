@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Star, Quote } from "lucide-react";
 import { reviewsApi } from "@/services/api";
+import { motion } from "motion/react";
 
 export default function TestimonialsSection() {
   const testimonials = [
@@ -195,7 +196,13 @@ export default function TestimonialsSection() {
     <section className="overflow-hidden bg-white py-16 font-sans sm:py-20 lg:py-24">
       <div className="mx-auto max-w-[1440px] space-y-12 px-4 sm:px-8 lg:space-y-14 lg:px-12">
         {/* Section Heading */}
-        <div className="text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="text-center"
+        >
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#0077b6]">
             Testimonials
           </p>
@@ -211,10 +218,14 @@ export default function TestimonialsSection() {
             Hear from learners about their experience with our courses and
             training.
           </p>
-        </div>
+        </motion.div>
 
         {/* Testimonials Carousel */}
-        <div
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.15 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
           className="relative -my-3 overflow-hidden py-3"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
@@ -287,8 +298,8 @@ export default function TestimonialsSection() {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </section >
   );
 }
