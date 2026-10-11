@@ -20,21 +20,21 @@ export default function AllCoursesPage() {
             .filter((b: any) => b.status === "ongoing")
             .map((b: any) => {
               const c = b.course || {};
-            const price = b.price || 16000;
-            const discountPrice = b.discount_price || 12000;
-            return {
-              id: c.slug || b.code || b.id, // Navigate using course slug or batch code
-              title: b.name || c.title,
-              tag: c.level?.toUpperCase() || "WEB",
-              discount: `৳${price - discountPrice} OFF`,
-              badge: c.level || "Professional",
-              duration: `Duration: ${c.duration || 3} ${c.duration_unit || "Months"}`,
-              price: discountPrice.toLocaleString(),
-              originalPrice: price.toLocaleString(),
-              image: c.thumbnail || "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
-              registrationEnd: b.registration_end,
-            };
-          });
+              const price = b.price || 16000;
+              const discountPrice = b.discount_price || 12000;
+              return {
+                id: c.slug || b.code || b.id, // Navigate using course slug or batch code
+                title: b.name || c.title,
+                tag: c.level?.toUpperCase() || "WEB",
+                discount: `৳${price - discountPrice} OFF`,
+                badge: c.level || "Professional",
+                duration: `Duration: ${c.duration || 3} ${c.duration_unit || "Months"}`,
+                price: discountPrice.toLocaleString(),
+                originalPrice: price.toLocaleString(),
+                image: c.thumbnail || "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
+                registrationEnd: b.registration_end,
+              };
+            });
           setCourses(apiBatches);
         }
       } catch {
@@ -53,13 +53,28 @@ export default function AllCoursesPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <main className="flex-1 py-16">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 space-y-12">
-          
+
+          {/* Page Heading */}
           <div className="text-center space-y-4">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#002b5b] tracking-tight">
-              All Professional Courses
+            <div className="inline-flex items-center gap-2 rounded-full border border-sky-100 bg-sky-50 px-4 py-2">
+              <span className="h-2 w-2 rounded-full bg-[#0077b6]" />
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-[#0077b6]">
+                Learn • Grow • Succeed
+              </span>
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-[#002b5b]">
+              All Professional <span className="text-[#0077b6]">Courses</span>
             </h1>
-            <p className="text-gray-500 text-sm sm:text-base font-medium max-w-2xl mx-auto">
-              Master the most in-demand skills in tech, engineering, and digital marketing. Enroll in our specialized batches today and jumpstart your career.
+
+            <div className="mx-auto flex items-center justify-center gap-1.5">
+              <span className="h-1 w-8 rounded-full bg-[#0077b6]" />
+              <span className="h-1 w-3 rounded-full bg-[#002b5b]/30" />
+              <span className="h-1 w-1 rounded-full bg-[#002b5b]/20" />
+            </div>
+
+            <p className="mx-auto max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">
+              Master in-demand skills through industry-focused training designed to turn your ambition into practical expertise and real career opportunities.
             </p>
           </div>
 

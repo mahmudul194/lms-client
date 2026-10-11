@@ -100,38 +100,73 @@ export default function StudentsGalleryPage() {
   ];
 
   return (
-    <div className="bg-white min-h-screen py-8 sm:py-12">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 space-y-14 sm:space-y-18">
-        {/* Breadcrumb */}
-        <div className="text-xs sm:text-sm text-slate-400 font-medium">
-          <Link href="/" className="hover:text-slate-600 transition-colors">
-            Home
-          </Link>
-          <span className="mx-2">/</span>
-          <span className="text-slate-700 font-semibold">Students Gallery</span>
+    <div className="min-h-screen bg-white font-sans">
+      {/* Page Background & Content */}
+      <div className="relative overflow-hidden">
+        <div className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-sky-100/50 blur-3xl" />
+        <div className="pointer-events-none absolute right-0 top-[35rem] h-64 w-64 rounded-full bg-blue-50/70 blur-3xl" />
+
+        <div className="relative mx-auto max-w-[1440px] space-y-14 px-4 py-8 sm:space-y-20 sm:px-8 sm:py-12 lg:px-12">
+          {/* Breadcrumb — unchanged */}
+          <div className="text-xs font-medium text-slate-400 sm:text-sm">
+            <Link href="/" className="transition-colors hover:text-[#0077b6]">
+              Home
+            </Link>
+            <span className="mx-2 text-slate-300">/</span>
+            <span className="font-semibold text-[#002b5b]">
+              Students Gallery
+            </span>
+          </div>
+
+          {/* Page Header */}
+          <div className="relative overflow-hidden rounded-3xl border border-slate-100 bg-gradient-to-br from-slate-50 via-white to-sky-50/70 px-5 py-10 text-center shadow-sm sm:px-10 sm:py-14 md:py-16">
+            <div className="pointer-events-none absolute -left-16 -top-16 h-40 w-40 rounded-full bg-sky-100/60 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-16 -right-16 h-40 w-40 rounded-full bg-blue-100/60 blur-3xl" />
+
+            <div className="relative">
+              <div className="mx-auto mb-5 flex w-fit items-center gap-2 rounded-full border border-sky-100 bg-white/90 px-4 py-2 shadow-sm">
+                <span className="h-2 w-2 rounded-full bg-[#0077b6]" />
+                <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#0077b6]">
+                  Our Learning Community
+                </span>
+              </div>
+
+              <h1 className="text-3xl font-black tracking-tight text-[#002b5b] sm:text-4xl md:text-5xl">
+                Students <span className="text-[#0077b6]">Gallery</span>
+              </h1>
+
+              <div className="mx-auto mt-5 flex items-center justify-center gap-1.5">
+                <span className="h-1 w-10 rounded-full bg-[#0077b6]" />
+                <span className="h-1 w-4 rounded-full bg-[#002b5b]/30" />
+                <span className="h-1 w-1 rounded-full bg-[#002b5b]/20" />
+              </div>
+
+              <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">
+                Take a look at our student batches, memorable learning moments,
+                and real experiences from the BIM Build BD community.
+              </p>
+            </div>
+          </div>
+
+          {/* Section 1: Batch Photo Gallery — component and content unchanged */}
+          <section className="relative">
+            <BatchGallerySection batches={batchList} />
+          </section>
+
+          {/* Section 2: Video Reviews — component and content unchanged */}
+          <section className="relative">
+            <VideoReviewsSection
+              videos={studentVideos}
+              onPlayVideo={(url) => setActiveVideo(url)}
+            />
+          </section>
+
+          {/* Reusable Video Modal */}
+          <VideoModal
+            videoUrl={activeVideo}
+            onClose={() => setActiveVideo(null)}
+          />
         </div>
-
-        {/* Page Title */}
-        <div className="text-center pt-1 pb-4">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#0f172a] tracking-tight">
-            Students Gallery
-          </h1>
-        </div>
-
-        {/* Section 1: Batch Photo Gallery */}
-        <BatchGallerySection batches={batchList} />
-
-        {/* Section 2: Video Reviews */}
-        <VideoReviewsSection
-          videos={studentVideos}
-          onPlayVideo={(url) => setActiveVideo(url)}
-        />
-
-        {/* Reusable Video Modal */}
-        <VideoModal
-          videoUrl={activeVideo}
-          onClose={() => setActiveVideo(null)}
-        />
       </div>
     </div>
   );

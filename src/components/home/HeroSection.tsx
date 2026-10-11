@@ -1,67 +1,116 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
-import { GraduationCap, CheckSquare } from "lucide-react";
+import { GraduationCap, CheckSquare, ArrowUpRight } from "lucide-react";
 import HeroSoftwareLogos from "./HeroSoftwareLogos";
 import HeroShowcaseCard from "./HeroShowcaseCard";
 
 export default function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-[#f4f8fb] py-14 sm:py-18 lg:py-20 xl:py-24 flex items-center">
-      {/* Background Architectural Photo with Luxury Blueprint Overlay */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+    <section className="relative isolate flex items-center overflow-hidden bg-[#f4f8fb] py-14 sm:py-18 lg:py-20 xl:py-24">
+
+      {/* Background — original image and colors preserved */}
+      <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
         <img
           src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=2000&q=80"
-          alt="Modern Architectural Infrastructure Background"
+          alt=""
+          aria-hidden="true"
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover object-center opacity-30 filter contrast-105"
+          className="h-full w-full object-cover object-center opacity-30 contrast-105"
         />
-        {/* Architectural Light Gradients to ensure text readability */}
+
         <div className="absolute inset-0 bg-gradient-to-r from-[#f4f8fb] via-[#f4f8fb]/80 to-[#f4f8fb]/40" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#f4f8fb] via-transparent to-[#f4f8fb]/60" />
-        <svg className="absolute inset-0 w-full h-full opacity-40" viewBox="0 0 1440 650" fill="none">
-          <circle cx="1180" cy="360" r="300" stroke="#0077b6" strokeWidth="1.5" strokeDasharray="6 6" />
+
+        {/* Subtle architectural blueprint grid */}
+        <div
+          className="absolute inset-0 opacity-[0.13]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(0,119,182,0.2) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0,119,182,0.2) 1px, transparent 1px)
+            `,
+            backgroundSize: "64px 64px",
+            maskImage:
+              "linear-gradient(to right, transparent, black 45%, black)",
+          }}
+        />
+
+        {/* Architectural circular motion */}
+        <svg
+          className="absolute right-[-180px] top-1/2 h-[620px] w-[620px] -translate-y-1/2 text-[#0077b6]/40 motion-safe:animate-[spin_90s_linear_infinite]"
+          viewBox="0 0 620 620"
+          fill="none"
+          aria-hidden="true"
+        >
+          <circle
+            cx="310"
+            cy="310"
+            r="270"
+            stroke="currentColor"
+            strokeWidth="1"
+            strokeDasharray="5 9"
+          />
+          <circle
+            cx="310"
+            cy="310"
+            r="225"
+            stroke="currentColor"
+            strokeWidth="0.8"
+          />
+          <path
+            d="M310 20V600 M20 310H600"
+            stroke="currentColor"
+            strokeWidth="0.7"
+            strokeDasharray="3 8"
+          />
+          <circle cx="310" cy="40" r="4" fill="#0077b6" />
+          <circle cx="535" cy="310" r="3" fill="#0077b6" />
         </svg>
+
+        {/* Soft ambient light */}
+        <div className="absolute right-[18%] top-[15%] h-48 w-48 rounded-full bg-sky-300/20 blur-[90px] motion-safe:animate-pulse" />
       </div>
 
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 relative z-10 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
-          
-          {/* Left Column: Headlines, Checkmarks, Buttons, Software Logos */}
-          <div className="lg:col-span-6 space-y-6 sm:space-y-7">
-            {/* Main Headline with Locked Elements */}
+      <div className="relative z-10 mx-auto w-full max-w-[1440px] px-4 sm:px-8 lg:px-12">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-8">
+
+          {/* LEFT SIDE */}
+          <div className="space-y-6 sm:space-y-7 lg:col-span-6">
+            {/* Main Headline */}
             <div className="space-y-1">
-              {/* Row 1: Learn BIM (with cap perched exactly on I) */}
               <div className="flex items-center gap-3">
-                <span className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-[#002b5b] tracking-tight leading-none">
+                <span className="text-4xl font-extrabold leading-none tracking-tight text-[#002b5b] sm:text-5xl lg:text-6xl xl:text-7xl">
                   Learn
                 </span>
-                <span className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-[#0077b6] tracking-tight leading-none relative inline-flex items-center">
+
+                <span className="inline-flex items-center text-4xl font-extrabold leading-none tracking-tight text-[#0077b6] sm:text-5xl lg:text-6xl xl:text-7xl">
                   B
                   <span className="relative inline-flex items-center">
                     I
-                    <GraduationCap className="w-6 h-6 sm:w-8 sm:h-8 lg:w-9 lg:h-9 text-[#002b5b] absolute -top-5 sm:-top-7 left-1/2 -translate-y-1/2" />
+                    <GraduationCap className="absolute -left-2 -top-2 h-6 w-6 -translate-y-1/2 text-[#002b5b] sm:-left-2 sm:-top-3 sm:h-8 sm:w-8 lg:h-9 lg:w-9" />
                   </span>
                   M
                 </span>
               </div>
 
-              {/* Row 2: Build Your Career */}
-              <div className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-[#002b5b] tracking-tight leading-tight">
+              <div className="text-4xl font-extrabold leading-tight tracking-tight text-[#002b5b] sm:text-5xl lg:text-6xl xl:text-7xl">
                 <span>Build Your </span>
+
                 <span className="relative inline-block">
                   <span className="text-[#0f4c81]">Career</span>
+
                   <svg
-                    className="w-full h-3 sm:h-4 text-[#0077b6] absolute -bottom-2 sm:-bottom-2.5 left-0"
+                    className="absolute -bottom-2 left-0 h-3 w-full text-[#0077b6] sm:-bottom-2.5 sm:h-4"
                     viewBox="0 0 160 14"
                     fill="none"
                     preserveAspectRatio="none"
+                    aria-hidden="true"
                   >
                     <path
                       d="M3 10C45 2 115 2 157 11"
-                      stroke="#0077b6"
+                      stroke="currentColor"
                       strokeWidth="3.5"
                       strokeLinecap="round"
                     />
@@ -70,52 +119,80 @@ export default function HeroSection() {
               </div>
             </div>
 
-            {/* 3 Checkmark Bullet Points */}
-            <div className="space-y-3 pt-1 text-sm sm:text-base font-semibold text-slate-700">
+            {/* Short Description */}
+            <p className="max-w-md text-sm leading-6 text-slate-600 sm:text-base">
+              Master practical BIM skills for your professional future.
+            </p>
+
+            {/* Compact Feature List */}
+            <div className="space-y-3 pt-1 text-sm font-semibold text-slate-700 sm:text-base">
               <div className="flex items-center gap-3">
-                <CheckSquare className="w-5 h-5 text-[#0077b6] shrink-0" />
-                <span>Revit Architecture | Structure | MEP</span>
+                <CheckSquare className="h-5 w-5 shrink-0 text-[#0077b6]" />
+                <span>Revit Architecture, Structure &amp; MEP</span>
               </div>
+
               <div className="flex items-center gap-3">
-                <CheckSquare className="w-5 h-5 text-[#0077b6] shrink-0" />
-                <span>Project-Based Training</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <CheckSquare className="w-5 h-5 text-[#0077b6] shrink-0" />
-                <span>Freelancing & Job Placement Support</span>
+                <CheckSquare className="h-5 w-5 shrink-0 text-[#0077b6]" />
+                <span>Project-Based Learning &amp; Career Support</span>
               </div>
             </div>
 
-            {/* CTA Buttons */}
-            <div className="space-y-3 pt-1">
-              <div>
-                <Link
-                  href="/courses"
-                  className="inline-block px-8 py-3.5 rounded-xl bg-[#0077b6] hover:bg-[#005a8c] text-white font-bold text-sm sm:text-base lg:text-lg shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95"
-                >
-                  Join Our Live Courses!
-                </Link>
-              </div>
+            {/* Call To Action */}
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <Link
+                href="/courses"
+                className="group inline-flex items-center gap-3 rounded-xl bg-[#0077b6] px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-sky-900/15 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#005a8c] hover:shadow-xl sm:px-7 sm:text-base"
+              >
+                Join Our Live Courses!
 
-              <div>
-                <Link
-                  href="/courses"
-                  className="inline-block px-9 py-3 rounded-xl bg-[#002b5b] hover:bg-[#001a38] text-white font-bold text-xs sm:text-sm lg:text-base transition-all shadow-md hover:scale-105 active:scale-95"
-                >
-                  Admission
-                </Link>
-              </div>
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/15 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
+                  <ArrowUpRight className="h-4 w-4" />
+                </span>
+              </Link>
+
+              <Link
+                href="/courses"
+                className="inline-flex items-center gap-2 rounded-xl border border-[#002b5b]/20 bg-white/70 px-6 py-3.5 text-sm font-bold text-[#002b5b] backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#0077b6] hover:bg-white sm:px-7 sm:text-base"
+              >
+                Admission
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
             </div>
 
-            {/* Software Logos 2-Row Grid */}
+            {/* Existing Software Logos */}
             <HeroSoftwareLogos />
           </div>
 
-          {/* Right Column: Visual Showcase Card */}
-          <HeroShowcaseCard />
 
+          {/* RIGHT SIDE — original component and dimensions */}
+          <div className="lg:col-span-6 motion-safe:animate-[heroReveal_1s_ease-out_0.12s_both]">
+            <HeroShowcaseCard />
+          </div>
         </div>
       </div>
+
+      {/* Entrance animation; respects reduced-motion preferences */}
+      <style jsx>{`
+        @keyframes heroReveal {
+          from {
+            opacity: 0;
+            transform: translateY(14px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          section :global(*) {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            scroll-behavior: auto !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

@@ -82,10 +82,21 @@ export default function FeaturedCourses() {
         }`}
     >
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12">
+        {/* Section Heading */}
         <div className="text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#002b5b] tracking-tight">
-            Explore All Batches
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#0077b6]">
+            Learn & Grow
+          </p>
+
+          <h2 className="text-2xl font-bold tracking-tight text-[#002b5b] sm:text-3xl md:text-4xl">
+            Explore All <span className="text-[#0077b6]">Batches</span>
           </h2>
+
+          <div className="mx-auto mt-3 h-1 w-12 rounded-full bg-[#0077b6]/70" />
+
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-500 sm:text-base">
+            Discover our upcoming and ongoing batches to find the right learning path for you.
+          </p>
         </div>
 
         {loading ? (

@@ -26,11 +26,21 @@ export default function RecentBlogsSection() {
   return (
     <section className="py-16 sm:py-20 bg-white font-sans">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 space-y-10">
-        {/* Section Header - Clean & Centered */}
+        {/* Section Heading */}
         <div className="text-center pb-2">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#002b5b] tracking-tight">
-            Recent Engineering & BIM Blogs
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#0077b6]">
+            Insights & Updates
+          </p>
+
+          <h2 className="text-2xl font-bold tracking-tight text-[#002b5b] sm:text-3xl md:text-4xl">
+            Recent <span className="text-[#0077b6]">Engineering & BIM Blogs</span>
           </h2>
+
+          <div className="mx-auto mt-3 h-1 w-12 rounded-full bg-[#0077b6]/70" />
+
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-500 sm:text-base">
+            Explore the latest insights, industry trends, and practical knowledge in engineering and BIM.
+          </p>
         </div>
 
         {/* 3-Column Recent Blog Cards */}

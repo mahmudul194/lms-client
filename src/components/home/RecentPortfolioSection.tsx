@@ -26,11 +26,21 @@ export default function RecentPortfolioSection() {
   return (
     <section className="py-16 sm:py-20 bg-[#f8fafc] font-sans border-y border-slate-100">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 space-y-10">
-        {/* Section Header - Clean & Centered */}
+        {/* Section Heading */}
         <div className="text-center pb-2">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#002b5b] tracking-tight">
-            Recent Projects & Student Portfolio
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#0077b6]">
+            Our Work & Achievements
+          </p>
+
+          <h2 className="text-2xl font-bold tracking-tight text-[#002b5b] sm:text-3xl md:text-4xl">
+            Recent Projects & <span className="text-[#0077b6]">Student Portfolio</span>
           </h2>
+
+          <div className="mx-auto mt-3 h-1 w-12 rounded-full bg-[#0077b6]/70" />
+
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-500 sm:text-base">
+            Discover our recent projects and explore the skills, creativity, and expertise behind every creation.
+          </p>
         </div>
 
         {/* 3-Column Portfolio Cards Grid */}

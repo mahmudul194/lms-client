@@ -192,21 +192,30 @@ export default function TestimonialsSection() {
   };
 
   return (
-    <section className="py-20 sm:py-24 bg-white font-sans overflow-hidden">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 space-y-10 sm:space-y-12">
-        {/* Clean Centered Header */}
-        <div className="text-center space-y-2.5">
-          <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#0077b6]">
-            TESTIMONIALS
-          </span>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-[#002b5b] tracking-tight">
-            What Students Say About Us
+    <section className="overflow-hidden bg-white py-16 font-sans sm:py-20 lg:py-24">
+      <div className="mx-auto max-w-[1440px] space-y-12 px-4 sm:px-8 lg:space-y-14 lg:px-12">
+        {/* Section Heading */}
+        <div className="text-center">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#0077b6]">
+            Testimonials
+          </p>
+
+          <h2 className="text-2xl font-bold tracking-tight text-[#002b5b] sm:text-3xl md:text-4xl">
+            What Students Say{" "}
+            <span className="text-[#0077b6]">About Us</span>
           </h2>
+
+          <div className="mx-auto mt-3 h-1 w-12 rounded-full bg-[#0077b6]/70" />
+
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-500 sm:text-base">
+            Hear from learners about their experience with our courses and
+            training.
+          </p>
         </div>
 
-        {/* Seamless Infinite Sliding Track */}
+        {/* Testimonials Carousel */}
         <div
-          className="relative overflow-hidden py-3 -my-3"
+          className="relative -my-3 overflow-hidden py-3"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
           onTouchStart={handleTouchStart}
@@ -214,53 +223,62 @@ export default function TestimonialsSection() {
           onTouchEnd={handleTouchEnd}
         >
           <div
-            onTransitionEnd={handleTransitionEnd}
-            className="flex"
+            onTransitionEnd={(e) => {
+              if (e.target === e.currentTarget) {
+                handleTransitionEnd(e);
+              }
+            }}
+            className="flex items-stretch"
             style={{
-              transform: `translateX(-${currentIndex * (100 / visibleCount)}%)`,
+              transform: `translate3d(-${currentIndex * (100 / visibleCount)}%, 0, 0)`,
               transition: isTransitioning
-                ? "transform 280ms ease-out"
+                ? "transform 800ms cubic-bezier(0.25, 0.1, 0.25, 1)"
                 : "none",
+              willChange: "transform",
+              backfaceVisibility: "hidden",
             }}
           >
             {extendedList.map((item, idx) => (
               <div
-                key={idx}
+                key={`${item.name}-${idx}`}
                 className="shrink-0 px-3 sm:px-3.5"
-                style={{
-                  width: `${100 / visibleCount}%`,
-                }}
+                style={{ width: `${100 / visibleCount}%` }}
               >
-                <div className="relative bg-gradient-to-b from-white to-slate-50/60 rounded-3xl border border-slate-200/90 p-7 sm:p-8 flex flex-col justify-between shadow-xs hover:shadow-xl hover:border-sky-300 transition-all duration-300 group hover:-translate-y-1.5 overflow-hidden h-full min-h-[290px]">
-                  {/* Subtle Decorative Quote Icon */}
-                  <Quote className="w-8 h-8 text-sky-100 group-hover:text-sky-200 absolute top-6 right-6 transition-colors pointer-events-none" />
+                <div className="group relative flex h-full min-h-[290px] flex-col justify-between overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50/70 p-7 transition-[border-color,box-shadow] duration-300 hover:border-sky-200 hover:shadow-xl hover:shadow-[#002b5b]/[0.06] sm:p-8">
+                  <Quote className="pointer-events-none absolute right-6 top-6 h-8 w-8 text-sky-100 transition-colors duration-300 group-hover:text-sky-200" />
 
-                  <div className="space-y-4 relative z-10">
-                    {/* 5-Star Rating */}
+                  <div className="relative z-10 space-y-4">
                     <div className="flex items-center gap-1">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} className={`w-3.5 h-3.5 ${i < (item.rating || 5) ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200"}`} />
+                        <Star
+                          key={i}
+                          className={`h-3.5 w-3.5 ${i < (item.rating || 5)
+                            ? "fill-amber-400 text-amber-400"
+                            : "fill-slate-200 text-slate-200"
+                            }`}
+                        />
                       ))}
                     </div>
 
-                    {/* Quote Text */}
-                    <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
+                    <p className="text-xs font-normal leading-relaxed text-slate-700 sm:text-sm">
                       &ldquo;{item.text}&rdquo;
                     </p>
                   </div>
 
-                  {/* Student Profile Info */}
-                  <div className="flex items-center gap-3.5 pt-6 mt-6 border-t border-slate-200/60 relative z-10">
+                  <div className="relative z-10 mt-6 flex items-center gap-3.5 border-t border-slate-200/70 pt-5">
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-12 h-12 rounded-full object-cover ring-2 ring-sky-100 shadow-sm shrink-0"
+                      loading="lazy"
+                      className="h-12 w-12 shrink-0 rounded-full object-cover ring-2 ring-sky-100"
                     />
+
                     <div className="min-w-0">
-                      <h4 className="text-sm font-extrabold text-[#002b5b] truncate group-hover:text-[#0077b6] transition-colors">
+                      <h4 className="truncate text-sm font-bold text-[#002b5b] transition-colors duration-300 group-hover:text-[#0077b6]">
                         {item.name}
                       </h4>
-                      <p className="text-xs font-semibold text-slate-500 truncate mt-0.5">
+
+                      <p className="mt-0.5 truncate text-xs font-medium text-slate-500">
                         {item.role}
                       </p>
                     </div>
