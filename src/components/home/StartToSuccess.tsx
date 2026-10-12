@@ -66,7 +66,7 @@ export default function StartToSuccess() {
       ),
     },
     {
-      targetNumber: statsData?.students || 200,
+      targetNumber: statsData?.students ?? 200,
       suffix: "+",
       label: "Students",
       icon: (
@@ -119,8 +119,32 @@ export default function StartToSuccess() {
       className="relative overflow-hidden border-b border-slate-200/80 bg-[#f4f8fb] py-16 sm:py-20 lg:py-24"
     >
       {/* Subtle background accents */}
-      <div className="pointer-events-none absolute -left-28 top-20 h-64 w-64 rounded-full bg-sky-100/50 blur-3xl" />
-      <div className="pointer-events-none absolute -right-28 bottom-0 h-72 w-72 rounded-full bg-blue-100/40 blur-3xl" />
+      <motion.div
+        className="pointer-events-none absolute -left-28 top-20 h-64 w-64 rounded-full bg-sky-100/60 blur-3xl"
+        animate={{
+          x: [0, 25, -10, 0],
+          y: [0, 20, 35, 0],
+          scale: [1, 1.12, 0.95, 1],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+      <motion.div
+        className="pointer-events-none absolute -right-28 bottom-0 h-72 w-72 rounded-full bg-blue-100/50 blur-3xl"
+        animate={{
+          x: [0, -25, 10, 0],
+          y: [0, -20, -35, 0],
+          scale: [1, 0.9, 1.12, 1],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
 
       <div className="relative mx-auto max-w-[1440px] space-y-12 px-4 sm:space-y-14 sm:px-8 lg:space-y-16 lg:px-12">
         {/* Section Heading — matching Tekla section */}

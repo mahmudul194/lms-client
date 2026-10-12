@@ -112,7 +112,7 @@ export default function HeroSection() {
                   B
                   <span className="relative inline-flex items-center">
                     I
-                    <GraduationCap className="absolute -left-2 -top-2 h-6 w-6 -translate-y-1/2 text-[#002b5b] sm:-left-2 sm:-top-3 sm:h-8 sm:w-8 lg:h-9 lg:w-9" />
+                    <GraduationCap className="absolute -left-1.6 -top-1 h-5 w-5 -translate-y-1/2 rotate-[25deg] text-[#002b5b] sm:left-0.8 sm:-top-1 sm:h-8 sm:w-8 lg:h-9 lg:w-9" />
                   </span>
                   M
                 </span>

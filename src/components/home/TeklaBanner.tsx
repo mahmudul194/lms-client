@@ -131,56 +131,59 @@ export default function TeklaBanner() {
         </motion.div>
       </div>
 
+
       <style jsx>{`
-      .tekla-glow {
-        animation: glowMove 9s ease-in-out infinite alternate;
-      }
-
-      .tekla-glow-secondary {
-        animation: glowMove 12s ease-in-out infinite alternate-reverse;
-      }
-
-      .tekla-line {
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(56, 189, 248, 0.65),
-          transparent
-        );
-        background-size: 200% 100%;
-        animation: lineMove 6s ease-in-out infinite;
-      }
-
-      @keyframes glowMove {
-        from {
-          transform: translate3d(-10px, 0, 0) scale(0.95);
+        .tekla-glow {
+          animation: glowMove 9s ease-in-out infinite alternate;
+          will-change: transform;
         }
-        to {
-          transform: translate3d(18px, 12px, 0) scale(1.08);
-        }
-      }
 
-      @keyframes lineMove {
-        0%,
-        100% {
-          background-position: 100% 0;
-          opacity: 0.45;
+        .tekla-glow-secondary {
+          animation: glowMove 12s ease-in-out infinite alternate-reverse;
+          will-change: transform;
         }
-        50% {
-          background-position: 0% 0;
-          opacity: 0.9;
-        }
-      }
 
-      @media (prefers-reduced-motion: reduce) {
-        .tekla-glow,
-        .tekla-glow-secondary,
         .tekla-line {
-          animation: none;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(56, 189, 248, 0.65),
+            transparent
+          );
+          background-size: 200% 100%;
+          animation: lineMove 6s ease-in-out infinite;
         }
-      }
-      `}
-      </style>
+
+        @keyframes glowMove {
+          from {
+            transform: translate3d(-10px, 0, 0) scale(0.95);
+          }
+          to {
+            transform: translate3d(18px, 12px, 0) scale(1.08);
+          }
+        }
+
+        @keyframes lineMove {
+          0%, 100% {
+            background-position: 100% 0;
+            opacity: 0.45;
+          }
+          50% {
+            background-position: 0% 0;
+            opacity: 0.9;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .tekla-glow,
+          .tekla-glow-secondary,
+          .tekla-line {
+            animation: none;
+            will-change: auto;
+          }
+        }
+      `}</style>
+
     </section >
   );
 }
