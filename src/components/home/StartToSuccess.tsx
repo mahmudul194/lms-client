@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import AnimatedCounter from "@/components/common/AnimatedCounter";
 import { overviewApi, PublicStatsReport } from "@/services/api/overviewApi";
+import { motion } from "motion/react";
 
 export default function StartToSuccess() {
   const [isInView, setIsInView] = useState(false);
@@ -113,27 +114,75 @@ export default function StartToSuccess() {
   ];
 
   return (
-    <section ref={sectionRef} className="py-20 lg:py-28 bg-[#f4f8fb] border-b border-slate-200/80">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 space-y-16">
-        {/* Section Headline */}
-        <div className="text-center space-y-2">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#002b5b] tracking-tight">
-            Start to Success
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-500 font-semibold uppercase tracking-widest">
-            Key Institutional Milestones
-          </p>
-        </div>
+    <section
+      ref={sectionRef}
+      className="relative overflow-hidden border-b border-slate-200/80 bg-[#f4f8fb] py-16 sm:py-20 lg:py-24"
+    >
+      {/* Subtle background accents */}
+      <div className="pointer-events-none absolute -left-28 top-20 h-64 w-64 rounded-full bg-sky-100/50 blur-3xl" />
+      <div className="pointer-events-none absolute -right-28 bottom-0 h-72 w-72 rounded-full bg-blue-100/40 blur-3xl" />
 
-        {/* 6 Grid Metric Counters */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 sm:gap-10">
+      <div className="relative mx-auto max-w-[1440px] space-y-12 px-4 sm:space-y-14 sm:px-8 lg:space-y-16 lg:px-12">
+        {/* Section Heading — matching Tekla section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="text-center"
+        >
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#0077b6]">
+            Our Achievements
+          </p>
+
+          <h2 className="text-2xl font-bold tracking-tight text-[#002b5b] sm:text-3xl md:text-4xl">
+            Start to <span className="text-[#0077b6]">Success</span>
+          </h2>
+
+          <div className="mx-auto mt-3 h-1 w-12 rounded-full bg-[#0077b6]/70" />
+
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-500 sm:text-base">
+            Key milestones that reflect our learning community and experience.
+          </p>
+        </motion.div>
+
+        {/* Statistics — Open Layout, No Cards */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.15 }}
+          variants={{
+            hidden: {},
+            visible: {
+              transition: {
+                staggerChildren: 0.12,
+              },
+            },
+          }}
+          className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-8 md:grid-cols-3 lg:grid-cols-6 lg:gap-x-6"
+        >
           {stats.map((item, idx) => (
-            <div key={idx} className="flex flex-col items-center text-center space-y-3 group">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white shadow-md flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border border-slate-100">
-                {item.icon}
+            <motion.div
+              key={idx}
+              variants={{
+                hidden: { opacity: 0, y: 25 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.6, ease: "easeOut" },
+                },
+              }}
+              className="stats-item group flex flex-col items-center text-center"
+            >
+              {/* Icon with Soft Blue Background */}
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#e5f3fb] transition-all duration-300 group-hover:scale-110 group-hover:bg-[#d6edfa] sm:h-20 sm:w-20">
+                <div className="transition-transform duration-300 group-hover:scale-105">
+                  {item.icon}
+                </div>
               </div>
 
-              <div className="text-3xl sm:text-4xl font-extrabold text-[#002b5b] tracking-tight">
+              {/* Animated Number */}
+              <div className="text-3xl font-extrabold tracking-tight text-[#002b5b] sm:text-4xl">
                 <AnimatedCounter
                   target={item.targetNumber}
                   suffix={item.suffix}
@@ -142,13 +191,17 @@ export default function StartToSuccess() {
                 />
               </div>
 
-              <div className="text-xs sm:text-sm font-bold text-slate-600">
+              {/* Label */}
+              <div className="mt-2 text-xs font-semibold leading-5 text-slate-600 sm:text-sm">
                 {item.label}
               </div>
-            </div>
+
+              {/* Small accent */}
+              <div className="mt-3 h-0.5 w-0 rounded-full bg-[#0077b6] transition-all duration-300 group-hover:w-8" />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </section >
   );
 }

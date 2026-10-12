@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Play } from "lucide-react";
 
 interface VideoReview {
@@ -44,7 +43,11 @@ export default function VideoReviewsSection({ videos, onPlayVideo }: VideoReview
         {videos.map((video, index) => (
           <div
             key={index}
-            className="group bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer"
+            className="group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm transition-all duration-500 ease-out hover:-translate-y-2 hover:border-sky-200 hover:shadow-[0_20px_45px_-15px_rgba(0,43,91,0.18)]"
+            style={{
+              animation: "galleryFadeUp 0.65s ease-out both",
+              animationDelay: `${index * 80}ms`,
+            }}
             onClick={() => onPlayVideo(video.url)}
           >
             <div className="relative aspect-[16/10] w-full bg-slate-900 overflow-hidden">

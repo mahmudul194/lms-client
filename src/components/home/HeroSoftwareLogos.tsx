@@ -1,10 +1,20 @@
 "use client";
 
-import React from "react";
+import { motion } from "motion/react";
 
 export default function HeroSoftwareLogos() {
   return (
-    <div className="pt-6 space-y-3 border-t border-slate-200/90">
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, y: 15 },
+        visible: {
+          opacity: 1,
+          y: 0,
+          transition: { duration: 0.6, ease: "easeOut" },
+        },
+      }}
+      className="pt-6 space-y-3 border-t border-slate-200/90"
+    >
       {/* Row 1 */}
       <div className="flex flex-wrap items-center gap-5 sm:gap-6 text-xs sm:text-sm">
         {/* 3ds Max */}
@@ -74,6 +84,6 @@ export default function HeroSoftwareLogos() {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

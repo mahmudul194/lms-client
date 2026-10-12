@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Users } from "lucide-react";
 
 interface BatchItem {
@@ -43,16 +42,20 @@ export default function BatchGallerySection({ batches }: BatchGallerySectionProp
         {batches.map((batch, index) => (
           <div
             key={index}
-            className="group bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
+            className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm transition-all duration-500 ease-out hover:-translate-y-2 hover:border-sky-200 hover:shadow-[0_20px_45px_-15px_rgba(0,43,91,0.18)]"
+            style={{
+              animation: "galleryFadeUp 0.65s ease-out both",
+              animationDelay: `${index * 100}ms`,
+            }}
           >
-            <div className="relative aspect-[16/10] w-full bg-slate-100 overflow-hidden flex items-center justify-center">
+            <div className="relative flex aspect-[16/10] w-full items-center justify-center overflow-hidden bg-slate-100">
               {batch.hasImage ? (
                 <img
                   src={batch.image}
                   alt={batch.title}
                   loading="lazy"
                   decoding="async"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center p-8 text-center text-slate-300 group-hover:text-[#0077b6] transition-colors">

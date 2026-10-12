@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Sparkles, Users } from "lucide-react";
+import { motion } from "motion/react";
 
 export default function CommunityCards() {
   const cards = [
@@ -53,65 +53,135 @@ export default function CommunityCards() {
   ];
 
   return (
-    <section className="py-20 sm:py-24 bg-[#f8fafc] border-t border-slate-100 font-sans">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 space-y-12">
+    <section className="relative overflow-hidden border-t border-slate-200/70 bg-slate-50/80 py-16 font-sans sm:py-20 lg:py-24">
+      <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-[min(700px,90%)] -translate-x-1/2 rounded-full bg-sky-100/40 blur-3xl" />
+
+      <div className="relative mx-auto max-w-[1440px] space-y-10 px-4 sm:px-8 lg:space-y-12 lg:px-12">
         {/* Section Header */}
-        <div className="text-center space-y-2">
-          <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#0077b6]">
-            COMMUNITY
-          </span>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#002b5b] tracking-tight">
-            Join Our Learning Community
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="text-center"
+        >
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#0077b6]">
+            Stay Connected
+          </p>
+
+          <h2 className="text-2xl font-bold tracking-tight text-[#002b5b] sm:text-3xl md:text-4xl">
+            Join Our{" "}
+            <span className="text-[#0077b6]">Learning Community</span>
           </h2>
-        </div>
 
-        {/* 3 Redesigned Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-          {cards.map((c, i) => (
-            <div
-              key={i}
-              className={`group relative bg-white rounded-3xl p-8 sm:p-9 border border-slate-200/80 ${c.accentBorder} shadow-xs hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between space-y-8 overflow-hidden`}
+          <div className="mx-auto mt-3 h-1 w-12 rounded-full bg-[#0077b6]/70" />
+
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-500 sm:text-base">
+            Connect with our community, learn from experts, and stay updated
+            with the latest tutorials and opportunities.
+          </p>
+        </motion.div>
+
+        {/* Community Cards */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.15 }}
+          variants={{
+            hidden: {},
+            visible: {
+              transition: {
+                staggerChildren: 0.15,
+              },
+            },
+          }}
+          className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-3 lg:gap-7"
+        >
+          {cards.map((card, index) => (
+            <motion.article
+              key={card.title}
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    duration: 0.6,
+                    ease: "easeOut",
+                  },
+                },
+              }}
+              className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-slate-900/[0.07] ${card.accentBorder}`}
             >
-              {/* Subtle top brand line on hover */}
-              <div
-                className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent ${c.topGlow} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
-              />
-
-              <div className="space-y-5">
-                {/* Brand Icon Squircle */}
+              {/* Brand Header */}
+              <div className="relative flex h-28 items-center justify-between overflow-hidden bg-slate-50 px-7 sm:px-8">
                 <div
-                  className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-xs ${c.badgeBg}`}
+                  className={`absolute inset-x-0 top-0 h-1 ${card.topGlow}`}
+                />
+
+                <div className="pointer-events-none absolute -right-5 -top-12 h-36 w-36 rounded-full border border-slate-200/70 transition-transform duration-500 group-hover:scale-125" />
+                <div className="pointer-events-none absolute -right-1 -top-5 h-24 w-24 rounded-full border border-slate-200/70 transition-transform duration-500 group-hover:scale-110" />
+
+                <div
+                  className={`relative z-10 flex h-14 w-14 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 group-hover:rotate-[-5deg] group-hover:scale-110 ${card.badgeBg}`}
                 >
-                  {c.icon}
+                  {card.icon}
                 </div>
 
-                {/* Title & Concise Description */}
-                <div>
-                  <h3 className="text-xl sm:text-2xl font-black text-[#002b5b] tracking-tight">
-                    {c.title}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed mt-2">
-                    {c.desc}
-                  </p>
-                </div>
+                <span className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-400 shadow-sm transition-all duration-300 group-hover:bg-[#002b5b] group-hover:text-white">
+                  <ArrowUpRight className="h-[18px] w-[18px] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </span>
               </div>
 
-              {/* Action Button */}
-              <div>
-                <a
-                  href={c.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`inline-flex items-center justify-between w-full px-5 py-3.5 rounded-xl font-bold text-xs sm:text-sm text-white ${c.btnClass} transition-all duration-200 shadow-xs hover:shadow-md group/btn`}
-                >
-                  <span>{c.action}</span>
-                  <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
-                </a>
+              {/* Card Body */}
+              <div className="flex flex-1 flex-col p-7 sm:p-8">
+                <span className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                  Connect & Explore
+                </span>
+
+                <h3 className="text-xl font-bold tracking-tight text-[#002b5b] transition-colors duration-300 group-hover:text-[#0077b6]">
+                  {card.title}
+                </h3>
+
+                <p className="mt-3 flex-1 text-sm leading-7 text-slate-500">
+                  {card.desc}
+                </p>
+
+                {/* Bottom Action */}
+                <div className="mt-7 border-t border-slate-100 pt-5">
+                  <a
+                    href={card.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-semibold text-white transition-all duration-300 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0077b6] focus-visible:ring-offset-2 ${card.btnClass}`}
+                  >
+                    {card.action}
+                    <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5" />
+                  </a>
+                </div>
               </div>
-            </div>
+            </motion.article>
           ))}
-        </div>
+        </motion.div>
+
+        {/* Community Note */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex flex-col items-center justify-center gap-2 pt-1 text-center sm:flex-row sm:gap-3"
+        >
+          <div className="flex items-center gap-2 text-[#0077b6]">
+            <Users className="h-4 w-4" />
+            <Sparkles className="h-3.5 w-3.5" />
+          </div>
+
+          <p className="text-xs leading-5 text-slate-500 sm:text-sm">
+            Learn together, share knowledge, and grow with the community.
+          </p>
+        </motion.div>
       </div>
-    </section>
+    </section >
   );
 }

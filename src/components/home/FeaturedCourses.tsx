@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import CourseCard, { CourseCardItem } from "../courses/CourseCard";
+import { motion } from "motion/react";
 
 export default function FeaturedCourses() {
   const [courses, setCourses] = useState<CourseCardItem[]>([]);
@@ -82,11 +83,28 @@ export default function FeaturedCourses() {
         }`}
     >
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12">
-        <div className="text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#002b5b] tracking-tight">
-            Explore All Batches
+        {/* Section Heading */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          className="text-center"
+        >
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#0077b6]">
+            Learn & Grow
+          </p>
+
+          <h2 className="text-2xl font-bold tracking-tight text-[#002b5b] sm:text-3xl md:text-4xl">
+            Explore All <span className="text-[#0077b6]">Batches</span>
           </h2>
-        </div>
+
+          <div className="mx-auto mt-3 h-1 w-12 rounded-full bg-[#0077b6]/70" />
+
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-500 sm:text-base">
+            Discover our upcoming and ongoing batches to find the right learning path for you.
+          </p>
+        </motion.div>
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 mt-10 sm:mt-12">
@@ -103,13 +121,42 @@ export default function FeaturedCourses() {
             ))}
           </div>
         ) : courses.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 mt-10 sm:mt-12">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.15 }}
+            variants={{
+              hidden: {},
+              visible: {
+                transition: {
+                  delayChildren: 0.35,
+                  staggerChildren: 0.18,
+                },
+              },
+            }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 mt-10 sm:mt-12"
+          >
             {courses.map((course) => (
-              <CourseCard key={course.id} course={course} />
+              <motion.div
+                key={course.id}
+                variants={{
+                  hidden: { opacity: 0, y: 25 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: {
+                      duration: 0.7,
+                      ease: [0.22, 1, 0.36, 1],
+                    },
+                  },
+                }}
+              >
+                <CourseCard key={course.id} course={course} />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         ) : null}
       </div>
-    </section>
+    </section >
   );
 }
