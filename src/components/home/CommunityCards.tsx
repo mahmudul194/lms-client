@@ -53,9 +53,8 @@ export default function CommunityCards() {
   ];
 
   return (
-    <section className="relative overflow-hidden border-t border-slate-200/70 bg-slate-50/80 py-16 font-sans sm:py-20 lg:py-24">
-      <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-[min(700px,90%)] -translate-x-1/2 rounded-full bg-sky-100/40 blur-3xl" />
-
+    <section className="relative overflow-hidden border-t border-slate-200 bg-white py-12 font-sans sm:py-14 lg:py-16">
+      <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-sky-200/40 blur-3xl animate-community-drift" />
       <div className="relative mx-auto max-w-[1440px] space-y-10 px-4 sm:px-8 lg:space-y-12 lg:px-12">
         {/* Section Header */}
         <motion.div
@@ -95,7 +94,7 @@ export default function CommunityCards() {
               },
             },
           }}
-          className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-3 lg:gap-7"
+          className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-3 lg:gap-6"
         >
           {cards.map((card, index) => (
             <motion.article
@@ -111,49 +110,60 @@ export default function CommunityCards() {
                   },
                 },
               }}
-              className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-slate-900/[0.07] ${card.accentBorder}`}
+              className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg hover:shadow-[#002b5b]/[0.06] ${card.accentBorder}`}
             >
+              {/* Animated Card Background */}
+              <motion.div
+                className="pointer-events-none absolute -right-12 -top-12 z-0 h-48 w-48 rounded-full bg-sky-200/60 blur-3xl"
+                animate={{
+                  x: [0, -30, 10, 0],
+                  y: [0, 25, 40, 0],
+                  scale: [1, 1.2, 0.9, 1],
+                }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
               {/* Brand Header */}
-              <div className="relative flex h-28 items-center justify-between overflow-hidden bg-slate-50 px-7 sm:px-8">
-                <div
+              <div className="relative z-10 flex h-20 items-center justify-between overflow-hidden px-5 sm:px-6">
+                {/* <div
                   className={`absolute inset-x-0 top-0 h-1 ${card.topGlow}`}
-                />
-
-                <div className="pointer-events-none absolute -right-5 -top-12 h-36 w-36 rounded-full border border-slate-200/70 transition-transform duration-500 group-hover:scale-125" />
-                <div className="pointer-events-none absolute -right-1 -top-5 h-24 w-24 rounded-full border border-slate-200/70 transition-transform duration-500 group-hover:scale-110" />
+                /> */}
 
                 <div
-                  className={`relative z-10 flex h-14 w-14 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 group-hover:rotate-[-5deg] group-hover:scale-110 ${card.badgeBg}`}
+                  className={`relative z-10 flex h-11 w-11 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-105 ${card.badgeBg}`}
                 >
                   {card.icon}
                 </div>
 
-                <span className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-400 shadow-sm transition-all duration-300 group-hover:bg-[#002b5b] group-hover:text-white">
-                  <ArrowUpRight className="h-[18px] w-[18px] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                <span className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition-colors duration-300 group-hover:border-[#0077b6] group-hover:text-[#0077b6]">
+                  <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </span>
               </div>
 
               {/* Card Body */}
-              <div className="flex flex-1 flex-col p-7 sm:p-8">
-                <span className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+              <div className="relative z-10 flex flex-1 flex-col p-5 sm:p-6">
+                <span className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
                   Connect & Explore
                 </span>
 
-                <h3 className="text-xl font-bold tracking-tight text-[#002b5b] transition-colors duration-300 group-hover:text-[#0077b6]">
+                <h3 className="text-lg font-semibold tracking-tight text-[#002b5b] transition-colors duration-300 group-hover:text-[#0077b6]">
                   {card.title}
                 </h3>
 
-                <p className="mt-3 flex-1 text-sm leading-7 text-slate-500">
+                <p className="mt-2 flex-1 text-sm leading-6 text-slate-500">
                   {card.desc}
                 </p>
 
                 {/* Bottom Action */}
-                <div className="mt-7 border-t border-slate-100 pt-5">
+                <div className="mt-5 border-t border-slate-100 pt-4">
                   <a
                     href={card.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-semibold text-white transition-all duration-300 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0077b6] focus-visible:ring-offset-2 ${card.btnClass}`}
+                    className={`inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-white transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0077b6] focus-visible:ring-offset-2 ${card.btnClass}`}
                   >
                     {card.action}
                     <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5" />
@@ -182,6 +192,33 @@ export default function CommunityCards() {
           </p>
         </motion.div>
       </div>
+      <style jsx>
+        {`
+          .animate-community-drift {
+            animation: communityDrift 8s ease-in-out infinite alternate;
+            will-change: transform;
+          }
+
+          @keyframes communityDrift {
+            0% {
+              transform: translate(-20px, 0) scale(0.9);
+            }
+            50% {
+              transform: translate(-100px, 70px) scale(1.15);
+            }
+            100% {
+              transform: translate(-40px, 120px) scale(1);
+            }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .animate-community-drift {
+              animation: none;
+            }
+          }
+        `}
+      </style>
     </section >
+
   );
 }

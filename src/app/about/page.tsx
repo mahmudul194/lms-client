@@ -1,262 +1,383 @@
-
 "use client";
 
 import React from "react";
 import {
+  ArrowDownRight,
+  ArrowUpRight,
   CheckCircle2,
   Target,
   Rocket,
-  ArrowUpRight,
   Sparkles,
+  Layers3,
+  CircleDot,
 } from "lucide-react";
 import { motion } from "motion/react";
 
+const features = [
+  "Direct training on international standard live BIM projects",
+  "Flexible 3-month installment plans with zero hidden fees",
+  "24/7 dedicated software & modeling troubleshooting support",
+  "Verifiable QR-coded official certificate upon completion",
+  "Lifetime access to full HD recorded backups & project libraries",
+  "Portfolio preparation & international job placement assistance",
+];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-slate-50/70 py-8 sm:py-12">
-      <div className="mx-auto max-w-7xl space-y-10 px-4 sm:space-y-14 sm:px-6 lg:px-8">
-
-
-        {/* Banner */}
+    <main className="min-h-screen overflow-hidden bg-[#f5f7fa] py-6 sm:py-10">
+      <div className="mx-auto max-w-7xl space-y-16 px-4 sm:px-6 lg:space-y-24 lg:px-8">
+        {/* ==================== HERO ==================== */}
         <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.15 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="relative isolate overflow-hidden rounded-3xl bg-[#002b5b] px-5 py-8 shadow-xl shadow-blue-950/10 sm:px-8 sm:py-10 lg:px-12 lg:py-12"
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="relative isolate overflow-hidden rounded-[2rem] bg-[#002b5b] text-white"
         >
-          {/* Subtle Animated Background */}
-          <motion.div
-            animate={{ x: [0, -15, 0], y: [0, 12, 0] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-            className="pointer-events-none absolute -right-16 -top-20 -z-10 h-64 w-64 rounded-full border border-sky-300/10"
-          />
+          {/* Decorative background */}
+          <div className="pointer-events-none absolute inset-0 -z-10">
+            <div className="absolute right-[-8rem] top-[-10rem] h-[28rem] w-[28rem] rounded-full border border-white/[0.09]" />
+            <div className="absolute right-[-4rem] top-[-6rem] h-[20rem] w-[20rem] rounded-full border border-white/[0.12]" />
+            <div className="absolute right-[1rem] top-[-1rem] h-[10rem] w-[10rem] rounded-full border border-[#38bdf8]/30" />
+            <div className="absolute bottom-0 right-0 h-64 w-64 bg-[#0077b6]/20 blur-[100px]" />
 
-          <motion.div
-            animate={{ x: [0, 12, 0], y: [0, -10, 0] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="pointer-events-none absolute -right-4 -top-8 -z-10 h-44 w-44 rounded-full border border-white/10"
-          />
-
-          <motion.div
-            animate={{ scale: [1, 1.12, 1], opacity: [0.35, 0.6, 0.35] }}
-            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-            className="pointer-events-none absolute -bottom-20 right-20 -z-10 h-56 w-56 rounded-full bg-sky-400/10 blur-3xl"
-          />
-
-          <motion.div
-            animate={{ x: [0, 12, 0], opacity: [0.2, 0.4, 0.2] }}
-            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-            className="pointer-events-none absolute -bottom-12 -left-10 -z-10 h-40 w-40 rounded-full bg-blue-400/10 blur-3xl"
-          />
-
-          <div className="relative max-w-4xl space-y-4 sm:space-y-5">
-            {/* Small Label */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-sky-300/20 bg-white/5 px-3 py-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-sky-300" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-sky-200 sm:text-[11px]">
-                About BIM Build BD
-              </span>
-            </div>
-
-            {/* Heading */}
-            <h1 className="text-2xl font-black leading-tight tracking-tight text-white sm:text-3xl lg:text-5xl">
-              Empowering the Future of
-              <span className="mt-1 block text-sky-300">
-                Architecture & Engineering
-              </span>
-              <span className="mt-1 block text-white/90">with BIM</span>
-            </h1>
-
-            {/* Description */}
-            <p className="max-w-3xl text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
-              BIM Build BD is a premier technical learning platform dedicated
-              to training engineers, architects, and diploma professionals in
-              modern Building Information Modeling and smart automation.
-            </p>
-
-            {/* Decorative Lines */}
-            <div className="flex items-center gap-2 pt-1">
-              <span className="h-1 w-10 rounded-full bg-sky-300" />
-              <span className="h-1 w-4 rounded-full bg-white/40" />
-              <span className="h-1 w-2 rounded-full bg-white/20" />
-            </div>
+            <div
+              className="absolute inset-0 opacity-[0.07]"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(255,255,255,0.35) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.35) 1px, transparent 1px)",
+                backgroundSize: "42px 42px",
+              }}
+            />
           </div>
+
+          <div className="grid min-h-[420px] items-center gap-12 px-6 py-12 sm:px-10 sm:py-16 lg:grid-cols-[1.2fr_0.8fr] lg:px-16 lg:py-20">
+            <div className="relative z-10">
+              <motion.div
+                initial={{ opacity: 0, x: -15 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.15, duration: 0.5 }}
+                className="mb-7 inline-flex items-center gap-2 border-l-2 border-[#38bdf8] pl-3 text-sm font-semibold tracking-[0.2em] text-sky-200"
+              >
+                <Sparkles size={16} />
+                ABOUT BIM BUILD BD
+              </motion.div>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25, duration: 0.6 }}
+                className="max-w-3xl text-4xl font-bold leading-[1.12] tracking-tight sm:text-5xl lg:text-6xl"
+              >
+                Empowering the Future of{" "}
+                <span className="text-sky-300">Architecture</span> & Engineering
+                with BIM
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+                className="mt-6 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg"
+              >
+                BIM Build BD is a premier technical learning platform dedicated
+                to training engineers, architects, and diploma professionals
+                in modern Building Information Modeling and smart automation.
+              </motion.p>
+
+              <motion.a
+                href="#our-purpose"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.65 }}
+                className="mt-9 inline-flex items-center gap-3 rounded-full bg-white px-6 py-3.5 text-sm font-bold text-[#002b5b] transition-all duration-300 hover:bg-sky-100"
+              >
+                Discover Our Purpose
+                <ArrowDownRight size={18} />
+              </motion.a>
+            </div>
+
+            {/* Abstract BIM-inspired visual */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.85, rotate: -8 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
+              className="relative mx-auto hidden h-[310px] w-full max-w-[350px] items-center justify-center lg:flex"
+            >
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{
+                  duration: 45,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+                className="absolute h-[290px] w-[290px] rounded-full border border-dashed border-sky-300/30"
+              />
+
+              <div className="absolute h-[225px] w-[225px] rounded-full border border-white/10" />
+              <div className="absolute h-[160px] w-[160px] rounded-full border border-sky-300/20" />
+
+              <div className="relative flex h-36 w-36 items-center justify-center border border-sky-200/40 bg-[#073969] shadow-2xl shadow-black/20">
+                <Layers3 size={66} strokeWidth={1.1} className="text-sky-300" />
+
+                <span className="absolute -right-3 -top-3 flex h-8 w-8 items-center justify-center rounded-full bg-sky-300 text-[#002b5b]">
+                  <CheckCircle2 size={17} />
+                </span>
+              </div>
+
+              <div className="absolute right-2 top-12 flex h-12 w-12 items-center justify-center rounded-xl border border-white/15 bg-white/[0.08] backdrop-blur-sm">
+                <Target size={23} className="text-sky-200" />
+              </div>
+
+              <div className="absolute bottom-10 left-0 flex h-12 w-12 items-center justify-center rounded-xl border border-white/15 bg-white/[0.08] backdrop-blur-sm">
+                <Rocket size={22} className="text-sky-200" />
+              </div>
+
+              <div className="absolute bottom-4 right-4 h-2.5 w-2.5 rounded-full bg-sky-300 shadow-[0_0_20px_rgba(125,211,252,0.8)]" />
+              <div className="absolute left-10 top-8 h-1.5 w-1.5 rounded-full bg-white/80" />
+            </motion.div>
+          </div>
+
+          <div className="absolute bottom-0 left-0 h-1 w-full bg-[#38bdf8]" />
         </motion.section>
 
+        {/* ==================== MISSION & VISION ==================== */}
+        <section id="our-purpose" className="scroll-mt-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={fadeUp}
+            transition={{ duration: 0.6 }}
+            className="mb-10 max-w-2xl"
+          >
+            <div className="mb-4 flex items-center gap-3">
+              <span className="h-px w-10 bg-[#0077b6]" />
+              <span className="text-xs font-bold uppercase tracking-[0.22em] text-[#0077b6]">
+                Our Purpose
+              </span>
+            </div>
 
-        {/* Mission & Vision */}
-        <section className="space-y-7">
-          <div className="mx-auto max-w-2xl space-y-3 text-center">
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#0077b6]">
-              Our Purpose
-            </span>
-            <h2 className="text-2xl font-black tracking-tight text-[#002b5b] sm:text-3xl">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
               What Drives Us Forward
             </h2>
-            <p className="text-sm leading-7 text-slate-500 sm:text-base">
+
+            <p className="mt-4 max-w-xl text-base leading-7 text-slate-600">
               Building practical skills and creating opportunities for the next
               generation of engineering professionals.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8">
-            {/* Mission */}
-            <motion.div
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-              className="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-sky-200 hover:shadow-xl hover:shadow-sky-950/5 sm:p-9"
+          <div className="grid gap-5 lg:grid-cols-2 lg:gap-7">
+            {/* Mission: light editorial panel */}
+            <motion.article
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              variants={fadeUp}
+              transition={{ duration: 0.55 }}
+              className="group relative overflow-hidden border border-slate-200 bg-white p-7 transition-colors duration-300 hover:border-sky-300 sm:p-10 lg:min-h-[340px]"
             >
-              <div className="absolute right-0 top-0 h-32 w-32 rounded-bl-full bg-sky-50/80 transition-colors duration-300 group-hover:bg-sky-100/70" />
+              <div className="absolute right-5 top-0 select-none text-[8rem] font-black leading-none text-slate-100 transition-colors duration-300 group-hover:text-sky-50 sm:text-[10rem]">
+                01
+              </div>
 
-              <div className="relative space-y-5">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-sky-100 bg-sky-50 text-[#0077b6] transition-all duration-300 group-hover:bg-[#0077b6] group-hover:text-white">
-                  <Target className="h-7 w-7" strokeWidth={1.8} />
+              <div className="relative z-10 flex h-full flex-col">
+                <div className="mb-9 flex items-center justify-between">
+                  <div className="flex items-center gap-3 text-[#0077b6]">
+                    <Target size={25} strokeWidth={1.7} />
+                    <span className="text-xs font-bold uppercase tracking-[0.2em]">
+                      What We Do
+                    </span>
+                  </div>
+
+                  <span className="text-sm font-medium text-slate-400">
+                    MISSION
+                  </span>
                 </div>
 
-                <div className="space-y-3">
-                  <h3 className="text-xl font-extrabold text-[#002b5b] sm:text-2xl">
-                    Our Mission
-                  </h3>
-                  <p className="text-sm leading-7 text-slate-600 sm:text-base">
-                    To transition engineers from legacy 2D drafting methods
-                    into cutting-edge 3D/4D/5D Building Information Modeling
-                    (BIM) workflows with practical industry competence.
-                  </p>
-                </div>
+                <h3 className="text-3xl font-bold tracking-tight text-slate-900">
+                  Our Mission
+                </h3>
 
-                <div className="flex items-center gap-2 pt-1 text-xs font-bold uppercase tracking-wider text-[#0077b6]">
-                  <span>Practical Learning</span>
-                  <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                <p className="mt-5 max-w-lg text-base leading-8 text-slate-600">
+                  To transition engineers from legacy 2D drafting methods into
+                  cutting-edge 3D/4D/5D Building Information Modeling (BIM)
+                  workflows with practical industry competence.
+                </p>
+
+                <div className="mt-auto pt-8">
+                  <div className="flex items-center gap-2 text-sm font-bold text-[#0077b6]">
+                    <span className="h-2 w-2 rounded-full bg-[#0077b6]" />
+                    Practical Learning
+                  </div>
                 </div>
               </div>
-            </motion.div>
+            </motion.article>
 
-            {/* Vision */}
-            <motion.div
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.2 }}
-              transition={{
-                duration: 0.6,
-                delay: 0.12,
-                ease: "easeOut",
-              }}
-              className="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/5 sm:p-9"
+            {/* Vision: dark, contrasting panel */}
+            <motion.article
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              variants={fadeUp}
+              transition={{ duration: 0.55, delay: 0.12 }}
+              className="group relative isolate overflow-hidden bg-[#002b5b] p-7 text-white sm:p-10 lg:min-h-[340px]"
             >
-              <div className="absolute right-0 top-0 h-32 w-32 rounded-bl-full bg-blue-50/80 transition-colors duration-300 group-hover:bg-blue-100/70" />
+              <div className="pointer-events-none absolute -bottom-20 -right-16 -z-10 h-72 w-72 rounded-full border border-white/[0.08]" />
+              <div className="pointer-events-none absolute -bottom-8 -right-4 -z-10 h-52 w-52 rounded-full border border-white/[0.1]" />
+              <div className="pointer-events-none absolute right-10 top-10 -z-10 h-24 w-24 rounded-full bg-[#0077b6]/30 blur-3xl" />
 
-              <div className="relative space-y-5">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-[#002b5b] transition-all duration-300 group-hover:bg-[#002b5b] group-hover:text-white">
-                  <Rocket className="h-7 w-7" strokeWidth={1.8} />
+              <div className="absolute right-5 top-0 select-none text-[8rem] font-black leading-none text-white/[0.05] sm:text-[10rem]">
+                02
+              </div>
+
+              <div className="relative z-10 flex h-full flex-col">
+                <div className="mb-9 flex items-center justify-between">
+                  <div className="flex items-center gap-3 text-sky-300">
+                    <Rocket size={25} strokeWidth={1.7} />
+                    <span className="text-xs font-bold uppercase tracking-[0.2em]">
+                      Where We’re Going
+                    </span>
+                  </div>
+
+                  <span className="text-sm font-medium text-slate-400">
+                    VISION
+                  </span>
                 </div>
 
-                <div className="space-y-3">
-                  <h3 className="text-xl font-extrabold text-[#002b5b] sm:text-2xl">
-                    Our Vision
-                  </h3>
-                  <p className="text-sm leading-7 text-slate-600 sm:text-base">
-                    To establish Bangladeshi engineering talent on the global
-                    stage, equipping professionals to lead major infrastructure
-                    and remote freelance contracts worldwide.
-                  </p>
-                </div>
+                <h3 className="text-3xl font-bold tracking-tight">
+                  Our Vision
+                </h3>
 
-                <div className="flex items-center gap-2 pt-1 text-xs font-bold uppercase tracking-wider text-[#0077b6]">
-                  <span>Global Opportunities</span>
-                  <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                <p className="mt-5 max-w-lg text-base leading-8 text-slate-300">
+                  To establish Bangladeshi engineering talent on the global
+                  stage, equipping professionals to lead major infrastructure
+                  and remote freelance contracts worldwide.
+                </p>
+
+                <div className="mt-auto pt-8">
+                  <div className="flex items-center gap-2 text-sm font-bold text-sky-300">
+                    <span className="h-2 w-2 rounded-full bg-sky-300" />
+                    Global Opportunities
+                  </div>
                 </div>
               </div>
-            </motion.div>
+            </motion.article>
           </div>
         </section>
 
-        {/* Key Features */}
-        <motion.section
-          initial={{ opacity: 0, y: 25 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.1 }}
-          transition={{ duration: 0.65, ease: "easeOut" }}
-          className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-10 lg:p-12"
-        >
-          <div className="mx-auto mb-9 max-w-2xl space-y-3 text-center">
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#0077b6]">
-              Why Choose Us
-            </span>
-            <h2 className="text-2xl font-black tracking-tight text-[#002b5b] sm:text-3xl">
-              Key Features & Student Advantages
-            </h2>
-            <p className="text-sm leading-7 text-slate-500 sm:text-base">
-              Learn with practical support, industry-focused resources, and
-              career-oriented guidance.
-            </p>
+        {/* ==================== KEY FEATURES ==================== */}
+        <section className="relative">
+          <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+            {/* Intro column */}
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.25 }}
+              variants={fadeUp}
+              transition={{ duration: 0.6 }}
+              className="lg:sticky lg:top-10 lg:self-start"
+            >
+              <div className="mb-4 flex items-center gap-3">
+                <span className="h-px w-10 bg-[#0077b6]" />
+                <span className="text-xs font-bold uppercase tracking-[0.22em] text-[#0077b6]">
+                  Why Choose Us
+                </span>
+              </div>
+
+              <h2 className="max-w-md text-3xl font-bold leading-tight tracking-tight text-slate-900 sm:text-4xl">
+                Key Features & Student Advantages
+              </h2>
+
+              <p className="mt-5 max-w-md text-base leading-8 text-slate-600">
+                Learn with practical support, industry-focused resources, and
+                career-oriented guidance.
+              </p>
+
+              <div className="mt-8 flex items-center gap-3 border-l-2 border-[#0077b6] bg-white px-5 py-4">
+                <CircleDot size={21} className="shrink-0 text-[#0077b6]" />
+                <p className="text-sm leading-6 text-slate-600">
+                  Everything you need to develop practical BIM skills and
+                  prepare for professional opportunities.
+                </p>
+              </div>
+
+              <div className="mt-8 hidden items-center gap-3 text-sm font-semibold text-slate-400 lg:flex">
+                <span className="h-px w-8 bg-slate-300" />
+                BUILT AROUND YOUR GROWTH
+              </div>
+            </motion.div>
+
+            {/* Numbered feature list */}
+            <div className="border-t border-slate-300">
+              {features.map((feature, index) => (
+                <motion.div
+                  key={feature}
+                  initial={{ opacity: 0, x: 18 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, amount: 0.25 }}
+                  transition={{
+                    duration: 0.45,
+                    delay: index * 0.07,
+                  }}
+                  className="group grid grid-cols-[44px_1fr_28px] items-center gap-3 border-b border-slate-300 py-6 transition-colors duration-300 hover:bg-white hover:px-4 sm:grid-cols-[58px_1fr_32px] sm:gap-5 sm:py-7"
+                >
+                  <span className="text-sm font-bold tabular-nums text-[#0077b6] sm:text-base">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+
+                  <p className="text-base font-medium leading-7 text-slate-700 transition-colors duration-300 group-hover:text-[#002b5b] sm:text-lg">
+                    {feature}
+                  </p>
+
+                  <CheckCircle2
+                    size={21}
+                    strokeWidth={1.7}
+                    className="text-slate-300 transition-all duration-300 group-hover:scale-110 group-hover:text-[#0077b6]"
+                  />
+                </motion.div>
+              ))}
+            </div>
           </div>
+        </section>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {/* Feature 1 */}
-            <div className="group flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-5 transition-all duration-300 hover:border-sky-200 hover:bg-sky-50/70">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-[#0077b6] shadow-sm transition-colors group-hover:bg-[#0077b6] group-hover:text-white">
-                <CheckCircle2 className="h-5 w-5" />
-              </div>
-              <p className="pt-1 text-sm font-medium leading-6 text-slate-700">
-                Direct training on international standard live BIM projects
+        {/* ==================== CLOSING STRIP ==================== */}
+        <motion.section
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          variants={fadeUp}
+          transition={{ duration: 0.6 }}
+          className="relative overflow-hidden bg-[#e5f3fa] px-6 py-9 sm:px-10 sm:py-12"
+        >
+          <div className="absolute right-0 top-0 h-full w-2 bg-[#0077b6]" />
+
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="max-w-2xl">
+              <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-[#0077b6]">
+                Your Next Step
               </p>
+              <h2 className="text-2xl font-bold tracking-tight text-[#002b5b] sm:text-3xl">
+                Build skills. Create opportunities.
+              </h2>
             </div>
 
-            {/* Feature 2 */}
-            <div className="group flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-5 transition-all duration-300 hover:border-sky-200 hover:bg-sky-50/70">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-[#0077b6] shadow-sm transition-colors group-hover:bg-[#0077b6] group-hover:text-white">
-                <CheckCircle2 className="h-5 w-5" />
-              </div>
-              <p className="pt-1 text-sm font-medium leading-6 text-slate-700">
-                Flexible 3-month installment plans with zero hidden fees
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="group flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-5 transition-all duration-300 hover:border-sky-200 hover:bg-sky-50/70">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-[#0077b6] shadow-sm transition-colors group-hover:bg-[#0077b6] group-hover:text-white">
-                <CheckCircle2 className="h-5 w-5" />
-              </div>
-              <p className="pt-1 text-sm font-medium leading-6 text-slate-700">
-                24/7 dedicated software & modeling troubleshooting support
-              </p>
-            </div>
-
-            {/* Feature 4 */}
-            <div className="group flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-5 transition-all duration-300 hover:border-sky-200 hover:bg-sky-50/70">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-[#0077b6] shadow-sm transition-colors group-hover:bg-[#0077b6] group-hover:text-white">
-                <CheckCircle2 className="h-5 w-5" />
-              </div>
-              <p className="pt-1 text-sm font-medium leading-6 text-slate-700">
-                Verifiable QR-coded official certificate upon completion
-              </p>
-            </div>
-
-            {/* Feature 5 */}
-            <div className="group flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-5 transition-all duration-300 hover:border-sky-200 hover:bg-sky-50/70">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-[#0077b6] shadow-sm transition-colors group-hover:bg-[#0077b6] group-hover:text-white">
-                <CheckCircle2 className="h-5 w-5" />
-              </div>
-              <p className="pt-1 text-sm font-medium leading-6 text-slate-700">
-                Lifetime access to full HD recorded backups & project libraries
-              </p>
-            </div>
-
-            {/* Feature 6 */}
-            <div className="group flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-5 transition-all duration-300 hover:border-sky-200 hover:bg-sky-50/70">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-[#0077b6] shadow-sm transition-colors group-hover:bg-[#0077b6] group-hover:text-white">
-                <CheckCircle2 className="h-5 w-5" />
-              </div>
-              <p className="pt-1 text-sm font-medium leading-6 text-slate-700">
-                Portfolio preparation & international job placement assistance
-              </p>
-            </div>
+            <a
+              href="#our-purpose"
+              className="inline-flex w-fit items-center gap-2 text-sm font-bold text-[#002b5b] transition-colors hover:text-[#0077b6]"
+            >
+              Explore Our Purpose
+              <ArrowUpRight size={19} />
+            </a>
           </div>
         </motion.section>
       </div>
-    </div>
+    </main>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Calendar } from "lucide-react";
+import { ArrowUpRight, Calendar } from "lucide-react";
 import { motion } from "motion/react";
 
 export default function BlogsPage() {
@@ -98,130 +98,89 @@ export default function BlogsPage() {
           </div>
         </motion.div>
 
+
         {/* Blog Cards Grid */}
         <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.08 }}
           variants={{
             hidden: {},
             visible: {
-              transition: {
-                staggerChildren: 0.12,
-              },
+              transition: { staggerChildren: 0.1 },
             },
           }}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: false, amount: 0.1 }}
-          className="grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+          className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-6"
         >
-          {blogs.map((blog) => (
+          {blogs.map((blog, index) => (
             <motion.article
               key={blog.id}
               variants={{
-                hidden: {
-                  opacity: 0,
-                  y: 35,
-                  scale: 0.97,
-                },
+                hidden: { opacity: 0, y: 18 },
                 visible: {
                   opacity: 1,
                   y: 0,
-                  scale: 1,
-                  transition: {
-                    duration: 0.65,
-                    ease: [0.22, 1, 0.36, 1],
-                  },
+                  transition: { duration: 0.5, ease: "easeOut" },
                 },
               }}
-              whileHover={{
-                y: -8,
-                transition: { duration: 0.3, ease: "easeOut" },
-              }}
-              className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm transition-shadow duration-300 hover:border-sky-200 hover:shadow-[0_20px_45px_-15px_rgba(0,43,91,0.16)]"
+              className="group relative flex min-h-[220px] overflow-hidden rounded-2xl border border-slate-200/80 bg-white transition-all duration-300 hover:border-[#0077b6]/40 hover:shadow-lg hover:shadow-[#002b5b]/[0.07] sm:min-h-[240px]"
             >
-              {/* Blog Image */}
-              {blog.image ? (
-                <div className="relative h-52 w-full overflow-hidden bg-slate-100 sm:h-56">
-                  <motion.img
+              {/* Image panel */}
+              <div className="relative w-[38%] shrink-0 overflow-hidden bg-[#002b5b] sm:w-[40%]">
+                {blog.image ? (
+                  <img
                     src={blog.image}
                     alt={blog.title}
                     loading="lazy"
                     decoding="async"
-                    className="h-full w-full object-cover"
-                    whileHover={{ scale: 1.07 }}
-                    transition={{ duration: 0.7, ease: "easeOut" }}
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
-
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#002b5b]/40 via-transparent to-transparent opacity-70" />
-
-                  <div className="absolute left-4 top-4">
-                    <span className="inline-flex rounded-full border border-white/50 bg-white/95 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#0077b6] shadow-sm backdrop-blur-md sm:text-xs">
-                      {blog.category}
-                    </span>
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-[#002b5b]">
+                    <div className="absolute -right-10 -top-8 h-32 w-32 rounded-full border-[20px] border-white/5 transition-transform duration-700 group-hover:scale-125" />
+                    <div className="absolute -bottom-10 -left-8 h-28 w-28 rounded-full border-[18px] border-sky-400/10" />
+                    <Calendar className="relative h-8 w-8 text-sky-200 transition-transform duration-300 group-hover:scale-110 sm:h-10 sm:w-10" />
                   </div>
-                </div>
-              ) : (
-                <div className="relative flex h-52 items-center justify-center overflow-hidden bg-slate-50 sm:h-56">
-                  <div className="absolute inset-0 bg-gradient-to-br from-sky-50 via-white to-blue-50" />
+                )}
 
-                  <motion.div
-                    className="absolute -right-8 -top-8 h-32 w-32 rounded-full border-[20px] border-sky-100/50"
-                    whileHover={{ scale: 1.12, rotate: 12 }}
-                    transition={{ duration: 0.6 }}
-                  />
+                <div className="absolute inset-0 bg-[#002b5b]/10 transition-colors duration-300 group-hover:bg-[#002b5b]/25" />
 
-                  <div className="absolute -bottom-10 -left-8 h-36 w-36 rounded-full border-[24px] border-blue-100/40" />
+                <span className="absolute left-2 top-3 max-w-[calc(100%-16px)] truncate rounded-md border border-white/30 bg-[#002b5b]/75 px-2 py-1 text-[8px] font-bold uppercase tracking-wider text-white backdrop-blur-sm sm:left-3 sm:top-4 sm:px-2.5 sm:text-[9px]">
+                  {blog.category}
+                </span>
 
-                  <div className="relative flex flex-col items-center gap-3">
-                    <motion.div
-                      whileHover={{ scale: 1.1, rotate: -5 }}
-                      transition={{ duration: 0.3 }}
-                      className="flex h-14 w-14 items-center justify-center rounded-2xl border border-sky-100 bg-white text-[#0077b6] shadow-sm"
-                    >
-                      <Calendar className="h-6 w-6" />
-                    </motion.div>
+                <span className="absolute bottom-3 left-3 h-1 w-8 rounded-full bg-sky-400 transition-all duration-300 group-hover:w-14 sm:bottom-4 sm:left-4" />
+              </div>
 
-                    <span className="rounded-full bg-white/90 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#0077b6] shadow-sm">
-                      {blog.category}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* Card Content */}
-              <div className="flex flex-1 flex-col p-5 sm:p-6">
-                <div className="mb-3 flex items-center gap-2 text-xs font-medium text-slate-400">
-                  <Calendar className="h-3.5 w-3.5 text-[#0077b6]" />
+              {/* Text panel */}
+              <div className="flex min-w-0 flex-1 flex-col justify-center p-3.5 sm:p-5 lg:p-6">
+                <div className="mb-2 flex items-center gap-1.5 text-[10px] font-medium text-slate-400 sm:mb-3 sm:gap-2 sm:text-xs">
+                  <Calendar className="h-3.5 w-3.5 shrink-0 text-[#0077b6]" />
                   <span>{blog.date}</span>
                 </div>
 
-                <h3 className="mb-3 text-base font-extrabold leading-snug text-[#002b5b] transition-colors duration-300 group-hover:text-[#0077b6] sm:text-lg">
+                <h3 className="line-clamp-3 text-sm font-extrabold leading-5 text-[#002b5b] transition-colors duration-300 group-hover:text-[#0077b6] sm:text-lg sm:leading-7">
                   {blog.title}
                 </h3>
 
-                <p className="line-clamp-3 flex-1 text-xs leading-6 text-slate-500 sm:text-sm">
+                <p className="mt-2 line-clamp-2 text-[11px] leading-5 text-slate-500 sm:mt-3 sm:text-sm sm:leading-6">
                   {blog.excerpt}
                 </p>
 
-                {/* Read More */}
-                <div className="mt-5 border-t border-slate-100 pt-4">
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-2 text-xs font-extrabold text-[#0077b6] transition-colors duration-300 hover:text-[#002b5b] sm:text-sm"
-                  >
-                    <span>Read Article</span>
-                    <motion.span
-                      className="inline-block"
-                      whileHover={{ x: 5 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      →
-                    </motion.span>
-                  </button>
+                <div className="mt-auto flex items-center justify-between gap-2 pt-3 sm:pt-4">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#0077b6] sm:text-xs">
+                    Article
+                  </span>
+
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 text-[#002b5b] transition-all duration-300 group-hover:border-[#0077b6] group-hover:bg-[#0077b6] group-hover:text-white">
+                    <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </span>
                 </div>
               </div>
             </motion.article>
           ))}
         </motion.div>
+
       </div>
     </div>
   );

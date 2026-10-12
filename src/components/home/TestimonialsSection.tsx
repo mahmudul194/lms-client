@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Star, Quote } from "lucide-react";
+import { Star, Quote, ArrowUpRight } from "lucide-react";
 import { reviewsApi } from "@/services/api";
 import { motion } from "motion/react";
 
@@ -190,11 +190,72 @@ export default function TestimonialsSection() {
     if (touchStartX.current - touchEndX.current < -50) {
       handlePrev();
     }
+    const pauseMovement = () => {
+      setIsPaused(true);
+    };
+
+    const resumeMovement = () => {
+      setIsPaused(false);
+    };
   };
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  const isPausedRef = useRef(false);
+
+  const pauseMovement = () => {
+    isPausedRef.current = true;
+    setIsPaused(true);
+  };
+
+  const resumeMovement = () => {
+    isPausedRef.current = false;
+    setIsPaused(false);
+  };
+
+  const duplicatedTestimonials = [
+    ...displayTestimonials,
+    ...displayTestimonials,
+  ];
+
+  useEffect(() => {
+    const track = trackRef.current;
+
+    if (!track || displayTestimonials.length < 2) return;
+
+    let animationFrame = 0;
+    let previousTime = 0;
+
+    const animate = (time: number) => {
+      if (!previousTime) previousTime = time;
+
+      const delta = Math.min(time - previousTime, 32);
+      previousTime = time;
+
+      const halfWidth = track.scrollWidth / 2;
+
+      if (
+        !isPausedRef.current &&
+        !document.hidden &&
+        halfWidth > 0
+      ) {
+        track.scrollLeft += delta * 0.035;
+
+        if (track.scrollLeft >= halfWidth) {
+          track.scrollLeft -= halfWidth;
+        }
+      }
+
+      animationFrame = requestAnimationFrame(animate);
+    };
+
+    animationFrame = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(animationFrame);
+  }, [displayTestimonials.length]);
 
   return (
     <section className="overflow-hidden bg-white py-16 font-sans sm:py-20 lg:py-24">
-      <div className="mx-auto max-w-[1440px] space-y-12 px-4 sm:px-8 lg:space-y-14 lg:px-12">
+      <div className="mx-auto max-w-[1440px] space-y-10 px-4 sm:px-8 lg:space-y-12 lg:px-12">
         {/* Section Heading */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -220,86 +281,110 @@ export default function TestimonialsSection() {
           </p>
         </motion.div>
 
-        {/* Testimonials Carousel */}
+        {/* Moving Testimonials */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 25 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.15 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative -my-3 overflow-hidden py-3"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
+          viewport={{ once: true, amount: 0.1 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="relative"
+          onMouseEnter={pauseMovement}
+          onMouseLeave={resumeMovement}
+          onTouchStart={pauseMovement}
+          onTouchEnd={() => {
+            window.setTimeout(resumeMovement, 1200);
+          }}
         >
+          {/* Edge Fades */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-5 bg-gradient-to-r from-white to-transparent sm:w-10 lg:w-16" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-5 bg-gradient-to-l from-white to-transparent sm:w-10 lg:w-16" />
+
           <div
-            onTransitionEnd={(e) => {
-              if (e.target === e.currentTarget) {
-                handleTransitionEnd(e);
-              }
-            }}
-            className="flex items-stretch"
-            style={{
-              transform: `translate3d(-${currentIndex * (100 / visibleCount)}%, 0, 0)`,
-              transition: isTransitioning
-                ? "transform 800ms cubic-bezier(0.25, 0.1, 0.25, 1)"
-                : "none",
-              willChange: "transform",
-              backfaceVisibility: "hidden",
-            }}
+            ref={trackRef}
+            className="flex gap-5 overflow-x-auto py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            {extendedList.map((item, idx) => (
-              <div
-                key={`${item.name}-${idx}`}
-                className="shrink-0 px-3 sm:px-3.5"
-                style={{ width: `${100 / visibleCount}%` }}
-              >
-                <div className="group relative flex h-full min-h-[290px] flex-col justify-between overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50/70 p-7 transition-[border-color,box-shadow] duration-300 hover:border-sky-200 hover:shadow-xl hover:shadow-[#002b5b]/[0.06] sm:p-8">
-                  <Quote className="pointer-events-none absolute right-6 top-6 h-8 w-8 text-sky-100 transition-colors duration-300 group-hover:text-sky-200" />
+            {duplicatedTestimonials.map((item, index) => {
+              const isDuplicate = index >= testimonials.length;
 
-                  <div className="relative z-10 space-y-4">
-                    <div className="flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-3.5 w-3.5 ${i < (item.rating || 5)
-                            ? "fill-amber-400 text-amber-400"
-                            : "fill-slate-200 text-slate-200"
-                            }`}
-                        />
-                      ))}
+              return (
+                <article
+                  key={`${item.name}-${index}`}
+                  aria-hidden={isDuplicate}
+                  className="group relative flex w-[290px] shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-[#0077b6]/40 hover:shadow-xl hover:shadow-[#002b5b]/10 sm:w-[340px] lg:w-[360px]"
+                >
+                  {/* Top Accent */}
+                  <div className="h-1 w-full bg-slate-100">
+                    <div className="h-full w-1/3 bg-[#0077b6] transition-all duration-500 group-hover:w-full" />
+                  </div>
+
+                  <div className="flex flex-1 flex-col p-5 sm:p-6">
+                    {/* Rating + Quote */}
+                    <div className="flex items-center justify-between">
+                      <div
+                        className="flex items-center gap-1"
+                        aria-label={`${item.rating ?? 5} out of 5 stars`}
+                      >
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`h-4 w-4 ${star <= (item.rating ?? 5)
+                              ? "fill-amber-400 text-amber-400"
+                              : "fill-slate-200 text-slate-200"
+                              }`}
+                          />
+                        ))}
+                      </div>
+
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0077b6]/8 text-[#0077b6] transition-colors duration-300 group-hover:bg-[#002b5b] group-hover:text-white">
+                        <Quote className="h-4 w-4" />
+                      </div>
                     </div>
 
-                    <p className="text-xs font-normal leading-relaxed text-slate-700 sm:text-sm">
-                      &ldquo;{item.text}&rdquo;
+                    {/* Review */}
+                    <p className="mt-5 flex-1 text-sm leading-7 text-slate-600">
+                      “{item.text}”
                     </p>
-                  </div>
 
-                  <div className="relative z-10 mt-6 flex items-center gap-3.5 border-t border-slate-200/70 pt-5">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      loading="lazy"
-                      className="h-12 w-12 shrink-0 rounded-full object-cover ring-2 ring-sky-100"
-                    />
+                    {/* Student Profile */}
+                    <div className="mt-6 flex items-center gap-3 border-t border-slate-100 pt-5">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        loading="lazy"
+                        decoding="async"
+                        draggable={false}
+                        className="h-12 w-12 shrink-0 rounded-xl object-cover ring-2 ring-slate-100 transition-all duration-300 group-hover:ring-[#0077b6]/30"
+                      />
 
-                    <div className="min-w-0">
-                      <h4 className="truncate text-sm font-bold text-[#002b5b] transition-colors duration-300 group-hover:text-[#0077b6]">
-                        {item.name}
-                      </h4>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="truncate text-sm font-bold text-[#002b5b]">
+                          {item.name}
+                        </h3>
+                        <p className="mt-1 truncate text-xs font-medium text-slate-500">
+                          {item.role}
+                        </p>
+                      </div>
 
-                      <p className="mt-0.5 truncate text-xs font-medium text-slate-500">
-                        {item.role}
-                      </p>
+                      <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-300 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#0077b6]" />
                     </div>
                   </div>
-                </div>
-              </div>
-            ))}
+                </article>
+              );
+            })}
           </div>
         </motion.div>
+
+        {/* Bottom Note */}
+        <div className="flex items-center justify-center gap-2 text-xs font-medium text-slate-400">
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${isPaused ? "bg-amber-400" : "animate-pulse bg-[#0077b6]"
+              }`}
+          />
+          {isPaused
+            ? "Take your time to read the reviews"
+            : "Explore more student experiences"}
+        </div>
       </div>
-    </section >
+    </section>
   );
 }
